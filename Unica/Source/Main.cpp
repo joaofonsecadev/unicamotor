@@ -1,7 +1,17 @@
-#include "iostream"
+// Copyright João Fonseca, All Rights Reserved.
 
+#include "Engine/UnicaEngine.h"
+
+UnicaEngine GEngine;
 int main(int argc, char* argv[])
 {
-    std::cout << "It works" << std::endl;
+    GEngine.Init();
+    
+    while (!GEngine.GetRequestedExit())
+    {
+        GEngine.Tick();
+    }
+
+    GEngine.Exit();
     return 0;
 }
