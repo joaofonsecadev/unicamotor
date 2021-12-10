@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-void Logger::Log(const LogLevel LogLevel, const string& Text)
+void Logger::Log(const LogLevel LogLevel, const string Text)
 {
     std::cout << Text << std::endl;
 }

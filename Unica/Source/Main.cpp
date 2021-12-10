@@ -2,16 +2,18 @@
 
 #include "Engine/UnicaEngine.h"
 
-UnicaEngine GEngine;
+
 int main(int argc, char* argv[])
 {
-    GEngine.Init();
+    UnicaEngine EngineInstance;
     
-    while (!GEngine.GetRequestedExit())
+    EngineInstance.Init();
+    
+    while (!EngineInstance.GetRequestedExit())
     {
-        GEngine.Tick();
+        EngineInstance.Tick();
     }
 
-    GEngine.Exit();
+    EngineInstance.Exit();
     return 0;
 }

@@ -6,16 +6,22 @@
 
 void UnicaEngine::Init()
 {
-    Logger::Log(Log, "Initiating engine");
+    Logger::Log(Log, "Initiating engine...");
+
+    m_Renderer = Renderer();
+    m_EventHandler = EventHandler();
+
+    m_EventHandler.Init(this);
+    m_Renderer.Init(this);
 }
 
 void UnicaEngine::Tick()
 {
-    Logger::Log(Log, "Ticking engine");
-    m_bRequestedExit = true;
+    m_EventHandler.Tick();
+    m_Renderer.Tick();
 }
 
 void UnicaEngine::Exit()
 {
-    Logger::Log(Log, "Exiting engine");
+    Logger::Log(Log, "Exiting engine...");
 }

@@ -15,5 +15,5 @@ enum LogLevel : uint8
 class Logger
 {
 public:
-    static void Log(LogLevel LogLevel, const string& Text);
+    static void Log(LogLevel LogLevel, string Text);
 };
