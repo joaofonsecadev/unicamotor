@@ -16,9 +16,12 @@ public:
     void Init(UnicaEngine* const EngineInstance);
     void Tick() override { }
 
+    SDL_Window* GetSDLWindow() const { return m_SDLWindow; }
+    SDL_Renderer* GetSDLRenderer() const { return m_SDLRenderer; }
+
 private:
     UnicaEngine* m_EngineInstance = nullptr;
 
-    SDL_Window* m_Window = nullptr;
-    SDL_Renderer* m_Renderer = nullptr;
+    SDL_Window* m_SDLWindow = nullptr;
+    SDL_Renderer* m_SDLRenderer = nullptr;
 };

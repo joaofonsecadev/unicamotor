@@ -2,6 +2,8 @@
 
 #include "UnicaEngine.h"
 
+#include "SDL.h"
+
 #include "Log/Log.h"
 
 void UnicaEngine::Init()
@@ -24,4 +26,8 @@ void UnicaEngine::Tick()
 void UnicaEngine::Exit()
 {
     Logger::Log(Log, "Exiting engine...");
+    
+    SDL_DestroyWindow(m_Renderer.GetSDLWindow());
+    SDL_DestroyRenderer(m_Renderer.GetSDLRenderer());
+    SDL_Quit();
 }
