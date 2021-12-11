@@ -19,6 +19,6 @@ public:
 private:
     bool m_bRequestedExit = false;
 
-    Renderer m_Renderer;
-    EventHandler m_EventHandler;
+    Renderer m_Renderer = Renderer();
+    EventHandler m_EventHandler = EventHandler();
 };

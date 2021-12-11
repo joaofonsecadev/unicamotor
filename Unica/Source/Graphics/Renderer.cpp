@@ -7,9 +7,9 @@
 
 void Renderer::Init(UnicaEngine* const EngineInstance)
 {
-    Logger::Log(Log, "Initiating renderer...");
+    EngineCoreComponent::Init(EngineInstance);
     
-    m_EngineInstance = EngineInstance;
+    Logger::Log(Log, "Initiating renderer...");
 
     SDL_InitSubSystem(SDL_INIT_VIDEO);
     m_SDLWindow = SDL_CreateWindow("UnicaEngine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 900, SDL_WINDOW_VULKAN);

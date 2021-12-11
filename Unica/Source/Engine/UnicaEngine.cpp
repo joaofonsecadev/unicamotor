@@ -9,9 +9,6 @@ void UnicaEngine::Init()
 {
     Logger::Log(Log, "Initiating engine...");
 
-    m_Renderer = Renderer();
-    m_EventHandler = EventHandler();
-
     m_EventHandler.Init(this);
     m_Renderer.Init(this);
 }

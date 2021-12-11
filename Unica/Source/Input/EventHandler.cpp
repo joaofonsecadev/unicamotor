@@ -10,11 +10,12 @@ void EventHandler::Tick()
 {
     SDL_Event Event;
     SDL_PollEvent(&Event);
+    UnicaEngine* EngineInstance = GetEngineInstance();
 
     switch (Event.type)
     {
     case SDL_QUIT:
-        m_EngineInstance->RequestExit();
+        EngineInstance->RequestExit();
         break;
 
     default:

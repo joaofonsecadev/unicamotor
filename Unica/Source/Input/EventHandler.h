@@ -2,17 +2,12 @@
 
 #pragma once
 
-#include "Interfaces/EngineCoreComponent.h"
+#include "Engine/EngineCoreComponent.h"
 
 class UnicaEngine;
 
-class EventHandler : IEngineCoreComponent
+class EventHandler : public EngineCoreComponent
 {
 public:
-    EventHandler() { }
-    void Init(UnicaEngine* const EngineInstance) {  m_EngineInstance = EngineInstance; }
     void Tick() override;
-
-private:
-    UnicaEngine* m_EngineInstance = nullptr;
 };
