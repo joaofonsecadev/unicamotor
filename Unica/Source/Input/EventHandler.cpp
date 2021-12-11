@@ -1,9 +1,10 @@
 // Copyright João Fonseca, All Rights Reserved.
 
 #include "EventHandler.h"
+
 #include "SDL.h"
+
 #include "Engine/UnicaEngine.h"
-#include "Log/Log.h"
 
 void EventHandler::Tick()
 {

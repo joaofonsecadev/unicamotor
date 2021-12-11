@@ -1,10 +1,9 @@
 // Copyright João Fonseca, All Rights Reserved.
 
 #include "UnicaEngine.h"
+#include "Core/UnicaPch.h"
 
 #include "SDL.h"
-
-#include "Log/Log.h"
 
 void UnicaEngine::Init()
 {

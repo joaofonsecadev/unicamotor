@@ -1,6 +1,7 @@
 // Copyright João Fonseca, All Rights Reserved.
 
 #pragma once
+
 #include "Interfaces/EngineCoreComponent.h"
 
 class UnicaEngine;

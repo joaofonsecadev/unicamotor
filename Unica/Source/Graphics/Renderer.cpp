@@ -1,8 +1,9 @@
 // Copyright João Fonseca, All Rights Reserved.
 
 #include "Renderer.h"
+#include "Core/UnicaPch.h"
+
 #include "SDL.h"
-#include "Log/Log.h"
 
 void Renderer::Init(UnicaEngine* const EngineInstance)
 {

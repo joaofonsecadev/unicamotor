@@ -2,7 +2,6 @@
 
 #include "Engine/UnicaEngine.h"
 
-
 int main(int argc, char* argv[])
 {
     UnicaEngine EngineInstance;
