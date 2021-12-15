@@ -6,6 +6,9 @@ project "Unica"
     targetdir ("../Build/" .. outputdir .. "/%{prj.name}")
     objdir ("../Intermediate/" .. outputdir .. "%{prj.name}")
 
+    pchheader "UnicaPch.h"
+    pchsource "Source/Core/UnicaPch.cpp"
+
     files
     {
         "Config/**.ini",
@@ -16,6 +19,12 @@ project "Unica"
     includedirs
     {
         "Source",
+        "Libraries/glfw/glfw/include/GLFW"
+    }
+
+    links
+    {
+        "glfw"
     }
 
 filter "configurations:Debug"
