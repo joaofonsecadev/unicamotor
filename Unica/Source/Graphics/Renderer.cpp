@@ -7,5 +7,5 @@ void Renderer::Init(UnicaEngine* const EngineInstance)
 {
     EngineCoreComponent::Init(EngineInstance);
     
-    Logger::Log(Log, "Initiating renderer...");
+    UNICA_LOG(Log, "Initiating renderer...");
 }

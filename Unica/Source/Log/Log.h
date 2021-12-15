@@ -17,3 +17,5 @@ class Logger
 public:
     static void Log(LogLevel LogLevel, string Text);
 };
+
+#define UNICA_LOG(...) Logger::Log(__VA_ARGS__)
