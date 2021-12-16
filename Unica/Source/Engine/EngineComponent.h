@@ -4,10 +4,10 @@
 
 class UnicaEngine;
 
-class EngineCoreComponent
+class EngineComponent
 {
 public:
-    virtual ~EngineCoreComponent() { }
+    virtual ~EngineComponent() { }
     virtual void Init(UnicaEngine* EngineInstance) { m_EngineInstance = EngineInstance; }
     virtual void Tick() { }
 

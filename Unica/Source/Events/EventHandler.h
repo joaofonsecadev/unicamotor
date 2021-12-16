@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "Engine/EngineCoreComponent.h"
+#include "Engine/EngineComponent.h"
 
 class UnicaEngine;
 
-class EventHandler : public EngineCoreComponent
+class EventHandler : public EngineComponent
 {
 public:
     void Tick() override;

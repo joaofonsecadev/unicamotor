@@ -5,7 +5,8 @@
 
 void Renderer::Init(UnicaEngine* const EngineInstance)
 {
-    EngineCoreComponent::Init(EngineInstance);
-    
+    EngineComponent::Init(EngineInstance);
     UNICA_LOG(Log, "Initiating renderer...");
+    
+    m_Window.Init();
 }
