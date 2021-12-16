@@ -13,7 +13,8 @@ class Renderer : public EngineComponent
 public:
     Renderer() { }
     void Init(UnicaEngine* EngineInstance) override;
-
+    void Tick() override;
+    
 private:
     Window m_Window;
 };

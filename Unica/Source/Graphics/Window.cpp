@@ -24,6 +24,11 @@ void Window::Init()
     m_Window = glfwCreateWindow(m_WindowWidth, m_WindowHeight, m_WindowTitle.c_str(), m_Monitor, nullptr);
 }
 
+void Window::Tick()
+{
+    glfwPollEvents();
+}
+
 Window::~Window()
 {
     glfwDestroyWindow(m_Window);

@@ -9,7 +9,7 @@ class EngineComponent
 public:
     virtual ~EngineComponent() { }
     virtual void Init(UnicaEngine* EngineInstance) { m_EngineInstance = EngineInstance; }
-    virtual void Tick() { }
+    virtual void Tick() = 0;
 
     UnicaEngine* GetEngineInstance() const { return m_EngineInstance; }
 

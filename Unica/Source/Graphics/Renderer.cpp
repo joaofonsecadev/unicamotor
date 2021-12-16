@@ -10,3 +10,8 @@ void Renderer::Init(UnicaEngine* const EngineInstance)
     
     m_Window.Init();
 }
+
+void Renderer::Tick()
+{
+    m_Window.Tick();
+}
