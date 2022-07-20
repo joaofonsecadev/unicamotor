@@ -1,48 +1,62 @@
-#!/usr/bin/python
-
 import os
 import sys
 import time
+import platform
 import subprocess
 
 startTime = time.time()
-bPrintTime = True
+
+helpText = "\n\
+Run the script without any commands to generate project files adequate for your system (Windows: Visual Studio 2019; MacOS: XCode 4).\n\n\
+The following arguments are accepted:\n\
+-h: Print this text.\n"
+
+# 'Linux', 'Darwin', 'Java', 'Windows'
+systemType = platform.system();
+
+premakeTool = ""
+projectType = ""
 argList = sys.argv[1:]
+buildHelperDir = os.path.dirname(__file__)
 
-currentDir = os.getcwd()
-riderDir = os.path.dirname("C:\Program Files\JetBrains\Rider for Unreal Engine 2021.2.1\\bin\\")
+# Make sure we are in the right directory
+os.chdir(buildHelperDir)
+os.chdir('..')
 
-riderFile = os.path.join(riderDir, "rider64.exe")
-solutionFile = os.path.join(currentDir, "Unica.sln")
-premakeFile = os.path.join(os.path.dirname(__file__), "premake5.exe")
+def generateProject():
+    subprocess.run([premakeTool, projectType])
 
-def disableExecutionTimer():
-    global bPrintTime
-    bPrintTime = False
+def endExecution():
+    print("Execution finished in {0} seconds".format(time.time() - startTime))
+    sys.exit()
 
-def printHelpText():
-    print("Help Text")
+if sys.version_info < (3, 10):
+    print('Python 3.10 or greater is required.')
+    endExecution()
+
+if systemType == 'Windows':
+    premakeTool = os.path.join(buildHelperDir, 'Windows\premake5.exe')
+    projectType = 'vs2019'
+elif systemType == 'Darwin':
+    premakeTool = os.path.join(buildHelperDir, 'MacOS/premake5')
+    projectType = 'xcode4'
+else:
+    print('System {0} not supported'.format(systemType))
+    endExecution()
 
 if (len(argList) < 1):
-    print("No command provided.\nTry -h for a list of possible commands.")
-    disableExecutionTimer()
+    generateProject()
 
 for arg in argList:
     match arg:
         case "-h":
-            printHelpText()
-            disableExecutionTimer()
+            print(helpText)
 
-        case "-generate":
-            subprocess.run([premakeFile, "vs2022"])
-
-        case "-rider":
-            subprocess.Popen([riderFile, solutionFile])
+        case "-gmake":
+            projectType = 'gmake2'
+            generateProject()
 
         case _:
-            print("Invalid command.\nTry -h for a list of possible commands.")
-            disableExecutionTimer()
+            print("Invalid command.\nTry -h for some useful information on how to run this script.")
 
-if (bPrintTime):
-    print("Execution finished in {0} seconds".format(time.time() - startTime))
-
+endExecution()

@@ -10,8 +10,4 @@ workspace "Unica"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-group "Dependencies"
-    include "Unica/Libraries/glfw"
-group ""
-
 include "Unica"

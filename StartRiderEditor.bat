@@ -1,1 +1,0 @@
-python ./Utilities/Build.py -generate -rider

@@ -1,9 +1,12 @@
 .vs/
 .idea/
 .vscode/
+.DS_Store
 
 Build/
 Intermediate/
 
 **.vcxproj*
 **.sln
+**.xcworkspace
+**.xcodeproj
