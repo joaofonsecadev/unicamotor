@@ -1,3 +1,0 @@
-[submodule "Unica/Libraries/glfw/glfw"]
-	path = Unica/Libraries/glfw/glfw
-	url = git@github.com:glfw/glfw.git
