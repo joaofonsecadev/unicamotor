@@ -9,7 +9,8 @@ startTime = time.time()
 helpText = "\n\
 Run the script without any commands to generate project files adequate for your system (Windows: Visual Studio 2019; MacOS: XCode 4).\n\n\
 The following arguments are accepted:\n\
--h: Print this text.\n"
+-h: Print this text.\n\
+-gmake: Generate GNU Make project files.\n"
 
 # 'Linux', 'Darwin', 'Java', 'Windows'
 systemType = platform.system();
@@ -41,7 +42,7 @@ elif systemType == 'Darwin':
     premakeTool = os.path.join(buildHelperDir, 'MacOS/premake5')
     projectType = 'xcode4'
 else:
-    print('System {0} not supported'.format(systemType))
+    print('System "{0}" not supported'.format(systemType))
     endExecution()
 
 if (len(argList) < 1):
