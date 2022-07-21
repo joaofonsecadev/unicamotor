@@ -12,3 +12,4 @@ Intermediate/
 **.xcodeproj
 CMakeLists.txt
 Unica/Unica.cmake
+.cache

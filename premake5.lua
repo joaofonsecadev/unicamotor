@@ -6,7 +6,7 @@ workspace "Unica"
     configurations
     {
         "Debug",
-        "Shipping"
+        "Release"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"

@@ -22,6 +22,6 @@ filter "configurations:Debug"
     defines "UNICA_DEBUG"
     symbols "on"
 
-filter "configurations:Shipping"
-    defines "UNICA_SHIPPING"
+filter "configurations:Release"
+    defines "UNICA_RELEASE"
     optimize "on"
