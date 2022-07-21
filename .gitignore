@@ -10,3 +10,5 @@ Intermediate/
 **.sln
 **.xcworkspace
 **.xcodeproj
+CMakeLists.txt
+Unica/Unica.cmake

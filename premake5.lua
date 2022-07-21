@@ -1,3 +1,4 @@
+require("cmake")
 workspace "Unica"
     architecture "x64"
     startproject "Unica"

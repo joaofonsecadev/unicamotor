@@ -36,10 +36,10 @@ if sys.version_info < (3, 10):
     endExecution()
 
 if systemType == 'Windows':
-    premakeTool = os.path.join(buildHelperDir, 'Windows\premake5.exe')
+    premakeTool = os.path.join(buildHelperDir, 'premake5\premake5.exe')
     projectType = 'vs2019'
 elif systemType == 'Darwin':
-    premakeTool = os.path.join(buildHelperDir, 'MacOS/premake5')
+    premakeTool = os.path.join(buildHelperDir, 'premake5/premake5')
     projectType = 'xcode4'
 else:
     print('System "{0}" not supported'.format(systemType))
@@ -47,17 +47,27 @@ else:
 
 if (len(argList) < 1):
     generateProject()
+    endExecution()
 
 for arg in argList:
     match arg:
         case "-h":
             print(helpText)
 
+        case "-vstudio":
+            projectType = 'vs2019'
+
+        case "-xcode":
+            projectType = 'xcode4'
+
+        case "-cmake":
+            projectType = 'cmake'
+
         case "-gmake":
             projectType = 'gmake2'
-            generateProject()
 
         case _:
             print("Invalid command.\nTry -h for some useful information on how to run this script.")
 
+generateProject()
 endExecution()
