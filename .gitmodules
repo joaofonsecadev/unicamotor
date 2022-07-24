@@ -1,3 +1,0 @@
-[submodule "Utilities/premake5/cmake"]
-	path = Utilities/premake5/cmake
-	url = git@github.com:Enhex/premake-cmake.git
