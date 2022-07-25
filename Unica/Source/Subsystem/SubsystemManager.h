@@ -3,6 +3,7 @@
 #pragma once
 
 #include <stack>
+#include <memory>
 #include <type_traits>
 
 #include "SubsystemBase.h"

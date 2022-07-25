@@ -1,11 +1,12 @@
 // Copyright joaofonseca.dev, All Rights Reserved.
 
+#include <memory>
 #include "SubsystemManager.h"
 #include "Timer/TimeManager.h"
 
 void SubsystemManager::Init()
 {
-    m_SubsystemCollection.push(std::unique_ptr<TimeManager>());
+    m_SubsystemCollection.push(std::make_unique<TimeManager>());
 }
 
 void SubsystemManager::Shutdown()
