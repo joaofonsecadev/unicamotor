@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "Core/UnicaMinimal.h"
+#include <string>
+#include "UnicaMinimal.h"
 
 enum LogLevel : uint8
 {

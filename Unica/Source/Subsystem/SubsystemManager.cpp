@@ -1,10 +1,11 @@
 // Copyright joaofonseca.dev, All Rights Reserved.
 
-#include <memory>
 #include "SubsystemManager.h"
+
+#include <memory>
 #include "Timer/TimeManager.h"
 
-std::stack<std::unique_ptr<SubsystemBase>> SubsystemManager::m_SubsystemCollection;
+std::vector<std::unique_ptr<SubsystemBase>> SubsystemManager::m_SubsystemCollection;
 
 void SubsystemManager::Init()
 {
@@ -15,15 +16,15 @@ void SubsystemManager::Shutdown()
 {
     while (!m_SubsystemCollection.empty())
     {
-        SubsystemBase* const Subsystem = m_SubsystemCollection.top().get();
+        SubsystemBase* const Subsystem = m_SubsystemCollection.back().get();
         Subsystem->Shutdown();
 
-        m_SubsystemCollection.pop();
+        m_SubsystemCollection.pop_back();
     }
 }
 
 void SubsystemManager::InitializeSubsystem(SubsystemBase* const Subsystem)
 {
     Subsystem->Init();
-    m_SubsystemCollection.push(std::unique_ptr<SubsystemBase>(Subsystem));
+    m_SubsystemCollection.push_back(std::unique_ptr<SubsystemBase>(Subsystem));
 }

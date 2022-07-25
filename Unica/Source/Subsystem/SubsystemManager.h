@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <stack>
+#include <vector>
 #include <memory>
-// #include <type_traits>
-
+#include <type_traits>
+#include "UnicaMinimal.h"
 #include "SubsystemBase.h"
 
 class SubsystemManager
@@ -13,26 +13,23 @@ class SubsystemManager
 public:
     void Init();
     void Shutdown();
-
-    /*
+    
     template <typename T, std::enable_if_t<std::is_base_of_v<SubsystemBase, T>, std::nullptr_t> = nullptr>
     static T* GetSubsystem()
     {
-        std::stack<std::unique_ptr<SubsystemBase>> SubsystemCollection = m_SubsystemCollection;
-        while (!SubsystemCollection.empty())
+        for (const std::unique_ptr<SubsystemBase>& Subsystem : m_SubsystemCollection)
         {
-            T* Subsystem = static_cast<T*>(SubsystemCollection.top().get());
-            if (Subsystem != nullptr)
+            const T* const CastedSubsystem = static_cast<T*>(Subsystem.get());
+            if (CastedSubsystem != nullptr)
             {
-                return Subsystem;
+                return CastedSubsystem;
             }
-            SubsystemCollection.pop();
         }
         return nullptr;
-    }*/
+    }
     
 private:
     void InitializeSubsystem(SubsystemBase* Subsystem);
     
-    static std::stack<std::unique_ptr<SubsystemBase>> m_SubsystemCollection;
+    static std::vector<std::unique_ptr<SubsystemBase>> m_SubsystemCollection;
 };

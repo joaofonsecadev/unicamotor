@@ -14,7 +14,7 @@ set(SourceFiles
 )
 
 add_executable("Unica" ${SourceFiles})
-target_include_directories("Unica" PUBLIC Source/)
+target_include_directories("Unica" PUBLIC Source/ Source/Core)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})

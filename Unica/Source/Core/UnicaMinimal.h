@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <string>
-
 typedef signed char         int8;
 typedef short               int16;
 typedef int                 int32;
