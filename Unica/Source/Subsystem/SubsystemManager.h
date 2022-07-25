@@ -4,7 +4,7 @@
 
 #include <stack>
 #include <memory>
-#include <type_traits>
+// #include <type_traits>
 
 #include "SubsystemBase.h"
 
@@ -32,5 +32,7 @@ public:
     }*/
     
 private:
-    std::stack<std::unique_ptr<SubsystemBase>> m_SubsystemCollection;
+    void InitializeSubsystem(SubsystemBase* Subsystem);
+    
+    static std::stack<std::unique_ptr<SubsystemBase>> m_SubsystemCollection;
 };

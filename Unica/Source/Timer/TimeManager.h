@@ -6,9 +6,6 @@
 
 class TimeManager final : public SubsystemBase
 {
-public:
-    TimeManager() { Init(); }
-
 private:
     void Init() override;
     void Shutdown() override;

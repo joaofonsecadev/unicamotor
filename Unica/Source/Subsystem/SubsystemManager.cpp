@@ -4,18 +4,26 @@
 #include "SubsystemManager.h"
 #include "Timer/TimeManager.h"
 
+std::stack<std::unique_ptr<SubsystemBase>> SubsystemManager::m_SubsystemCollection;
+
 void SubsystemManager::Init()
 {
-    m_SubsystemCollection.push(std::make_unique<TimeManager>());
+    InitializeSubsystem(new TimeManager);
 }
 
 void SubsystemManager::Shutdown()
 {
-    while (!SubsystemManager::m_SubsystemCollection.empty())
+    while (!m_SubsystemCollection.empty())
     {
-        SubsystemBase* const Subsystem = SubsystemManager::m_SubsystemCollection.top().get();
+        SubsystemBase* const Subsystem = m_SubsystemCollection.top().get();
         Subsystem->Shutdown();
 
-        SubsystemManager::m_SubsystemCollection.pop();
+        m_SubsystemCollection.pop();
     }
+}
+
+void SubsystemManager::InitializeSubsystem(SubsystemBase* const Subsystem)
+{
+    Subsystem->Init();
+    m_SubsystemCollection.push(std::unique_ptr<SubsystemBase>(Subsystem));
 }
