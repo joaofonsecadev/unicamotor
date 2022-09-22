@@ -23,6 +23,9 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
     source_group(${GroupPath} FILES ${SourceFile})
 endforeach()
 
+add_subdirectory("Libraries/fmt")
+target_link_libraries("Unica" fmt::fmt)
+
 # @TODO
 #
 # targetdir ("../Build/" .. outputdir .. "/%{prj.name}")

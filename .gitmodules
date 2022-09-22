@@ -1,0 +1,3 @@
+[submodule "Unica/Libraries/fmt"]
+	path = Unica/Libraries/fmt
+	url = git@github.com:fmtlib/fmt.git
