@@ -14,15 +14,15 @@ void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::s
         case ::Log:
             break;
         case Warning:
-            LogLevelInfoName = "[Warning] ";
+            LogLevelInfoName = "[WARNG] ";
             LogLevelTextStyle = fg(fmt::color::yellow);
             break;
         case Error:
-            LogLevelInfoName = "[Error] ";
+            LogLevelInfoName = "[ERROR] ";
             LogLevelTextStyle = fg(fmt::color::red);
             break;
         case Fatal:
-            LogLevelInfoName = "[Fatal] ";
+            LogLevelInfoName = "[FATAL] ";
             LogLevelTextStyle = fg(fmt::color::dark_magenta) | fmt::emphasis::bold;
             break;
     }
