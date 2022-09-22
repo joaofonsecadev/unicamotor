@@ -3,9 +3,8 @@
 #pragma once
 
 #include <string>
-#include "UnicaMinimal.h"
 
-enum LogLevel : uint8
+enum LogLevel : uint8_t
 {
     Log,
     Warning,

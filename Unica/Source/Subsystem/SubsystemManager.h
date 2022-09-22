@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include <type_traits>
-#include "UnicaMinimal.h"
 #include "SubsystemBase.h"
 
 class SubsystemManager
