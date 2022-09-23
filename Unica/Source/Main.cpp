@@ -1,29 +1,18 @@
 // Copyright joaofonseca.dev, All Rights Reserved.
 
-#include <csignal>
-#include "Log/Logger.h"
+#include "UnicaInstance.h"
 #include "Subsystem/SubsystemManager.h"
-
-// Temporary way oh handling CRTL+C
-void SignalCallbackHandler(int signum)
-{
-    SubsystemManager::RequestEngineExit();
-    // Hacky force of a newline
-    UNICA_LOG(Log, "", "");
-}
 
 int main(int argc, char* argv[])
 {
-    signal(SIGINT, SignalCallbackHandler);
+    std::unique_ptr<UnicaInstance>EngineInstance(new class UnicaInstance);
+    EngineInstance->Init();
 
-    std::unique_ptr<SubsystemManager>SystemManager(new class SubsystemManager);
-    SystemManager->Init();
-
-    while (!SubsystemManager::HasRequestedExit())
+    while (!UnicaInstance::HasRequestedExit())
     {
-        SystemManager->TickSubsystems();
+        EngineInstance->Tick();
     }
 
-    SystemManager->Shutdown();
+    EngineInstance->Shutdown();
     return 0;
 }

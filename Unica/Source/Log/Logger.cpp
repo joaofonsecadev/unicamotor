@@ -1,7 +1,7 @@
 // Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "Logger.h"
-#include "Subsystem/SubsystemManager.h"
+#include "UnicaInstance.h"
 #include "fmt/printf.h"
 #include "fmt/color.h"
 
@@ -32,7 +32,7 @@ void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::s
 
     if (LogLevel == Fatal)
     {
-        SubsystemManager::RequestEngineExit();
+        UnicaInstance::RequestExit();
     }
 }
 

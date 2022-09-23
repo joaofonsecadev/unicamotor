@@ -13,9 +13,6 @@ public:
     void Init();
     void Shutdown();
     void TickSubsystems();
-
-    static bool HasRequestedExit() { return m_bHasRequestedExit; }
-    static void RequestEngineExit() { m_bHasRequestedExit = true; }
     
     template <typename T, std::enable_if_t<std::is_base_of_v<SubsystemBase, T>, std::nullptr_t> = nullptr>
     static T* GetSubsystem()
@@ -34,6 +31,4 @@ public:
 private:
     void InitializeSubsystem(SubsystemBase* Subsystem);
     static std::vector<std::unique_ptr<SubsystemBase>> m_SubsystemCollection;
-
-    static bool m_bHasRequestedExit;
 };

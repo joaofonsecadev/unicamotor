@@ -7,9 +7,7 @@
 #include "Timer/TimeManager.h"
 #include "fmt/format.h"
 
-bool SubsystemManager::m_bHasRequestedExit = false;
 std::vector<std::unique_ptr<SubsystemBase>> SubsystemManager::m_SubsystemCollection;
-
 void SubsystemManager::Init()
 {
     InitializeSubsystem(new TimeManager);
@@ -39,7 +37,7 @@ void SubsystemManager::TickSubsystems()
 {
     for (const std::unique_ptr<SubsystemBase>& Subsystem : m_SubsystemCollection)
     {
-        if (!Subsystem->IsTicking())
+        if (!Subsystem->ShouldTick())
         {
             continue;
         }

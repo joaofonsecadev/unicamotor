@@ -7,6 +7,8 @@
 #include "fmt/color.h"
 #include "Log/Logger.h"
 
+float TimeManager::m_DeltaTimeSeconds;
+
 void TimeManager::Init()
 {
     if (std::chrono::high_resolution_clock::period::den != std::nano::den)

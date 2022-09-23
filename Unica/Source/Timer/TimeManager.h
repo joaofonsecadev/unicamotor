@@ -15,7 +15,7 @@ private:
     void Init() override;
     void Tick() override;
     void Shutdown() override { }
-    bool IsTicking() override { return true; }
+    bool ShouldTick() override { return true; }
 
     uint64 GetNanoSinceEpoch();
     void CalculateLastFrameTime();

@@ -1,16 +1,18 @@
 cmake_minimum_required(VERSION 3.21)
 
 set(SourceFiles
-    Config/DefaultEngine.ini
-    Source/Main.cpp
-    Source/Core/UnicaMinimal.h
-    Source/Log/Logger.cpp
-    Source/Log/Logger.h
-    Source/Subsystem/SubsystemBase.h
-    Source/Subsystem/SubsystemManager.cpp
-    Source/Subsystem/SubsystemManager.h
-    Source/Timer/TimeManager.cpp
-    Source/Timer/TimeManager.h
+        Config/DefaultEngine.ini
+        Source/Main.cpp
+        Source/Core/UnicaInstance.cpp
+        Source/Core/UnicaInstance.h
+        Source/Core/UnicaMinimal.h
+        Source/Log/Logger.cpp
+        Source/Log/Logger.h
+        Source/Subsystem/SubsystemBase.h
+        Source/Subsystem/SubsystemManager.cpp
+        Source/Subsystem/SubsystemManager.h
+        Source/Timer/TimeManager.cpp
+        Source/Timer/TimeManager.h
 )
 
 add_executable("Unica" ${SourceFiles})
