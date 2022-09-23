@@ -9,7 +9,7 @@
 class TimeManager final : public SubsystemBase
 {
 public:
-    float GetDeltaTimeInSeconds();
+    static float GetDeltaTimeSeconds() { return m_DeltaTimeSeconds; }
 
 private:
     void Init() override;
@@ -22,4 +22,6 @@ private:
 
     uint64 m_LastFrameTimeNano;
     uint64 m_DeltaTimeNano = 0;
+
+    static float m_DeltaTimeSeconds;
 };

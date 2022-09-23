@@ -20,7 +20,7 @@ void TimeManager::Tick()
 {
     CalculateLastFrameTime();
     fmt::print(fg(fmt::color::white),
-               "\33[2K\r[LogTimeManager] I'm being ticked at {:.0f} fps", 1 / GetDeltaTimeInSeconds());
+               "\33[2K\r[LogTimeManager] I'm being ticked at {:.0f} fps", 1 / GetDeltaTimeSeconds());
 }
 
 uint64 TimeManager::GetNanoSinceEpoch()
@@ -30,12 +30,10 @@ uint64 TimeManager::GetNanoSinceEpoch()
 
 void TimeManager::CalculateLastFrameTime()
 {
-    auto CurrentFrameTime = GetNanoSinceEpoch();
+    uint64 CurrentFrameTime = GetNanoSinceEpoch();
     m_DeltaTimeNano = CurrentFrameTime - m_LastFrameTimeNano;
-    m_LastFrameTimeNano = CurrentFrameTime;
-}
 
-float TimeManager::GetDeltaTimeInSeconds()
-{
-    return (float)m_DeltaTimeNano / 1'000'000'000.f;
+    // Convert Nanoseconds to Seconds
+    m_DeltaTimeSeconds = (float)m_DeltaTimeNano / 1'000'000'000.f;
+    m_LastFrameTimeNano = CurrentFrameTime;
 }
