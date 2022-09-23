@@ -20,10 +20,10 @@ void TimeManager::Tick()
 {
     CalculateLastFrameTime();
     fmt::print(fg(fmt::color::white),
-               "\33[2K\r[LogTimeManager] I'm being ticked at {:.0f} fps", 1/GetDeltaTimeInSeconds());
+               "\33[2K\r[LogTimeManager] I'm being ticked at {:.0f} fps", 1 / GetDeltaTimeInSeconds());
 }
 
-uint64_t TimeManager::GetNanoSinceEpoch()
+uint64 TimeManager::GetNanoSinceEpoch()
 {
     return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
@@ -37,5 +37,5 @@ void TimeManager::CalculateLastFrameTime()
 
 float TimeManager::GetDeltaTimeInSeconds()
 {
-    return (float)m_DeltaTimeNano / 1000000000.f;
+    return (float)m_DeltaTimeNano / 1'000'000'000.f;
 }

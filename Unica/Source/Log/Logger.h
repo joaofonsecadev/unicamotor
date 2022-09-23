@@ -3,10 +3,11 @@
 #pragma once
 
 #include <string>
+#include "UnicaMinimal.h"
 
 #define UNICA_LOG(...) Logger::Log(__VA_ARGS__)
 
-enum LogLevel : uint8_t
+enum LogLevel : uint8
 {
     Log,
     Warning,

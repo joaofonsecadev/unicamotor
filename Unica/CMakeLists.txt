@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 set(SourceFiles
     Config/DefaultEngine.ini
     Source/Main.cpp
+    Source/Core/UnicaMinimal.h
     Source/Log/Logger.cpp
     Source/Log/Logger.h
     Source/Subsystem/SubsystemBase.h
@@ -13,7 +14,7 @@ set(SourceFiles
 )
 
 add_executable("Unica" ${SourceFiles})
-target_include_directories("Unica" PUBLIC Source/)
+target_include_directories("Unica" PUBLIC Source/ Source/Core)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})
