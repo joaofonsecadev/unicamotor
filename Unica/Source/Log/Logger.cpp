@@ -1,6 +1,7 @@
 // Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "Logger.h"
+#include "Subsystem/SubsystemManager.h"
 #include "fmt/printf.h"
 #include "fmt/color.h"
 
@@ -28,5 +29,10 @@ void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::s
     }
 
     fmt::print(LogLevelTextStyle, "{}[{}] {}\n", LogLevelInfoName, LogCategory, LogText);
+
+    if (LogLevel == Fatal)
+    {
+        SubsystemManager::RequestEngineExit();
+    }
 }
 

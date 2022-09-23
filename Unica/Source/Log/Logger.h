@@ -14,11 +14,6 @@ enum LogLevel : uint8_t
     Fatal
 };
 
-namespace LogCategory
-{
-    static std::string SubsystemManager = "SubsystemManager";
-}
-
 class Logger
 {
 public:

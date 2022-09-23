@@ -7,5 +7,7 @@ class SubsystemBase
 public:
     virtual void Init() = 0;
     virtual void Shutdown() = 0;
-    virtual ~SubsystemBase() = default;
+    virtual void Tick() { }
+
+    virtual bool IsTicking() { return false; }
 };
