@@ -2,16 +2,24 @@ import os
 import datetime
 import pathlib
 
-CopyrightDisclaimer = "// 2021-{} Copyright joaofonseca.dev, All Rights Reserved.\n".format(datetime.date.today().year)
+CopyrightDisclaimer = "2021-{} Copyright joaofonseca.dev, All Rights Reserved.\n".format(datetime.date.today().year)
 
 # Make sure we are in the right directory
 FileDirectory = os.path.dirname(__file__)
 os.chdir(FileDirectory)
-os.chdir('../Unica/Source')
+os.chdir('..')
 
-SourceFilesPaths = list(pathlib.Path(os.getcwd()).rglob("./*.*"))
+SourceFilePaths = list(pathlib.Path(os.getcwd()).rglob("Unica/Source/**/*.*"))
+UtilitiesFilePaths = list(pathlib.Path(os.getcwd()).rglob("Utilities/**/*.*"))
 
-for FilePath in SourceFilesPaths:
+AllFilePaths = SourceFilePaths + UtilitiesFilePaths
+
+for FilePath in AllFilePaths:
+    if FilePath.suffix == ".py":
+        CopyrightDisclaimer = "# {}".format(CopyrightDisclaimer)
+    else:
+        CopyrightDisclaimer = "// {}".format(CopyrightDisclaimer)
+
     with open(FilePath.absolute()) as File:
         FileLines = File.readlines()
 
