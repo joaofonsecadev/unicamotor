@@ -1,3 +1,5 @@
+# 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+
 import os
 import datetime
 import pathlib
@@ -16,23 +18,23 @@ AllFilePaths = SourceFilePaths + UtilitiesFilePaths
 
 for FilePath in AllFilePaths:
     if FilePath.suffix == ".py":
-        CopyrightDisclaimer = "# {}".format(CopyrightDisclaimer)
+        AdaptedCopyrightDisclaimer = "# {}".format(CopyrightDisclaimer)
     else:
-        CopyrightDisclaimer = "// {}".format(CopyrightDisclaimer)
+        AdaptedCopyrightDisclaimer = "// {}".format(CopyrightDisclaimer)
 
     with open(FilePath.absolute()) as File:
         FileLines = File.readlines()
 
     FirstLine = FileLines[0]
-    if FirstLine == CopyrightDisclaimer:
+    if FirstLine == AdaptedCopyrightDisclaimer:
         print("\033[90m{}\033[0m".format(FilePath.absolute()))
         continue
 
     if "copyright" in FirstLine.lower():
-        FileLines[0] = CopyrightDisclaimer
+        FileLines[0] = AdaptedCopyrightDisclaimer
     else:
         FileLines.insert(0, "\n")
-        FileLines.insert(0, CopyrightDisclaimer)
+        FileLines.insert(0, AdaptedCopyrightDisclaimer)
 
     with open(FilePath.absolute(), "w") as NewFile:
         NewFile.writelines(FileLines)

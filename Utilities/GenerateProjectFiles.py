@@ -1,3 +1,5 @@
+# 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+
 import os
 import sys
 import time
