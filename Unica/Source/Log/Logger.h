@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+
 #include "UnicaMinimal.h"
 
 #define UNICA_LOG(...) Logger::Log(__VA_ARGS__)

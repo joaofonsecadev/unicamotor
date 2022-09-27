@@ -1,6 +1,9 @@
 // Copyright joaofonseca.dev, All Rights Reserved.
 
+#pragma once
+
 #include <memory>
+
 #include "Subsystem/SubsystemManager.h"
 
 class UnicaInstance

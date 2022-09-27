@@ -1,9 +1,11 @@
 // Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "Logger.h"
-#include "UnicaInstance.h"
+
 #include "fmt/printf.h"
 #include "fmt/color.h"
+
+#include "UnicaInstance.h"
 
 void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::string& LogText)
 {

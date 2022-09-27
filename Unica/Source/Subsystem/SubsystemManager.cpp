@@ -3,9 +3,11 @@
 #include "SubsystemManager.h"
 
 #include <memory>
+
+#include "fmt/format.h"
+
 #include "Log/Logger.h"
 #include "Timer/TimeManager.h"
-#include "fmt/format.h"
 
 std::vector<std::unique_ptr<SubsystemBase>> SubsystemManager::m_SubsystemCollection;
 void SubsystemManager::Init()

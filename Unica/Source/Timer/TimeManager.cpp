@@ -4,7 +4,9 @@
 
 #include <ratio>
 #include <chrono>
+
 #include "fmt/color.h"
+
 #include "Log/Logger.h"
 
 float TimeManager::m_DeltaTimeSeconds;
