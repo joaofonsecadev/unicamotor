@@ -14,9 +14,7 @@ set(SourceFiles
         Source/Timer/TimeManager.cpp
         Source/Timer/TimeManager.h
 )
-
 add_executable("Unica" ${SourceFiles})
-target_include_directories("Unica" PUBLIC Source/ Source/Core)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})
@@ -26,8 +24,23 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
     source_group(${GroupPath} FILES ${SourceFile})
 endforeach()
 
+# Libraries
 add_subdirectory("Libraries/fmt")
-target_link_libraries("Unica" fmt::fmt)
+add_subdirectory("Libraries/glm")
+add_subdirectory("Libraries/glfw")
+find_package(Vulkan REQUIRED FATAL_ERROR)
+
+target_include_directories("Unica" PUBLIC
+        Source/
+        Source/Core
+        ${Vulkan_INCLUDE_DIRS}
+)
+target_link_libraries("Unica"
+        glfw
+        fmt::fmt
+        glm::glm
+        ${Vulkan_LIBRARIES}
+)
 
 # @TODO
 #
