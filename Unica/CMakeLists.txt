@@ -8,6 +8,10 @@ set(SourceFiles
         Source/Core/UnicaMinimal.h
         Source/Log/Logger.cpp
         Source/Log/Logger.h
+        Source/Renderer/GameWindow.cpp
+        Source/Renderer/GameWindow.h
+        Source/Renderer/RenderManager.cpp
+        Source/Renderer/RenderManager.h
         Source/Subsystem/SubsystemBase.h
         Source/Subsystem/SubsystemManager.cpp
         Source/Subsystem/SubsystemManager.h

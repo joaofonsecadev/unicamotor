@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-    std::unique_ptr<UnicaInstance>EngineInstance(new class UnicaInstance);
+    std::unique_ptr<UnicaInstance> EngineInstance(new class UnicaInstance);
     EngineInstance->Init();
 
     while (!UnicaInstance::HasRequestedExit())

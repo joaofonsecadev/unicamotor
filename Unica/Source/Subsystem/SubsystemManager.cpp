@@ -8,11 +8,13 @@
 
 #include "Log/Logger.h"
 #include "Timer/TimeManager.h"
+#include "Renderer/RenderManager.h"
 
 std::vector<std::unique_ptr<SubsystemBase>> SubsystemManager::m_SubsystemCollection;
 void SubsystemManager::Init()
 {
     InitializeSubsystem(new TimeManager);
+    InitializeSubsystem(new RenderManager);
 }
 
 void SubsystemManager::InitializeSubsystem(SubsystemBase* const Subsystem)
