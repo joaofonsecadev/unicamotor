@@ -21,7 +21,7 @@ private:
     uint64 GetNanoSinceEpoch();
     void CalculateLastFrameTime();
 
-    uint64 m_LastFrameTimeNano;
+    uint64 m_LastFrameTimeNano = 0;
     uint64 m_DeltaTimeNano = 0;
 
     static float m_DeltaTimeSeconds;

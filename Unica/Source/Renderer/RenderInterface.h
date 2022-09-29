@@ -12,6 +12,7 @@ public:
 
 private:
     void CreateVulkanInstance();
+    void LogVulkanInstanceExtensions();
 
     VkInstance m_VulkanInstance;
 };

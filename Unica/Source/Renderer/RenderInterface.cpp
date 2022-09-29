@@ -2,7 +2,10 @@
 
 #include "RenderInterface.h"
 
+#include <vector>
+
 #include "GLFW/glfw3.h"
+#include "fmt/format.h"
 
 #include "UnicaMinimal.h"
 
@@ -38,6 +41,24 @@ void RenderInterface::CreateVulkanInstance()
         return;
     }
     UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created successfully");
+
+    LogVulkanInstanceExtensions();
+}
+
+void RenderInterface::LogVulkanInstanceExtensions()
+{
+    uint32 ExtensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, nullptr);
+    std::vector<VkExtensionProperties> ExtensionList(ExtensionCount);
+    vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, ExtensionList.data());
+
+    std::string ExtensionLogString = "Listing available Vulkan extensions:";
+    for (const VkExtensionProperties& Extension : ExtensionList)
+    {
+        ExtensionLogString += fmt::format("\n\t{}", Extension.extensionName);
+    }
+
+    UNICA_LOG(Log, "LogRenderInterface", ExtensionLogString);
 }
 
 RenderInterface::~RenderInterface()
