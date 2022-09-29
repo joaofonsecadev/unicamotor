@@ -31,6 +31,11 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
 endforeach()
 
 # Libraries
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
 add_subdirectory("Libraries/fmt")
 add_subdirectory("Libraries/glm")
 add_subdirectory("Libraries/glfw")
@@ -47,6 +52,7 @@ target_link_libraries("Unica"
         glm::glm
         ${Vulkan_LIBRARIES}
 )
+set_target_properties(glfw update_mappings fmt PROPERTIES FOLDER "Libraries")
 
 # @TODO
 #

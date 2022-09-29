@@ -37,7 +37,7 @@ def ensurecmake():
 def generateproject():
     subprocess.run([ensurecmake(),
                     "-S.",
-                    "-B{0}/Intermediate/CMake".format(os.getcwd()),
+                    "-B{0}/Intermediate".format(os.getcwd()),
                     projectType
                     ])
 
@@ -52,7 +52,7 @@ if sys.version_info < (3, 10):
     endexecution()
 
 if systemType == 'Windows':
-    projectType = '-GVisual Studio 16 2019'
+    projectType = '-GVisual Studio 17 2022'
 elif systemType == 'Darwin':
     projectType = '-GXcode'
 else:
