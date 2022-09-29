@@ -7,8 +7,6 @@
 
 #include "fmt/color.h"
 
-#include "Log/Logger.h"
-
 float TimeManager::m_DeltaTimeSeconds;
 
 void TimeManager::Init()
@@ -23,8 +21,7 @@ void TimeManager::Init()
 void TimeManager::Tick()
 {
     CalculateLastFrameTime();
-    fmt::print(fg(fmt::color::white),
-               "\33[2K\r[LogTimeManager] I'm being ticked at {:.0f} fps", 1 / GetDeltaTimeSeconds());
+    //fmt::print(fg(fmt::color::white), "\33[2K\r[LogTimeManager] I'm being ticked at {:.0f} fps", 1 / GetDeltaTimeSeconds());
 }
 
 uint64 TimeManager::GetNanoSinceEpoch()

@@ -4,10 +4,11 @@
 
 void RenderManager::Init()
 {
-    m_GameWindow = std::make_unique<GameWindow>();
+    m_RenderWindow = std::make_unique<RenderWindow>();
+    m_RenderInterface = std::make_unique<RenderInterface>();
 }
 
 void RenderManager::Tick()
 {
-    m_GameWindow->Tick();
+    m_RenderWindow->Tick();
 }

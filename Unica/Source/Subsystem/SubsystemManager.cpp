@@ -6,7 +6,6 @@
 
 #include "fmt/format.h"
 
-#include "Log/Logger.h"
 #include "Timer/TimeManager.h"
 #include "Renderer/RenderManager.h"
 

@@ -4,7 +4,7 @@
 
 #include <csignal>
 
-#include "Log/Logger.h"
+#include "UnicaMinimal.h"
 
 bool UnicaInstance::m_bHasRequestedExit = false;
 

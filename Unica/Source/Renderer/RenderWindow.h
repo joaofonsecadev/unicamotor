@@ -7,11 +7,11 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-class GameWindow
+class RenderWindow
 {
 public:
-    GameWindow();
-    ~GameWindow();
+    RenderWindow();
+    ~RenderWindow();
 
     void Tick();
 

@@ -1,10 +1,11 @@
 // 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
 
-#include "GameWindow.h"
+#include "RenderWindow.h"
 
 #include "UnicaInstance.h"
+#include "UnicaMinimal.h"
 
-GameWindow::GameWindow()
+RenderWindow::RenderWindow()
 {
     glfwInit();
 
@@ -12,9 +13,11 @@ GameWindow::GameWindow()
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     m_GlfwWindow = glfwCreateWindow(1280, 900, "Unica Engine", nullptr, nullptr);
+
+    UNICA_LOG(Log, "LogRenderWindow", "Created application window");
 }
 
-void GameWindow::Tick()
+void RenderWindow::Tick()
 {
     if (glfwWindowShouldClose(m_GlfwWindow))
     {
@@ -23,8 +26,10 @@ void GameWindow::Tick()
     glfwPollEvents();
 }
 
-GameWindow::~GameWindow()
+RenderWindow::~RenderWindow()
 {
     glfwDestroyWindow(m_GlfwWindow);
     glfwTerminate();
+
+    UNICA_LOG(Log, "LogRenderWindow", "Destroyed application window");
 }

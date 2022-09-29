@@ -5,7 +5,8 @@
 #include <memory>
 
 #include "Subsystem/SubsystemBase.h"
-#include "GameWindow.h"
+#include "RenderWindow.h"
+#include "RenderInterface.h"
 
 class RenderManager final : public SubsystemBase
 {
@@ -15,5 +16,6 @@ private:
     void Shutdown() override { }
     bool ShouldTick() override { return true; }
 
-    std::unique_ptr<GameWindow> m_GameWindow;
+    std::unique_ptr<RenderWindow> m_RenderWindow;
+    std::unique_ptr<RenderInterface> m_RenderInterface;
 };

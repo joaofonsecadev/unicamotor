@@ -2,8 +2,11 @@
 
 #include "Logger.h"
 
+#include <chrono>
+
 #include "fmt/printf.h"
 #include "fmt/color.h"
+#include "fmt/chrono.h"
 
 #include "UnicaInstance.h"
 
@@ -11,7 +14,6 @@ void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::s
 {
     std::string LogLevelInfoName;
     fmt::text_style LogLevelTextStyle = fg(fmt::color::white);
-
     switch (LogLevel)
     {
         case ::Log:
@@ -30,7 +32,10 @@ void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::s
             break;
     }
 
-    fmt::print(LogLevelTextStyle, "{}[{}] {}\n", LogLevelInfoName, LogCategory, LogText);
+    std::chrono::time_point CurrentTimestamp = std::chrono::system_clock::now();
+    const std::string CurrentTimeStampString = fmt::format("{0:%FT%T}", CurrentTimestamp);
+
+    fmt::print(LogLevelTextStyle, "[{}] {}[{}] {}\n", CurrentTimeStampString, LogLevelInfoName, LogCategory, LogText);
 
     if (LogLevel == Fatal)
     {
