@@ -20,4 +20,7 @@ class Logger
 {
 public:
     static void Log(LogLevel LogLevel, const std::string& LogCategory, const std::string& LogText);
+
+private:
+    static std::string GetLogTimestamp();
 };

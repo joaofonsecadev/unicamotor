@@ -32,14 +32,22 @@ void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::s
             break;
     }
 
-    std::chrono::time_point CurrentTimestamp = std::chrono::system_clock::now();
-    const std::string CurrentTimeStampString = fmt::format("{0:%FT%T}", CurrentTimestamp);
-
-    fmt::print(LogLevelTextStyle, "[{}] {}[{}] {}\n", CurrentTimeStampString, LogLevelInfoName, LogCategory, LogText);
+    fmt::print(LogLevelTextStyle, "[{}] {}[{}] {}\n", GetLogTimestamp(), LogLevelInfoName, LogCategory, LogText);
 
     if (LogLevel == Fatal)
     {
         UnicaInstance::RequestExit();
     }
+}
+
+std::string Logger::GetLogTimestamp()
+{
+    const std::chrono::time_point CurrentTimestamp = std::chrono::system_clock::now();
+    const std::chrono::duration TimeSinceEpoch = CurrentTimestamp.time_since_epoch();
+
+    const uint64 SecSinceEpochInMillis = std::chrono::duration_cast<std::chrono::seconds>(TimeSinceEpoch).count() * 1000;
+    const uint64 MillisSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(TimeSinceEpoch).count();
+
+    return fmt::format("{0:%FT%T}.{1:03d}", CurrentTimestamp, MillisSinceEpoch - SecSinceEpochInMillis);
 }
 
