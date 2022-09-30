@@ -32,7 +32,8 @@ void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::s
             break;
     }
 
-    fmt::print(LogLevelTextStyle, "[{}] {}[{}] {}\n", GetLogTimestamp(), LogLevelInfoName, LogCategory, LogText);
+    const std::string FinalLogString = fmt::format("[{}] {}[{}] {}\n", GetLogTimestamp(), LogLevelInfoName, LogCategory, LogText);
+    fmt::print(LogLevelTextStyle, FinalLogString);
 
     if (LogLevel == Fatal)
     {

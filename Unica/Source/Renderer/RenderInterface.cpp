@@ -18,9 +18,9 @@ void RenderInterface::CreateVulkanInstance()
 {
     VkApplicationInfo VulkanAppInfo { };
     VulkanAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    VulkanAppInfo.pApplicationName = "Sandbox";
+    VulkanAppInfo.pApplicationName = UnicaSettings::ApplicationName.c_str();
     VulkanAppInfo.applicationVersion = VK_MAKE_VERSION(1,0,0);
-    VulkanAppInfo.pEngineName = "Unica Engine";
+    VulkanAppInfo.pEngineName =UnicaSettings::EngineName.c_str();
     VulkanAppInfo.engineVersion = VK_MAKE_VERSION(1,0,0);
     VulkanAppInfo.apiVersion = VK_API_VERSION_1_0;
 
@@ -35,14 +35,53 @@ void RenderInterface::CreateVulkanInstance()
     VulkanCreateInfo.ppEnabledExtensionNames = GlfwExtensions;
     VulkanCreateInfo.enabledLayerCount = 0;
 
+	if (UnicaSettings::bValidationLayersEnabled)
+	{
+        if (!CheckAvailableValidationLayers())
+        {
+			VulkanCreateInfo.enabledLayerCount = static_cast<uint32>(UnicaSettings::RequestedValidationLayers.size());
+			VulkanCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
+        }
+        else
+        {
+			UNICA_LOG(Fatal, "LogRenderInterface", "Not all the requested Vulkan Validation Layers are available");
+        }
+	}
+
     if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanInstance) != VK_SUCCESS)
     {
-        UNICA_LOG(Fatal, "LogRenderInterface", "Couldn't create Vulkan instance. Aborting execution");
+        UNICA_LOG(Fatal, "LogRenderInterface", "Couldn't create Vulkan instance");
         return;
     }
     UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created successfully");
+}
 
-    LogVulkanInstanceExtensions();
+bool RenderInterface::CheckAvailableValidationLayers()
+{
+    uint32 LayerCount;
+    vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
+
+    std::vector<VkLayerProperties> AvailableLayers(LayerCount);
+    vkEnumerateInstanceLayerProperties(&LayerCount, AvailableLayers.data());
+
+    for (const char* LayerName : UnicaSettings::RequestedValidationLayers)
+    {
+        bool bLayerFound = false;
+        for (const VkLayerProperties& LayerProperties : AvailableLayers)
+        {
+            if (strcmp(LayerName, LayerProperties.layerName) == 0)
+            {
+                bLayerFound = true;
+                break;
+            }
+        }
+        if (!bLayerFound)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void RenderInterface::LogVulkanInstanceExtensions()

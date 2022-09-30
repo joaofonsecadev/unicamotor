@@ -13,3 +13,4 @@ typedef unsigned int        uint32;
 typedef unsigned long long  uint64;
 
 #include "Log/Logger.h"
+#include "UnicaSettings.h"

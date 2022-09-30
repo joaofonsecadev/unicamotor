@@ -8,12 +8,13 @@
 #include "fmt/color.h"
 
 float TimeManager::m_DeltaTimeSeconds;
+float TimeManager::m_DeltaTimeMillis;
 
 void TimeManager::Init()
 {
     if (std::chrono::high_resolution_clock::period::den != std::nano::den)
     {
-        UNICA_LOG(Fatal, "LogTimeManager", "HighResClock unit is not nanoseconds. Aborting execution");
+        UNICA_LOG(Fatal, "LogTimeManager", "HighResClock unit is not nanoseconds");
     }
     m_LastFrameTimeNanos = GetNanosSinceEpoch();
 }

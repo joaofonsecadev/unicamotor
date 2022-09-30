@@ -12,7 +12,11 @@ RenderWindow::RenderWindow()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    m_GlfwWindow = glfwCreateWindow(1280, 900, "Unica Engine", nullptr, nullptr);
+    m_GlfwWindow = glfwCreateWindow(
+        UnicaSettings::WindowWidth,
+        UnicaSettings::WindowHeight,
+        UnicaSettings::EngineName.c_str(),
+        nullptr, nullptr);
 
     UNICA_LOG(Log, "LogRenderWindow", "Created application window");
 }

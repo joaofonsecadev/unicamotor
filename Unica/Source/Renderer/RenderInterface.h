@@ -12,6 +12,7 @@ public:
 
 private:
     void CreateVulkanInstance();
+    bool CheckAvailableValidationLayers();
     void LogVulkanInstanceExtensions();
 
     VkInstance m_VulkanInstance;
