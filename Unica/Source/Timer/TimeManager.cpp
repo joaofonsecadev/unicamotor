@@ -15,7 +15,7 @@ void TimeManager::Init()
     {
         UNICA_LOG(Fatal, "LogTimeManager", "HighResClock unit is not nanoseconds. Aborting execution");
     }
-    m_LastFrameTimeNano = GetNanoSinceEpoch();
+    m_LastFrameTimeNanos = GetNanosSinceEpoch();
 }
 
 void TimeManager::Tick()
@@ -24,17 +24,19 @@ void TimeManager::Tick()
     //fmt::print(fg(fmt::color::white), "\33[2K\r[LogTimeManager] I'm being ticked at {:.0f} fps", 1 / GetDeltaTimeSeconds());
 }
 
-uint64 TimeManager::GetNanoSinceEpoch()
+uint64 TimeManager::GetNanosSinceEpoch()
 {
     return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
 
 void TimeManager::CalculateLastFrameTime()
 {
-    uint64 CurrentFrameTime = GetNanoSinceEpoch();
-    m_DeltaTimeNano = CurrentFrameTime - m_LastFrameTimeNano;
+    uint64 CurrentFrameTime = GetNanosSinceEpoch();
+    m_DeltaTimeNanos = CurrentFrameTime - m_LastFrameTimeNanos;
 
     // Convert Nanoseconds to Seconds
-    m_DeltaTimeSeconds = (float)m_DeltaTimeNano / 1'000'000'000.f;
-    m_LastFrameTimeNano = CurrentFrameTime;
+    m_DeltaTimeSeconds = (float)m_DeltaTimeNanos / 1'000'000'000.f;
+    m_DeltaTimeMillis = (float)m_DeltaTimeNanos / 1'000'000.f;
+
+    m_LastFrameTimeNanos = CurrentFrameTime;
 }
