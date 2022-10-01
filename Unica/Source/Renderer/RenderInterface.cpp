@@ -27,77 +27,102 @@ void RenderInterface::CreateVulkanInstance()
     VkInstanceCreateInfo VulkanCreateInfo { };
     VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     VulkanCreateInfo.pApplicationInfo = &VulkanAppInfo;
-
-    uint32 GlfwExtensionCount = 0;
-    const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
-
-    VulkanCreateInfo.enabledExtensionCount = GlfwExtensionCount;
-    VulkanCreateInfo.ppEnabledExtensionNames = GlfwExtensions;
     VulkanCreateInfo.enabledLayerCount = 0;
 
-	if (UnicaSettings::bValidationLayersEnabled)
-	{
-        if (!CheckAvailableValidationLayers())
-        {
-			VulkanCreateInfo.enabledLayerCount = static_cast<uint32>(UnicaSettings::RequestedValidationLayers.size());
-			VulkanCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
-        }
-        else
-        {
-			UNICA_LOG(Fatal, "LogRenderInterface", "Not all the requested Vulkan Validation Layers are available");
-        }
-	}
+	uint32 GlfwExtensionCount = 0;
+	const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
+	std::vector<const char*> RequiredExtensions(GlfwExtensions, GlfwExtensions + GlfwExtensionCount);
+
+    AddRequiredExtensions(VulkanCreateInfo, RequiredExtensions);
+    AddValidationLayers(VulkanCreateInfo);
 
     if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanInstance) != VK_SUCCESS)
     {
         UNICA_LOG(Fatal, "LogRenderInterface", "Couldn't create Vulkan instance");
         return;
     }
-    UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created successfully");
+    UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created");
 }
 
-bool RenderInterface::CheckAvailableValidationLayers()
+void RenderInterface::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions)
 {
+    if (UnicaSettings::bValidationLayersEnabled)
+    {
+        RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    }
+
+    uint32 AvailableExtensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, nullptr);
+	std::vector<VkExtensionProperties> AvailableExtensions(AvailableExtensionCount);
+	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, AvailableExtensions.data());
+
+    bool bAllExtensionsFound = true;
+    for (const char* RequiredExtensionName : RequiredExtensions)
+    {
+        bool bWasExtensionFound = false;
+        for (const VkExtensionProperties& AvailableExtension : AvailableExtensions)
+        {
+            if (strcmp(RequiredExtensionName, AvailableExtension.extensionName) == 0)
+            {
+                bWasExtensionFound = true;
+                break;
+            }
+        }
+        if (!bWasExtensionFound)
+        {
+            UNICA_LOG(Error, "LogRenderInterface", fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
+            bAllExtensionsFound = false;
+        }
+    }
+    if (!bAllExtensionsFound)
+    {
+		UNICA_LOG(Fatal, "LogRenderInterface", "Not all required instance extensions found");
+		return;
+    }
+
+    VulkanCreateInfo.enabledExtensionCount = static_cast<uint32>(RequiredExtensions.size());
+    VulkanCreateInfo.ppEnabledExtensionNames = RequiredExtensions.data();
+}
+
+void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo)
+{
+    if (!UnicaSettings::bValidationLayersEnabled)
+    {
+        return;
+    }
+
     uint32 LayerCount;
     vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
 
     std::vector<VkLayerProperties> AvailableLayers(LayerCount);
     vkEnumerateInstanceLayerProperties(&LayerCount, AvailableLayers.data());
 
-    for (const char* LayerName : UnicaSettings::RequestedValidationLayers)
+    bool bAllLayersFound = true;
+    for (const char* RequestedLayerName : UnicaSettings::RequestedValidationLayers)
     {
-        bool bLayerFound = false;
-        for (const VkLayerProperties& LayerProperties : AvailableLayers)
+        bool bWasLayerFound = false;
+        for (const VkLayerProperties& AvailableLayer : AvailableLayers)
         {
-            if (strcmp(LayerName, LayerProperties.layerName) == 0)
+            if (strcmp(RequestedLayerName, AvailableLayer.layerName) == 0)
             {
-                bLayerFound = true;
+                bWasLayerFound = true;
                 break;
             }
         }
-        if (!bLayerFound)
+        if (!bWasLayerFound)
         {
-            return false;
+			UNICA_LOG(Error, "LogRenderInterface", fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
+			bAllLayersFound = false;
         }
     }
+    if (!bAllLayersFound)
+	{
+        UNICA_LOG(Error, "LogRenderInterface", "Won't enable VulkanValidationLayers since not all of them are available");
+        return;
+	}
 
-    return true;
-}
-
-void RenderInterface::LogVulkanInstanceExtensions()
-{
-    uint32 ExtensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, nullptr);
-    std::vector<VkExtensionProperties> ExtensionList(ExtensionCount);
-    vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, ExtensionList.data());
-
-    std::string ExtensionLogString = "Listing available Vulkan extensions:";
-    for (const VkExtensionProperties& Extension : ExtensionList)
-    {
-        ExtensionLogString += fmt::format("\n\t{}", Extension.extensionName);
-    }
-
-    UNICA_LOG(Log, "LogRenderInterface", ExtensionLogString);
+	VulkanCreateInfo.enabledLayerCount = static_cast<uint32>(UnicaSettings::RequestedValidationLayers.size());
+	VulkanCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
 }
 
 RenderInterface::~RenderInterface()
