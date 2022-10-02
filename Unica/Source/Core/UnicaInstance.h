@@ -17,9 +17,6 @@ public:
     static void RequestExit() { m_bHasRequestedExit = true; }
 
 private:
-    // Temporary way oh handling CRTL+C
-    static void SignalCallbackHandler(int signum);
-
     std::unique_ptr<SubsystemManager> m_SubsystemManager;
     static bool m_bHasRequestedExit;
 };
