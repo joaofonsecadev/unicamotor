@@ -12,6 +12,7 @@
 RenderInterface::RenderInterface()
 {
     CreateVulkanInstance();
+    CreateVulkanDebugMessenger();
 }
 
 void RenderInterface::CreateVulkanInstance()
@@ -25,16 +26,18 @@ void RenderInterface::CreateVulkanInstance()
     VulkanAppInfo.apiVersion = VK_API_VERSION_1_0;
 
     VkInstanceCreateInfo VulkanCreateInfo { };
+    VkDebugUtilsMessengerCreateInfoEXT VulkanDebugCreateInfo;
     VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     VulkanCreateInfo.pApplicationInfo = &VulkanAppInfo;
     VulkanCreateInfo.enabledLayerCount = 0;
+    VulkanCreateInfo.pNext = nullptr;
 
 	uint32 GlfwExtensionCount = 0;
 	const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
 	std::vector<const char*> RequiredExtensions(GlfwExtensions, GlfwExtensions + GlfwExtensionCount);
 
     AddRequiredExtensions(VulkanCreateInfo, RequiredExtensions);
-    AddValidationLayers(VulkanCreateInfo);
+    AddValidationLayers(VulkanCreateInfo, VulkanDebugCreateInfo);
 
     if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanInstance) != VK_SUCCESS)
     {
@@ -42,6 +45,31 @@ void RenderInterface::CreateVulkanInstance()
         return;
     }
     UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created");
+}
+
+void RenderInterface::CreateVulkanDebugMessenger()
+{
+    if (!UnicaSettings::bValidationLayersEnabled)
+    {
+        return;
+    }
+
+    VkDebugUtilsMessengerCreateInfoEXT VulkanCreateInfo;
+    PopulateVulkanDebugMessengerInfo(VulkanCreateInfo);
+
+    if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
+    {
+        UNICA_LOG(Error, "LogRenderInterface", "Couldn't setup VulkanDebugMessenger");
+    }
+}
+
+void RenderInterface::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo)
+{
+    VulkanCreateInfo = { };
+    VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    VulkanCreateInfo.messageSeverity = /*VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |*/ VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    VulkanCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    VulkanCreateInfo.pfnUserCallback = VulkanDebugCallback;
 }
 
 void RenderInterface::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions)
@@ -84,7 +112,7 @@ void RenderInterface::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateIn
     VulkanCreateInfo.ppEnabledExtensionNames = RequiredExtensions.data();
 }
 
-void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo)
+void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDebugUtilsMessengerCreateInfoEXT& VulkanDebugCreateInfo)
 {
     if (!UnicaSettings::bValidationLayersEnabled)
     {
@@ -123,10 +151,60 @@ void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo
 
 	VulkanCreateInfo.enabledLayerCount = static_cast<uint32>(UnicaSettings::RequestedValidationLayers.size());
 	VulkanCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
+
+    PopulateVulkanDebugMessengerInfo(VulkanDebugCreateInfo);
+    VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &VulkanDebugCreateInfo;
+}
+
+VkResult RenderInterface::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInstance, const VkDebugUtilsMessengerCreateInfoEXT* VulkanCreateInfo, const VkAllocationCallbacks* VulkanAllocator, VkDebugUtilsMessengerEXT* VulkanDebugMessenger)
+{
+	PFN_vkCreateDebugUtilsMessengerEXT Func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(VulkanInstance, "vkCreateDebugUtilsMessengerEXT");
+	if (Func != nullptr)
+	{
+		return Func(VulkanInstance, VulkanCreateInfo, VulkanAllocator, VulkanDebugMessenger);
+	}
+	else
+	{
+		return VK_ERROR_EXTENSION_NOT_PRESENT;
+	}
+}
+
+void RenderInterface::DestroyVulkanDebugUtilsMessengerEXT(VkInstance VulkanInstance, VkDebugUtilsMessengerEXT VulkanDebugMessenger, const VkAllocationCallbacks* VulkanAllocator)
+{
+	PFN_vkDestroyDebugUtilsMessengerEXT Func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(VulkanInstance, "vkDestroyDebugUtilsMessengerEXT");
+	if (Func != nullptr)
+	{
+		Func(VulkanInstance, VulkanDebugMessenger, VulkanAllocator);
+	}
+}
+
+VKAPI_ATTR VkBool32 VKAPI_CALL RenderInterface::VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT MessageType, const VkDebugUtilsMessengerCallbackDataEXT* CallbackData, void* UserData)
+{
+    LogLevel LogLvl = Log;
+
+    if (MessageSeverity < VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+    {
+        return VK_FALSE;
+    }
+    else if ((MessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+    {
+        LogLvl = Warning;
+    }
+    else if ((MessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+    {
+        LogLvl = Error;
+    }
+
+    UNICA_LOG(LogLvl, "LogVulkanAPI", CallbackData->pMessage);
+    return VK_FALSE;
 }
 
 RenderInterface::~RenderInterface()
 {
+	if (UnicaSettings::bValidationLayersEnabled)
+	{
+		DestroyVulkanDebugUtilsMessengerEXT(m_VulkanInstance, m_VulkanDebugMessenger, nullptr);
+	}
     vkDestroyInstance(m_VulkanInstance, nullptr);
     UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance has been destroyed");
 }
