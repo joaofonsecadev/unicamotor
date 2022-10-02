@@ -13,7 +13,7 @@
 void Logger::Log(LogLevel LogLevel, const std::string& LogCategory, const std::string& LogText)
 {
     std::string LogLevelInfoName;
-    fmt::text_style LogLevelTextStyle = fg(fmt::color::white);
+    fmt::text_style LogLevelTextStyle = fg(fmt::color::light_gray);
     switch (LogLevel)
     {
         case ::Log:
