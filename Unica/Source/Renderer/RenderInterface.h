@@ -11,7 +11,11 @@ public:
     RenderInterface();
     ~RenderInterface();
 
+// VulkanAPI 
 private:
+	void InitVulkanInterface();
+	void DestroyVulkanInterface();
+
     void CreateVulkanInstance();
     void CreateVulkanDebugMessenger();
     void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);

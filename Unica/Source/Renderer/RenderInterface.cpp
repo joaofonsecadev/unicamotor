@@ -11,154 +11,164 @@
 
 RenderInterface::RenderInterface()
 {
-    CreateVulkanInstance();
-    CreateVulkanDebugMessenger();
+    InitVulkanInterface();
+}
+
+RenderInterface::~RenderInterface()
+{
+    DestroyVulkanInterface();
+}
+
+void RenderInterface::InitVulkanInterface()
+{
+	CreateVulkanInstance();
+	CreateVulkanDebugMessenger();
 }
 
 void RenderInterface::CreateVulkanInstance()
 {
-    VkApplicationInfo VulkanAppInfo { };
-    VulkanAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    VulkanAppInfo.pApplicationName = UnicaSettings::ApplicationName.c_str();
-    VulkanAppInfo.applicationVersion = VK_MAKE_VERSION(1,0,0);
-    VulkanAppInfo.pEngineName =UnicaSettings::EngineName.c_str();
-    VulkanAppInfo.engineVersion = VK_MAKE_VERSION(1,0,0);
-    VulkanAppInfo.apiVersion = VK_API_VERSION_1_0;
+	VkApplicationInfo VulkanAppInfo{ };
+	VulkanAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	VulkanAppInfo.pApplicationName = UnicaSettings::ApplicationName.c_str();
+	VulkanAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+	VulkanAppInfo.pEngineName = UnicaSettings::EngineName.c_str();
+	VulkanAppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+	VulkanAppInfo.apiVersion = VK_API_VERSION_1_0;
 
-    VkInstanceCreateInfo VulkanCreateInfo { };
-    VkDebugUtilsMessengerCreateInfoEXT VulkanDebugCreateInfo;
-    VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    VulkanCreateInfo.pApplicationInfo = &VulkanAppInfo;
-    VulkanCreateInfo.enabledLayerCount = 0;
-    VulkanCreateInfo.pNext = nullptr;
+	VkInstanceCreateInfo VulkanCreateInfo{ };
+	VkDebugUtilsMessengerCreateInfoEXT VulkanDebugCreateInfo;
+	VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	VulkanCreateInfo.pApplicationInfo = &VulkanAppInfo;
+	VulkanCreateInfo.enabledLayerCount = 0;
+	VulkanCreateInfo.pNext = nullptr;
 
 	uint32 GlfwExtensionCount = 0;
 	const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
 	std::vector<const char*> RequiredExtensions(GlfwExtensions, GlfwExtensions + GlfwExtensionCount);
 
-    AddRequiredExtensions(VulkanCreateInfo, RequiredExtensions);
-    AddValidationLayers(VulkanCreateInfo, VulkanDebugCreateInfo);
+	AddRequiredExtensions(VulkanCreateInfo, RequiredExtensions);
+	AddValidationLayers(VulkanCreateInfo, VulkanDebugCreateInfo);
 
-    if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanInstance) != VK_SUCCESS)
-    {
-        UNICA_LOG(Fatal, "LogRenderInterface", "Couldn't create Vulkan instance");
-        return;
-    }
-    UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created");
+	if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanInstance) != VK_SUCCESS)
+	{
+		UNICA_LOG(Fatal, "LogRenderInterface", "Couldn't create Vulkan instance");
+		return;
+	}
+	UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created");
 }
 
 void RenderInterface::CreateVulkanDebugMessenger()
 {
-    if (!UnicaSettings::bValidationLayersEnabled)
-    {
-        return;
-    }
+	if (!UnicaSettings::bValidationLayersEnabled)
+	{
+		return;
+	}
 
-    VkDebugUtilsMessengerCreateInfoEXT VulkanCreateInfo;
-    PopulateVulkanDebugMessengerInfo(VulkanCreateInfo);
+	VkDebugUtilsMessengerCreateInfoEXT VulkanCreateInfo;
+	PopulateVulkanDebugMessengerInfo(VulkanCreateInfo);
 
-    if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
-    {
-        UNICA_LOG(Error, "LogRenderInterface", "Couldn't setup VulkanDebugMessenger");
-    }
+	if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
+	{
+		UNICA_LOG(Error, "LogRenderInterface", "Couldn't setup VulkanDebugMessenger");
+	}
 }
 
 void RenderInterface::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo)
 {
-    VulkanCreateInfo = { };
-    VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    VulkanCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    VulkanCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    VulkanCreateInfo.pfnUserCallback = VulkanDebugCallback;
+	VulkanCreateInfo = { };
+	VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	VulkanCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	VulkanCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+	VulkanCreateInfo.pfnUserCallback = VulkanDebugCallback;
 }
 
 void RenderInterface::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions)
 {
-    if (UnicaSettings::bValidationLayersEnabled)
-    {
-        RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    }
+	if (UnicaSettings::bValidationLayersEnabled)
+	{
+		RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
 
-    uint32 AvailableExtensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, nullptr);
+	uint32 AvailableExtensionCount = 0;
+	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, nullptr);
 	std::vector<VkExtensionProperties> AvailableExtensions(AvailableExtensionCount);
 	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, AvailableExtensions.data());
 
-    bool bAllExtensionsFound = true;
-    for (const char* RequiredExtensionName : RequiredExtensions)
-    {
-        bool bWasExtensionFound = false;
-        for (const VkExtensionProperties& AvailableExtension : AvailableExtensions)
-        {
-            if (strcmp(RequiredExtensionName, AvailableExtension.extensionName) == 0)
-            {
-                bWasExtensionFound = true;
-                break;
-            }
-        }
-        if (!bWasExtensionFound)
-        {
-            UNICA_LOG(Error, "LogRenderInterface", fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
-            bAllExtensionsFound = false;
-        }
-    }
-    if (!bAllExtensionsFound)
-    {
+	bool bAllExtensionsFound = true;
+	for (const char* RequiredExtensionName : RequiredExtensions)
+	{
+		bool bWasExtensionFound = false;
+		for (const VkExtensionProperties& AvailableExtension : AvailableExtensions)
+		{
+			if (strcmp(RequiredExtensionName, AvailableExtension.extensionName) == 0)
+			{
+				bWasExtensionFound = true;
+				break;
+			}
+		}
+		if (!bWasExtensionFound)
+		{
+			UNICA_LOG(Error, "LogRenderInterface", fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
+			bAllExtensionsFound = false;
+		}
+	}
+	if (!bAllExtensionsFound)
+	{
 		UNICA_LOG(Fatal, "LogRenderInterface", "Not all required instance extensions found");
 		return;
-    }
+	}
 
-    VulkanCreateInfo.enabledExtensionCount = static_cast<uint32>(RequiredExtensions.size());
-    VulkanCreateInfo.ppEnabledExtensionNames = RequiredExtensions.data();
+	VulkanCreateInfo.enabledExtensionCount = static_cast<uint32>(RequiredExtensions.size());
+	VulkanCreateInfo.ppEnabledExtensionNames = RequiredExtensions.data();
 }
 
 void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDebugUtilsMessengerCreateInfoEXT& VulkanDebugCreateInfo)
 {
-    if (!UnicaSettings::bValidationLayersEnabled)
-    {
-        return;
-    }
+	if (!UnicaSettings::bValidationLayersEnabled)
+	{
+		return;
+	}
 
-    uint32 LayerCount;
-    vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
+	uint32 LayerCount;
+	vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
 
-    std::vector<VkLayerProperties> AvailableLayers(LayerCount);
-    vkEnumerateInstanceLayerProperties(&LayerCount, AvailableLayers.data());
+	std::vector<VkLayerProperties> AvailableLayers(LayerCount);
+	vkEnumerateInstanceLayerProperties(&LayerCount, AvailableLayers.data());
 
-    bool bAllLayersFound = true;
-    for (const char* RequestedLayerName : UnicaSettings::RequestedValidationLayers)
-    {
-        bool bWasLayerFound = false;
-        for (const VkLayerProperties& AvailableLayer : AvailableLayers)
-        {
-            if (strcmp(RequestedLayerName, AvailableLayer.layerName) == 0)
-            {
-                bWasLayerFound = true;
-                break;
-            }
-        }
-        if (!bWasLayerFound)
-        {
+	bool bAllLayersFound = true;
+	for (const char* RequestedLayerName : UnicaSettings::RequestedValidationLayers)
+	{
+		bool bWasLayerFound = false;
+		for (const VkLayerProperties& AvailableLayer : AvailableLayers)
+		{
+			if (strcmp(RequestedLayerName, AvailableLayer.layerName) == 0)
+			{
+				bWasLayerFound = true;
+				break;
+			}
+		}
+		if (!bWasLayerFound)
+		{
 			UNICA_LOG(Error, "LogRenderInterface", fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
 			bAllLayersFound = false;
-        }
-    }
-    if (!bAllLayersFound)
+		}
+	}
+	if (!bAllLayersFound)
 	{
-        UNICA_LOG(Error, "LogRenderInterface", "Won't enable VulkanValidationLayers since not all of them are available");
-        return;
+		UNICA_LOG(Error, "LogRenderInterface", "Won't enable VulkanValidationLayers since not all of them are available");
+		return;
 	}
 
 	VulkanCreateInfo.enabledLayerCount = static_cast<uint32>(UnicaSettings::RequestedValidationLayers.size());
 	VulkanCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
 
-    PopulateVulkanDebugMessengerInfo(VulkanDebugCreateInfo);
-    VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &VulkanDebugCreateInfo;
+	PopulateVulkanDebugMessengerInfo(VulkanDebugCreateInfo);
+	VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&VulkanDebugCreateInfo;
 }
 
 VkResult RenderInterface::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInstance, const VkDebugUtilsMessengerCreateInfoEXT* VulkanCreateInfo, const VkAllocationCallbacks* VulkanAllocator, VkDebugUtilsMessengerEXT* VulkanDebugMessenger)
 {
-	PFN_vkCreateDebugUtilsMessengerEXT Func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(VulkanInstance, "vkCreateDebugUtilsMessengerEXT");
+	PFN_vkCreateDebugUtilsMessengerEXT Func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(VulkanInstance, "vkCreateDebugUtilsMessengerEXT");
 	if (Func != nullptr)
 	{
 		return Func(VulkanInstance, VulkanCreateInfo, VulkanAllocator, VulkanDebugMessenger);
@@ -171,7 +181,7 @@ VkResult RenderInterface::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInsta
 
 void RenderInterface::DestroyVulkanDebugUtilsMessengerEXT(VkInstance VulkanInstance, VkDebugUtilsMessengerEXT VulkanDebugMessenger, const VkAllocationCallbacks* VulkanAllocator)
 {
-	PFN_vkDestroyDebugUtilsMessengerEXT Func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(VulkanInstance, "vkDestroyDebugUtilsMessengerEXT");
+	PFN_vkDestroyDebugUtilsMessengerEXT Func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(VulkanInstance, "vkDestroyDebugUtilsMessengerEXT");
 	if (Func != nullptr)
 	{
 		Func(VulkanInstance, VulkanDebugMessenger, VulkanAllocator);
@@ -180,27 +190,27 @@ void RenderInterface::DestroyVulkanDebugUtilsMessengerEXT(VkInstance VulkanInsta
 
 VKAPI_ATTR VkBool32 VKAPI_CALL RenderInterface::VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT MessageType, const VkDebugUtilsMessengerCallbackDataEXT* CallbackData, void* UserData)
 {
-    LogLevel LogLvl = Log;
+	LogLevel LogLvl = Log;
 
 	if ((MessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
-    {
-        LogLvl = Warning;
-    }
-    else if ((MessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
-    {
-        LogLvl = Error;
-    }
+	{
+		LogLvl = Warning;
+	}
+	else if ((MessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+	{
+		LogLvl = Error;
+	}
 
-    UNICA_LOG(LogLvl, "LogVulkanAPI", CallbackData->pMessage);
-    return VK_FALSE;
+	UNICA_LOG(LogLvl, "LogVulkanAPI", CallbackData->pMessage);
+	return VK_FALSE;
 }
 
-RenderInterface::~RenderInterface()
+void RenderInterface::DestroyVulkanInterface()
 {
 	if (UnicaSettings::bValidationLayersEnabled)
 	{
 		DestroyVulkanDebugUtilsMessengerEXT(m_VulkanInstance, m_VulkanDebugMessenger, nullptr);
 	}
-    vkDestroyInstance(m_VulkanInstance, nullptr);
-    UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance has been destroyed");
+	vkDestroyInstance(m_VulkanInstance, nullptr);
+	UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance has been destroyed");
 }
