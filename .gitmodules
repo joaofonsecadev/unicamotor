@@ -1,9 +1,9 @@
-[submodule "Unica/Libraries/fmt"]
-	path = Unica/Libraries/fmt
+[submodule "Libraries/fmt"]
+	path = Libraries/fmt
 	url = git@github.com:fmtlib/fmt.git
-[submodule "Unica/Libraries/glfw"]
-	path = Unica/Libraries/glfw
+[submodule "Libraries/glfw"]
+	path = Libraries/glfw
 	url = git@github.com:glfw/glfw.git
-[submodule "Unica/Libraries/glm"]
-	path = Unica/Libraries/glm
+[submodule "Libraries/glm"]
+	path = Libraries/glm
 	url = git@github.com:g-truc/glm.git

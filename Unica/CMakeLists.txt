@@ -31,17 +31,6 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
     source_group(${GroupPath} FILES ${SourceFile})
 endforeach()
 
-# Libraries
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-add_subdirectory("Libraries/fmt")
-add_subdirectory("Libraries/glm")
-add_subdirectory("Libraries/glfw")
-find_package(Vulkan REQUIRED FATAL_ERROR)
-
 target_include_directories("Unica" PUBLIC
         Source/
         Source/Core
