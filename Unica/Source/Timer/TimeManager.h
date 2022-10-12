@@ -12,7 +12,10 @@ class TimeManager final : public SubsystemBase
 {
 public:
     static float GetDeltaTimeSeconds() { return m_DeltaTimeMillis / 1000; }
-    static float GetDeltaTimeMillis() { return m_DeltaTimeMillis;  }
+    static float GetDeltaTimeMillis() { return m_DeltaTimeMillis; }
+
+    static void SetFrameWorkDuration(const float FrameWorkDuration) { m_FrameWorkDuration = FrameWorkDuration; }
+    static void SetFrameSleepDuration(const float FrameSleepDuration) { m_FrameSleepDuration = FrameSleepDuration; }
 
 private:
     void Init() override;
@@ -25,4 +28,6 @@ private:
 	std::chrono::steady_clock::time_point m_LastFrameTime = std::chrono::steady_clock::now();
 
     static float m_DeltaTimeMillis;
+    static float m_FrameWorkDuration;
+    static float m_FrameSleepDuration;
 };

@@ -37,11 +37,14 @@ void UnicaInstance::Tick()
 
     std::chrono::time_point FinishWorkTime = std::chrono::steady_clock::now();
     std::chrono::nanoseconds SleepDuration = NextFrameTimeTarget - FinishWorkTime;
+    TimeManager::SetFrameWorkDuration((float) (FinishWorkTime - StartWorkTime).count() / 1'000'000);
 
     if (SleepDuration <= std::chrono::nanoseconds())
     {
+		TimeManager::SetFrameSleepDuration(0);
         return;
     }
+	TimeManager::SetFrameSleepDuration((float) SleepDuration.count() / 1'000'000);
 
     while (std::chrono::steady_clock::now() < NextFrameTimeTarget);
 }
