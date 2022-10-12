@@ -6,6 +6,7 @@ set(SourceFiles
         Source/Core/UnicaInstance.cpp
         Source/Core/UnicaInstance.h
         Source/Core/UnicaMinimal.h
+        Source/Core/UnicaSettings.h
         Source/Log/Logger.cpp
         Source/Log/Logger.h
         Source/Renderer/RenderInterface.cpp

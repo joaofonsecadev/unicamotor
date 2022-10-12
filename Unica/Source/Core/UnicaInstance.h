@@ -19,4 +19,6 @@ public:
 private:
     std::unique_ptr<SubsystemManager> m_SubsystemManager;
     static bool m_bHasRequestedExit;
+
+    void TickLogic();
 };
