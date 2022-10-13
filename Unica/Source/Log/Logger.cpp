@@ -4,7 +4,6 @@
 
 #include <chrono>
 
-#include "fmt/printf.h"
 #include "fmt/color.h"
 #include "fmt/chrono.h"
 

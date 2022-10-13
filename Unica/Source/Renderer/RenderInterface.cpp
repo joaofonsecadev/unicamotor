@@ -163,12 +163,12 @@ void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo
 	VulkanCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
 
 	PopulateVulkanDebugMessengerInfo(VulkanDebugCreateInfo);
-	VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&VulkanDebugCreateInfo;
+	VulkanCreateInfo.pNext = &VulkanDebugCreateInfo;
 }
 
 VkResult RenderInterface::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInstance, const VkDebugUtilsMessengerCreateInfoEXT* VulkanCreateInfo, const VkAllocationCallbacks* VulkanAllocator, VkDebugUtilsMessengerEXT* VulkanDebugMessenger)
 {
-	PFN_vkCreateDebugUtilsMessengerEXT Func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(VulkanInstance, "vkCreateDebugUtilsMessengerEXT");
+	const auto Func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(VulkanInstance, "vkCreateDebugUtilsMessengerEXT"));
 	if (Func != nullptr)
 	{
 		return Func(VulkanInstance, VulkanCreateInfo, VulkanAllocator, VulkanDebugMessenger);
@@ -181,7 +181,7 @@ VkResult RenderInterface::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInsta
 
 void RenderInterface::DestroyVulkanDebugUtilsMessengerEXT(VkInstance VulkanInstance, VkDebugUtilsMessengerEXT VulkanDebugMessenger, const VkAllocationCallbacks* VulkanAllocator)
 {
-	PFN_vkDestroyDebugUtilsMessengerEXT Func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(VulkanInstance, "vkDestroyDebugUtilsMessengerEXT");
+	const auto Func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(VulkanInstance, "vkDestroyDebugUtilsMessengerEXT"));
 	if (Func != nullptr)
 	{
 		Func(VulkanInstance, VulkanDebugMessenger, VulkanAllocator);

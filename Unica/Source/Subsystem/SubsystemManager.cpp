@@ -6,6 +6,7 @@
 
 #include "fmt/format.h"
 
+#include "UnicaMinimal.h"
 #include "Timer/TimeManager.h"
 #include "Renderer/RenderManager.h"
 

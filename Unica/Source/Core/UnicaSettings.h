@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "UnicaMinimal.h"
-
 namespace UnicaSettings
 {
 	static const uint32 WindowWidth = 1270;

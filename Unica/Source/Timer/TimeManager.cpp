@@ -7,6 +7,8 @@
 
 #include "fmt/color.h"
 
+#include "UnicaMinimal.h"
+
 float TimeManager::m_DeltaTimeMillis;
 float TimeManager::m_FrameWorkDuration;
 float TimeManager::m_FrameSleepDuration;
@@ -28,10 +30,10 @@ void TimeManager::Tick()
 
 void TimeManager::CalculateLastFrameTime()
 {
-    std::chrono::time_point CurrentFrameTime = std::chrono::steady_clock::now();
-    std::chrono::nanoseconds DeltaTime = CurrentFrameTime - m_LastFrameTime;
+    const std::chrono::time_point CurrentFrameTime = std::chrono::steady_clock::now();
+    const std::chrono::nanoseconds DeltaTime = CurrentFrameTime - m_LastFrameTime;
 
-    m_DeltaTimeMillis = DeltaTime.count() / 1'000'000.f;
+    m_DeltaTimeMillis = static_cast<float>(DeltaTime.count()) / 1'000'000.f;
 
     m_LastFrameTime = CurrentFrameTime;
 }
