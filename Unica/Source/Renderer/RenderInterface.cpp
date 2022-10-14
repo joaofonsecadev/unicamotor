@@ -2,6 +2,7 @@
 
 #include "RenderInterface.h"
 
+#include <map>
 #include <vector>
 
 #include "GLFW/glfw3.h"
@@ -23,6 +24,7 @@ void RenderInterface::InitVulkanInterface()
 {
 	CreateVulkanInstance();
 	CreateVulkanDebugMessenger();
+	SelectVulkanPhysicalDevice();
 }
 
 void RenderInterface::CreateVulkanInstance()
@@ -71,6 +73,57 @@ void RenderInterface::CreateVulkanDebugMessenger()
 	{
 		UNICA_LOG(Error, "LogRenderInterface", "Couldn't setup VulkanDebugMessenger");
 	}
+}
+
+void RenderInterface::SelectVulkanPhysicalDevice()
+{
+	uint32 VulkanPhysicalDeviceCount = 0;
+	vkEnumeratePhysicalDevices(m_VulkanInstance, &VulkanPhysicalDeviceCount, nullptr);
+	if (VulkanPhysicalDeviceCount < 1)
+	{
+		UNICA_LOG(Fatal, "LogRenderInterface", "No GPUs with Vulkan support found");
+	}
+
+	std::vector<VkPhysicalDevice> VulkanPhysicalDevices(VulkanPhysicalDeviceCount);
+	vkEnumeratePhysicalDevices(m_VulkanInstance, &VulkanPhysicalDeviceCount, VulkanPhysicalDevices.data());
+
+	std::multimap<uint32, VkPhysicalDevice> VulkanPhysicalDeviceCandidates;
+	for (const VkPhysicalDevice& VulkanPhysicalDevice : VulkanPhysicalDevices)
+	{
+		uint32 VulkanPhysicalDeviceScore = RateVulkanPhysicalDevice(VulkanPhysicalDevice);
+		VulkanPhysicalDeviceCandidates.insert(std::make_pair(VulkanPhysicalDeviceScore, VulkanPhysicalDevice));
+	}
+
+	if (VulkanPhysicalDeviceCandidates.rbegin()->first > 0)
+	{
+		m_VulkanPhysicalDevice = VulkanPhysicalDeviceCandidates.rbegin()->second;
+	}
+	else
+	{
+		UNICA_LOG(Fatal, "LogRenderInterface", "No suitable GPU found");
+	}
+}
+
+uint32 RenderInterface::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice)
+{
+	uint32 Score = 0;
+
+	VkPhysicalDeviceProperties VulkanPhysicalDeviceProperties;
+	VkPhysicalDeviceFeatures VulkanPhysicalDeviceFeatures;
+	vkGetPhysicalDeviceProperties(VulkanPhysicalDevice, &VulkanPhysicalDeviceProperties);
+	vkGetPhysicalDeviceFeatures(VulkanPhysicalDevice, &VulkanPhysicalDeviceFeatures);
+
+	if (VulkanPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+	{
+		Score += 1000;
+	}
+
+	if (!VulkanPhysicalDeviceFeatures.geometryShader)
+	{
+		Score = 0;
+	}
+	
+	return Score;
 }
 
 void RenderInterface::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo)
