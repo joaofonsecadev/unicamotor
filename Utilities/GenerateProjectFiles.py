@@ -86,6 +86,7 @@ for arg in argList:
 
         case _:
             print("Invalid command.\nTry -h for some useful information on how to run this script.")
+            endexecution()
 
 generateproject()
 endexecution()
