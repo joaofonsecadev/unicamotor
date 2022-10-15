@@ -43,6 +43,10 @@ void RenderInterface::CreateVulkanInstance()
 	VulkanCreateInfo.pApplicationInfo = &VulkanAppInfo;
 	VulkanCreateInfo.enabledLayerCount = 0;
 	VulkanCreateInfo.pNext = nullptr;
+    
+#ifdef __APPLE__
+    VulkanCreateInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif // __APPLE__
 
 	uint32 GlfwExtensionCount = 0;
 	const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
@@ -106,7 +110,7 @@ void RenderInterface::SelectVulkanPhysicalDevice()
 
 uint32 RenderInterface::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice)
 {
-	uint32 Score = 0;
+	uint32 Score = 1;
 
 	VkPhysicalDeviceProperties VulkanPhysicalDeviceProperties;
 	VkPhysicalDeviceFeatures VulkanPhysicalDeviceFeatures;
@@ -116,11 +120,6 @@ uint32 RenderInterface::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanP
 	if (VulkanPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 	{
 		Score += 1000;
-	}
-
-	if (!VulkanPhysicalDeviceFeatures.geometryShader)
-	{
-		Score = 0;
 	}
 	
 	return Score;
@@ -137,6 +136,12 @@ void RenderInterface::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCrea
 
 void RenderInterface::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions)
 {
+    
+#ifdef __APPLE__
+    RequiredExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+    RequiredExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif // __APPLE__
+    
 	if (UnicaSettings::bValidationLayersEnabled)
 	{
 		RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
