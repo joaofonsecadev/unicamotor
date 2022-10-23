@@ -7,6 +7,7 @@
 #include "fmt/format.h"
 
 #include "UnicaMinimal.h"
+#include "VulkanQueueFamilyIndices.h"
 
 VulkanAPI::VulkanAPI()
 {
@@ -45,10 +46,10 @@ void VulkanAPI::CreateVulkanInstance()
 
 	if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanInstance) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, "LogRenderInterface", "Couldn't create Vulkan instance");
+		UNICA_LOG(Fatal, "LogVulkanAPI", "Couldn't create Vulkan instance");
 		return;
 	}
-	UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created");
+	UNICA_LOG(Log, "LogVulkanAPI", "Vulkan instance created");
 }
 
 void VulkanAPI::CreateVulkanDebugMessenger()
@@ -63,7 +64,7 @@ void VulkanAPI::CreateVulkanDebugMessenger()
 
 	if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
 	{
-		UNICA_LOG(Error, "LogRenderInterface", "Couldn't setup VulkanDebugMessenger");
+		UNICA_LOG(Error, "LogVulkanAPI", "Couldn't setup VulkanDebugMessenger");
 	}
 }
 
@@ -73,7 +74,7 @@ void VulkanAPI::SelectVulkanPhysicalDevice()
 	vkEnumeratePhysicalDevices(m_VulkanInstance, &VulkanPhysicalDeviceCount, nullptr);
 	if (VulkanPhysicalDeviceCount < 1)
 	{
-		UNICA_LOG(Fatal, "LogRenderInterface", "No GPUs with Vulkan support found");
+		UNICA_LOG(Fatal, "LogVulkanAPI", "No GPUs with Vulkan support found");
 	}
 
 	std::vector<VkPhysicalDevice> VulkanPhysicalDevices(VulkanPhysicalDeviceCount);
@@ -92,12 +93,17 @@ void VulkanAPI::SelectVulkanPhysicalDevice()
 	}
 	else
 	{
-		UNICA_LOG(Fatal, "LogRenderInterface", "No suitable GPU found");
+		UNICA_LOG(Fatal, "LogVulkanAPI", "No suitable GPU found");
 	}
 }
 
 uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice)
 {
+	if (!GetDeviceQueueFamilies(VulkanPhysicalDevice).WasSet())
+	{
+		return 0;
+	}
+	
 	uint32 Score = 1;
 
 	VkPhysicalDeviceProperties VulkanPhysicalDeviceProperties;
@@ -111,6 +117,35 @@ uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysica
 	}
 	
 	return Score;
+}
+
+VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
+{
+	VulkanQueueFamilyIndices QueueFamilyIndices;
+
+	uint32 QueueFamilyCount = 0;
+	vkGetPhysicalDeviceQueueFamilyProperties(VulkanPhysicalDevice, &QueueFamilyCount, nullptr);
+
+	std::vector<VkQueueFamilyProperties> QueueFamilies(QueueFamilyCount);
+	vkGetPhysicalDeviceQueueFamilyProperties(VulkanPhysicalDevice, &QueueFamilyCount, QueueFamilies.data());
+
+	uint32 QueueFamilyIndex = 0;
+	for (const VkQueueFamilyProperties& QueueFamily : QueueFamilies)
+	{
+		if (QueueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		{
+			QueueFamilyIndices.SetGraphicsFamily(QueueFamilyIndex);
+		}
+
+		if (QueueFamilyIndices.WasSet())
+		{
+			break;
+		}
+		
+		QueueFamilyIndex++;
+	}
+	
+	return QueueFamilyIndices;
 }
 
 void VulkanAPI::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo)
@@ -154,13 +189,13 @@ void VulkanAPI::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, st
 		}
 		if (!bWasExtensionFound)
 		{
-			UNICA_LOG(Error, "LogRenderInterface", fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
+			UNICA_LOG(Error, "LogVulkanAPI", fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
 			bAllExtensionsFound = false;
 		}
 	}
 	if (!bAllExtensionsFound)
 	{
-		UNICA_LOG(Fatal, "LogRenderInterface", "Not all required instance extensions found");
+		UNICA_LOG(Fatal, "LogVulkanAPI", "Not all required instance extensions found");
 		return;
 	}
 
@@ -195,13 +230,13 @@ void VulkanAPI::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDe
 		}
 		if (!bWasLayerFound)
 		{
-			UNICA_LOG(Error, "LogRenderInterface", fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
+			UNICA_LOG(Error, "LogVulkanAPI", fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
 			bAllLayersFound = false;
 		}
 	}
 	if (!bAllLayersFound)
 	{
-		UNICA_LOG(Error, "LogRenderInterface", "Won't enable VulkanValidationLayers since not all of them are available");
+		UNICA_LOG(Error, "LogVulkanAPI", "Won't enable VulkanValidationLayers since not all of them are available");
 		return;
 	}
 
@@ -258,6 +293,6 @@ VulkanAPI::~VulkanAPI()
 		DestroyVulkanDebugUtilsMessengerEXT(m_VulkanInstance, m_VulkanDebugMessenger, nullptr);
 	}
 	vkDestroyInstance(m_VulkanInstance, nullptr);
-	UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance has been destroyed");
+	UNICA_LOG(Log, "LogVulkanAPI", "Vulkan instance has been destroyed");
 }
 

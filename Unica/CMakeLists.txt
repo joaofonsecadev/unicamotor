@@ -15,6 +15,8 @@ set(SourceFiles
         Source/Renderer/RenderWindow.h
         Source/Renderer/Vulkan/VulkanAPI.cpp
         Source/Renderer/Vulkan/VulkanAPI.h
+        Source/Renderer/Vulkan/VulkanQueueFamilyIndices.cpp
+        Source/Renderer/Vulkan/VulkanQueueFamilyIndices.h
         Source/Subsystem/SubsystemBase.h
         Source/Subsystem/SubsystemManager.cpp
         Source/Subsystem/SubsystemManager.h

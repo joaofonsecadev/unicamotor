@@ -7,6 +7,8 @@
 
 #include "UnicaMinimal.h"
 
+class VulkanQueueFamilyIndices;
+
 class VulkanAPI
 {
 public:
@@ -19,6 +21,7 @@ private:
 	void SelectVulkanPhysicalDevice();
 
 	uint32 RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice);
+	VulkanQueueFamilyIndices GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice);
 	
     void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);
     void AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions);
