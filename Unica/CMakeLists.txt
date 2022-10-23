@@ -9,12 +9,12 @@ set(SourceFiles
         Source/Core/UnicaSettings.h
         Source/Log/Logger.cpp
         Source/Log/Logger.h
-        Source/Renderer/RenderInterface.cpp
-        Source/Renderer/RenderInterface.h
         Source/Renderer/RenderManager.cpp
         Source/Renderer/RenderManager.h
         Source/Renderer/RenderWindow.cpp
         Source/Renderer/RenderWindow.h
+        Source/Renderer/Vulkan/VulkanAPI.cpp
+        Source/Renderer/Vulkan/VulkanAPI.h
         Source/Subsystem/SubsystemBase.h
         Source/Subsystem/SubsystemManager.cpp
         Source/Subsystem/SubsystemManager.h

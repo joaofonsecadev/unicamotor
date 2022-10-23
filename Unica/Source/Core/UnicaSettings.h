@@ -1,3 +1,5 @@
+// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+
 #pragma once
 
 #include <vector>

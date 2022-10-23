@@ -1,6 +1,4 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
-
-#include "RenderInterface.h"
+#include "VulkanAPI.h"
 
 #include <map>
 #include <vector>
@@ -10,24 +8,14 @@
 
 #include "UnicaMinimal.h"
 
-RenderInterface::RenderInterface()
-{
-    InitVulkanInterface();
-}
-
-RenderInterface::~RenderInterface()
-{
-    DestroyVulkanInterface();
-}
-
-void RenderInterface::InitVulkanInterface()
+VulkanAPI::VulkanAPI()
 {
 	CreateVulkanInstance();
 	CreateVulkanDebugMessenger();
 	SelectVulkanPhysicalDevice();
 }
 
-void RenderInterface::CreateVulkanInstance()
+void VulkanAPI::CreateVulkanInstance()
 {
 	VkApplicationInfo VulkanAppInfo{ };
 	VulkanAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -63,7 +51,7 @@ void RenderInterface::CreateVulkanInstance()
 	UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance created");
 }
 
-void RenderInterface::CreateVulkanDebugMessenger()
+void VulkanAPI::CreateVulkanDebugMessenger()
 {
 	if (!UnicaSettings::bValidationLayersEnabled)
 	{
@@ -79,7 +67,7 @@ void RenderInterface::CreateVulkanDebugMessenger()
 	}
 }
 
-void RenderInterface::SelectVulkanPhysicalDevice()
+void VulkanAPI::SelectVulkanPhysicalDevice()
 {
 	uint32 VulkanPhysicalDeviceCount = 0;
 	vkEnumeratePhysicalDevices(m_VulkanInstance, &VulkanPhysicalDeviceCount, nullptr);
@@ -108,7 +96,7 @@ void RenderInterface::SelectVulkanPhysicalDevice()
 	}
 }
 
-uint32 RenderInterface::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice)
+uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice)
 {
 	uint32 Score = 1;
 
@@ -125,7 +113,7 @@ uint32 RenderInterface::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanP
 	return Score;
 }
 
-void RenderInterface::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo)
+void VulkanAPI::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo)
 {
 	VulkanCreateInfo = { };
 	VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -134,7 +122,7 @@ void RenderInterface::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCrea
 	VulkanCreateInfo.pfnUserCallback = VulkanDebugCallback;
 }
 
-void RenderInterface::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions)
+void VulkanAPI::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions)
 {
     
 #ifdef __APPLE__
@@ -180,7 +168,7 @@ void RenderInterface::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateIn
 	VulkanCreateInfo.ppEnabledExtensionNames = RequiredExtensions.data();
 }
 
-void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDebugUtilsMessengerCreateInfoEXT& VulkanDebugCreateInfo)
+void VulkanAPI::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDebugUtilsMessengerCreateInfoEXT& VulkanDebugCreateInfo)
 {
 	if (!UnicaSettings::bValidationLayersEnabled)
 	{
@@ -224,7 +212,7 @@ void RenderInterface::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo
 	VulkanCreateInfo.pNext = &VulkanDebugCreateInfo;
 }
 
-VkResult RenderInterface::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInstance, const VkDebugUtilsMessengerCreateInfoEXT* VulkanCreateInfo, const VkAllocationCallbacks* VulkanAllocator, VkDebugUtilsMessengerEXT* VulkanDebugMessenger)
+VkResult VulkanAPI::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInstance, const VkDebugUtilsMessengerCreateInfoEXT* VulkanCreateInfo, const VkAllocationCallbacks* VulkanAllocator, VkDebugUtilsMessengerEXT* VulkanDebugMessenger)
 {
 	const auto Func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(VulkanInstance, "vkCreateDebugUtilsMessengerEXT"));
 	if (Func != nullptr)
@@ -237,7 +225,7 @@ VkResult RenderInterface::CreateVulkanDebugUtilsMessenger(VkInstance VulkanInsta
 	}
 }
 
-void RenderInterface::DestroyVulkanDebugUtilsMessengerEXT(VkInstance VulkanInstance, VkDebugUtilsMessengerEXT VulkanDebugMessenger, const VkAllocationCallbacks* VulkanAllocator)
+void VulkanAPI::DestroyVulkanDebugUtilsMessengerEXT(VkInstance VulkanInstance, VkDebugUtilsMessengerEXT VulkanDebugMessenger, const VkAllocationCallbacks* VulkanAllocator)
 {
 	const auto Func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(VulkanInstance, "vkDestroyDebugUtilsMessengerEXT"));
 	if (Func != nullptr)
@@ -246,7 +234,7 @@ void RenderInterface::DestroyVulkanDebugUtilsMessengerEXT(VkInstance VulkanInsta
 	}
 }
 
-VKAPI_ATTR VkBool32 VKAPI_CALL RenderInterface::VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT MessageType, const VkDebugUtilsMessengerCallbackDataEXT* CallbackData, void* UserData)
+VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT MessageType, const VkDebugUtilsMessengerCallbackDataEXT* CallbackData, void* UserData)
 {
 	LogLevel LogLvl = Log;
 
@@ -263,7 +251,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL RenderInterface::VulkanDebugCallback(VkDebugUtils
 	return VK_FALSE;
 }
 
-void RenderInterface::DestroyVulkanInterface()
+VulkanAPI::~VulkanAPI()
 {
 	if (UnicaSettings::bValidationLayersEnabled)
 	{
@@ -272,3 +260,4 @@ void RenderInterface::DestroyVulkanInterface()
 	vkDestroyInstance(m_VulkanInstance, nullptr);
 	UNICA_LOG(Log, "LogRenderInterface", "Vulkan instance has been destroyed");
 }
+

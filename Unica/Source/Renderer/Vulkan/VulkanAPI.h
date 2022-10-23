@@ -7,17 +7,13 @@
 
 #include "UnicaMinimal.h"
 
-class RenderInterface
+class VulkanAPI
 {
 public:
-    RenderInterface();
-    ~RenderInterface();
+    VulkanAPI();
+    ~VulkanAPI();
 
-// VulkanAPI 
 private:
-	void InitVulkanInterface();
-	void DestroyVulkanInterface();
-
     void CreateVulkanInstance();
     void CreateVulkanDebugMessenger();
 	void SelectVulkanPhysicalDevice();

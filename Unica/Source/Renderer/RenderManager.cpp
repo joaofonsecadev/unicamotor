@@ -5,7 +5,7 @@
 void RenderManager::Init()
 {
     m_RenderWindow = std::make_unique<RenderWindow>();
-    m_RenderInterface = std::make_unique<RenderInterface>();
+    m_RenderInterface = std::make_unique<VulkanAPI>();
 }
 
 void RenderManager::Tick()
