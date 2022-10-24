@@ -14,6 +14,7 @@ VulkanAPI::VulkanAPI()
 	CreateVulkanInstance();
 	CreateVulkanDebugMessenger();
 	SelectVulkanPhysicalDevice();
+	CreateVulkanLogicalDevice();
 }
 
 void VulkanAPI::CreateVulkanInstance()
@@ -50,22 +51,6 @@ void VulkanAPI::CreateVulkanInstance()
 		return;
 	}
 	UNICA_LOG(Log, "LogVulkanAPI", "Vulkan instance created");
-}
-
-void VulkanAPI::CreateVulkanDebugMessenger()
-{
-	if (!UnicaSettings::bValidationLayersEnabled)
-	{
-		return;
-	}
-
-	VkDebugUtilsMessengerCreateInfoEXT VulkanCreateInfo;
-	PopulateVulkanDebugMessengerInfo(VulkanCreateInfo);
-
-	if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
-	{
-		UNICA_LOG(Error, "LogVulkanAPI", "Couldn't setup VulkanDebugMessenger");
-	}
 }
 
 void VulkanAPI::SelectVulkanPhysicalDevice()
@@ -146,6 +131,48 @@ VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevic
 	}
 	
 	return QueueFamilyIndices;
+}
+
+void VulkanAPI::CreateVulkanLogicalDevice()
+{
+	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
+
+	VkDeviceQueueCreateInfo QueueCreateInfo { };
+	QueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	QueueCreateInfo.queueFamilyIndex = QueueFamilyIndices.GetGraphicsFamily().value();
+	QueueCreateInfo.queueCount = 1;
+
+	const float QueuePriority = 1.f;
+	QueueCreateInfo.pQueuePriorities = &QueuePriority;
+
+	VkPhysicalDeviceFeatures DeviceFeatures { };
+
+	VkDeviceCreateInfo DeviceCreateInfo { };
+	DeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	DeviceCreateInfo.pQueueCreateInfos = &QueueCreateInfo;
+	DeviceCreateInfo.queueCreateInfoCount = 1;
+	DeviceCreateInfo.pEnabledFeatures = &DeviceFeatures;
+
+	if (vkCreateDevice(m_VulkanPhysicalDevice, &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
+	{
+		UNICA_LOG(Fatal, "LogVulkanAPI", "Couldn't create a VulkanLogicalDevice");
+	}
+}
+
+void VulkanAPI::CreateVulkanDebugMessenger()
+{
+	if (!UnicaSettings::bValidationLayersEnabled)
+	{
+		return;
+	}
+
+	VkDebugUtilsMessengerCreateInfoEXT VulkanCreateInfo;
+	PopulateVulkanDebugMessengerInfo(VulkanCreateInfo);
+
+	if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
+	{
+		UNICA_LOG(Error, "LogVulkanAPI", "Couldn't setup VulkanDebugMessenger");
+	}
 }
 
 void VulkanAPI::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo)
@@ -288,6 +315,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 
 VulkanAPI::~VulkanAPI()
 {
+	vkDestroyDevice(m_VulkanLogicalDevice, nullptr);
 	if (UnicaSettings::bValidationLayersEnabled)
 	{
 		DestroyVulkanDebugUtilsMessengerEXT(m_VulkanInstance, m_VulkanDebugMessenger, nullptr);

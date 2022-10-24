@@ -19,6 +19,7 @@ private:
     void CreateVulkanInstance();
     void CreateVulkanDebugMessenger();
 	void SelectVulkanPhysicalDevice();
+	void CreateVulkanLogicalDevice();
 
 	uint32 RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice);
 	VulkanQueueFamilyIndices GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice);
@@ -44,6 +45,7 @@ private:
     );
 
     VkInstance m_VulkanInstance = VK_NULL_HANDLE;
+	VkDevice m_VulkanLogicalDevice = VK_NULL_HANDLE;
 	VkPhysicalDevice m_VulkanPhysicalDevice = VK_NULL_HANDLE;
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 };
