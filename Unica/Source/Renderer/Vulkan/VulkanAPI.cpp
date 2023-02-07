@@ -1,6 +1,9 @@
+// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+
 #include "VulkanAPI.h"
 
 #include <map>
+#include <set>
 #include <vector>
 
 #include "GLFW/glfw3.h"
@@ -8,11 +11,15 @@
 
 #include "UnicaMinimal.h"
 #include "VulkanQueueFamilyIndices.h"
+#include "Renderer/RenderManager.h"
 
-VulkanAPI::VulkanAPI()
+VulkanAPI::VulkanAPI(const RenderManager* OwningRenderManager)
 {
+	m_OwningRenderManager = OwningRenderManager;
+	
 	CreateVulkanInstance();
 	CreateVulkanDebugMessenger();
+	CreateVulkanWindowSurface();
 	SelectVulkanPhysicalDevice();
 	CreateVulkanLogicalDevice();
 }
@@ -60,6 +67,7 @@ void VulkanAPI::SelectVulkanPhysicalDevice()
 	if (VulkanPhysicalDeviceCount < 1)
 	{
 		UNICA_LOG(Fatal, "LogVulkanAPI", "No GPUs with Vulkan support found");
+		return;
 	}
 
 	std::vector<VkPhysicalDevice> VulkanPhysicalDevices(VulkanPhysicalDeviceCount);
@@ -79,6 +87,7 @@ void VulkanAPI::SelectVulkanPhysicalDevice()
 	else
 	{
 		UNICA_LOG(Fatal, "LogVulkanAPI", "No suitable GPU found");
+		return;
 	}
 }
 
@@ -122,6 +131,14 @@ VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevic
 			QueueFamilyIndices.SetGraphicsFamily(QueueFamilyIndex);
 		}
 
+		VkBool32 PresentImagesSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(m_VulkanPhysicalDevice, QueueFamilyIndex, m_VulkanWindowSurface, &PresentImagesSupport);
+
+		if (PresentImagesSupport)
+		{
+			QueueFamilyIndices.SetPresentImagesFamily(QueueFamilyIndex);
+		}
+
 		if (QueueFamilyIndices.WasSet())
 		{
 			break;
@@ -136,6 +153,14 @@ VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevic
 void VulkanAPI::CreateVulkanLogicalDevice()
 {
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
+	if (!QueueFamilyIndices.WasSet())
+	{
+		UNICA_LOG(Fatal, "LogVulkanAPI", "No support for graphics and image presentation queues");
+		return;
+	}
+
+	std::set<uint32> UniqueQueueFamilies = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetGPresentImagesFamily().value() };
+	// @TODO finish processing graphics and present image queues
 
 	VkDeviceQueueCreateInfo QueueCreateInfo { };
 	QueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -156,7 +181,9 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 	if (vkCreateDevice(m_VulkanPhysicalDevice, &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
 	{
 		UNICA_LOG(Fatal, "LogVulkanAPI", "Couldn't create a VulkanLogicalDevice");
+		return;
 	}
+	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGraphicsFamily().value(), 0, &m_VulkanDeviceQueue);
 }
 
 void VulkanAPI::CreateVulkanDebugMessenger()
@@ -172,6 +199,15 @@ void VulkanAPI::CreateVulkanDebugMessenger()
 	if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
 	{
 		UNICA_LOG(Error, "LogVulkanAPI", "Couldn't setup VulkanDebugMessenger");
+	}
+}
+
+void VulkanAPI::CreateVulkanWindowSurface()
+{
+	if (glfwCreateWindowSurface(m_VulkanInstance, m_OwningRenderManager->GetRenderWindow()->GetGlfwWindow(), nullptr, &m_VulkanWindowSurface))
+	{
+		UNICA_LOG(Fatal, "LogVulkanAPI", "Failed to create VulkanWindowSurface");
+		return;
 	}
 }
 
@@ -316,6 +352,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 VulkanAPI::~VulkanAPI()
 {
 	vkDestroyDevice(m_VulkanLogicalDevice, nullptr);
+	vkDestroySurfaceKHR(m_VulkanInstance, m_VulkanWindowSurface, nullptr);
 	if (UnicaSettings::bValidationLayersEnabled)
 	{
 		DestroyVulkanDebugUtilsMessengerEXT(m_VulkanInstance, m_VulkanDebugMessenger, nullptr);

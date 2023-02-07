@@ -18,6 +18,7 @@ void TimeManager::Init()
 	if (std::chrono::steady_clock::period::den != std::nano::den)
 	{
 		UNICA_LOG(Fatal, "LogTimeManager", "HighResClock unit is not nanoseconds");
+		return;
 	}
 }
 

@@ -42,8 +42,8 @@ void UnicaInstance::Tick()
 		TimeManager::SetFrameSleepDuration(0);
         return;
     }
+    
 	TimeManager::SetFrameSleepDuration(static_cast<float>(SleepDuration.count()) / 1'000'000);
-
     while (std::chrono::steady_clock::now() < NextFrameTimeTarget);
 }
 

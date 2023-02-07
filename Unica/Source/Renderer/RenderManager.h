@@ -18,4 +18,7 @@ private:
 
     std::unique_ptr<RenderWindow> m_RenderWindow;
     std::unique_ptr<VulkanAPI> m_RenderInterface;
+
+public:
+    RenderWindow* GetRenderWindow() const { return m_RenderWindow.get(); }
 };

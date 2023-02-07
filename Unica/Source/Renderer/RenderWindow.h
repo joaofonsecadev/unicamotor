@@ -13,6 +13,8 @@ public:
 
     void Tick();
 
+    GLFWwindow* GetGlfwWindow() const { return m_GlfwWindow; }
+
 private:
     GLFWwindow* m_GlfwWindow;
 };
