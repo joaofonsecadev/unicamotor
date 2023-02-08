@@ -49,6 +49,11 @@ void VulkanAPI::CreateVulkanInstance()
 	const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
 	std::vector<const char*> RequiredExtensions(GlfwExtensions, GlfwExtensions + GlfwExtensionCount);
 
+	if (UnicaSettings::bValidationLayersEnabled)
+	{
+		RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+
 	AddRequiredExtensions(VulkanCreateInfo, RequiredExtensions);
 	AddValidationLayers(VulkanCreateInfo, VulkanDebugCreateInfo);
 
@@ -97,6 +102,11 @@ uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysica
 	{
 		return 0;
 	}
+
+	if (!DeviceHasRequiredExtensions(VulkanPhysicalDevice))
+	{
+		return 0;
+	}
 	
 	uint32 Score = 1;
 
@@ -111,6 +121,24 @@ uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysica
 	}
 	
 	return Score;
+}
+
+bool VulkanAPI::DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysicalDevice)
+{
+	const std::vector<const char*> RequiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+	
+	uint32_t AvailableDeviceExtensionCount;
+	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, nullptr);
+	std::vector<VkExtensionProperties> AvailableDeviceExtensions(AvailableDeviceExtensionCount);
+	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, AvailableDeviceExtensions.data());
+
+	std::set<std::string> DeviceExtensions(RequiredDeviceExtensions.begin(), RequiredDeviceExtensions.end());
+	for (const auto& extension : AvailableDeviceExtensions)
+	{
+		DeviceExtensions.erase(extension.extensionName);
+	}
+
+	return DeviceExtensions.empty();
 }
 
 VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
@@ -132,7 +160,7 @@ VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevic
 		}
 
 		VkBool32 PresentImagesSupport = false;
-		vkGetPhysicalDeviceSurfaceSupportKHR(m_VulkanPhysicalDevice, QueueFamilyIndex, m_VulkanWindowSurface, &PresentImagesSupport);
+		vkGetPhysicalDeviceSurfaceSupportKHR(VulkanPhysicalDevice, QueueFamilyIndex, m_VulkanWindowSurface, &PresentImagesSupport);
 
 		if (PresentImagesSupport)
 		{
@@ -159,23 +187,26 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 		return;
 	}
 
+	std::vector<VkDeviceQueueCreateInfo> QueueCreateInfos;
 	std::set<uint32> UniqueQueueFamilies = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetGPresentImagesFamily().value() };
-	// @TODO finish processing graphics and present image queues
-
-	VkDeviceQueueCreateInfo QueueCreateInfo { };
-	QueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	QueueCreateInfo.queueFamilyIndex = QueueFamilyIndices.GetGraphicsFamily().value();
-	QueueCreateInfo.queueCount = 1;
-
+	
 	const float QueuePriority = 1.f;
-	QueueCreateInfo.pQueuePriorities = &QueuePriority;
+	for (const uint32 UniqueQueueFamily : UniqueQueueFamilies)
+	{
+		VkDeviceQueueCreateInfo QueueCreateInfo { };
+		QueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		QueueCreateInfo.queueFamilyIndex = UniqueQueueFamily;
+		QueueCreateInfo.queueCount = 1;
+		QueueCreateInfo.pQueuePriorities = &QueuePriority;
+		QueueCreateInfos.push_back(QueueCreateInfo);
+	}
 
 	VkPhysicalDeviceFeatures DeviceFeatures { };
 
 	VkDeviceCreateInfo DeviceCreateInfo { };
 	DeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	DeviceCreateInfo.pQueueCreateInfos = &QueueCreateInfo;
-	DeviceCreateInfo.queueCreateInfoCount = 1;
+	DeviceCreateInfo.queueCreateInfoCount = static_cast<uint32>(QueueCreateInfos.size());
+	DeviceCreateInfo.pQueueCreateInfos = QueueCreateInfos.data();
 	DeviceCreateInfo.pEnabledFeatures = &DeviceFeatures;
 
 	if (vkCreateDevice(m_VulkanPhysicalDevice, &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
@@ -183,7 +214,8 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 		UNICA_LOG(Fatal, "LogVulkanAPI", "Couldn't create a VulkanLogicalDevice");
 		return;
 	}
-	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGraphicsFamily().value(), 0, &m_VulkanDeviceQueue);
+	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGraphicsFamily().value(), 0, &m_VulkanGraphicsQueue);
+	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGPresentImagesFamily().value(), 0, &m_VulkanPresentImagesQueue);
 }
 
 void VulkanAPI::CreateVulkanDebugMessenger()
@@ -227,22 +259,17 @@ void VulkanAPI::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, st
     RequiredExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
     RequiredExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 #endif // __APPLE__
-    
-	if (UnicaSettings::bValidationLayersEnabled)
-	{
-		RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-	}
 
-	uint32 AvailableExtensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, nullptr);
-	std::vector<VkExtensionProperties> AvailableExtensions(AvailableExtensionCount);
-	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableExtensionCount, AvailableExtensions.data());
+	uint32 AvailableInstanceExtensionCount = 0;
+	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableInstanceExtensionCount, nullptr);
+	std::vector<VkExtensionProperties> AvailableInstanceExtensions(AvailableInstanceExtensionCount);
+	vkEnumerateInstanceExtensionProperties(nullptr, &AvailableInstanceExtensionCount, AvailableInstanceExtensions.data());
 
 	bool bAllExtensionsFound = true;
 	for (const char* RequiredExtensionName : RequiredExtensions)
 	{
 		bool bWasExtensionFound = false;
-		for (const VkExtensionProperties& AvailableExtension : AvailableExtensions)
+		for (const VkExtensionProperties& AvailableExtension : AvailableInstanceExtensions)
 		{
 			if (strcmp(RequiredExtensionName, AvailableExtension.extensionName) == 0)
 			{
