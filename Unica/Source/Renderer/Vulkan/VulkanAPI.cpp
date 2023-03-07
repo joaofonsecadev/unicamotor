@@ -133,9 +133,9 @@ bool VulkanAPI::DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysic
 	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, AvailableDeviceExtensions.data());
 
 	std::set<std::string> DeviceExtensions(RequiredDeviceExtensions.begin(), RequiredDeviceExtensions.end());
-	for (const auto& extension : AvailableDeviceExtensions)
+	for (const VkExtensionProperties& DeviceExtension : AvailableDeviceExtensions)
 	{
-		DeviceExtensions.erase(extension.extensionName);
+		DeviceExtensions.erase(DeviceExtension.extensionName);
 	}
 
 	return DeviceExtensions.empty();
@@ -188,7 +188,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 	}
 
 	std::vector<VkDeviceQueueCreateInfo> QueueCreateInfos;
-	std::set<uint32> UniqueQueueFamilies = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetGPresentImagesFamily().value() };
+	std::set<uint32> UniqueQueueFamilies = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetPresentImagesFamily().value() };
 	
 	const float QueuePriority = 1.f;
 	for (const uint32 UniqueQueueFamily : UniqueQueueFamilies)
@@ -215,7 +215,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 		return;
 	}
 	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGraphicsFamily().value(), 0, &m_VulkanGraphicsQueue);
-	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGPresentImagesFamily().value(), 0, &m_VulkanPresentImagesQueue);
+	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetPresentImagesFamily().value(), 0, &m_VulkanPresentImagesQueue);
 }
 
 void VulkanAPI::CreateVulkanDebugMessenger()
@@ -254,7 +254,6 @@ void VulkanAPI::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfo
 
 void VulkanAPI::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions)
 {
-    
 #ifdef __APPLE__
     RequiredExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
     RequiredExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
