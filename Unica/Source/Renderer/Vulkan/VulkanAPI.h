@@ -6,6 +6,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "UnicaMinimal.h"
+#include "VulkanSwapChainSupportDetails.h"
 
 class RenderManager;
 class VulkanQueueFamilyIndices;
@@ -18,28 +19,35 @@ public:
 
 private:
     void CreateVulkanInstance();
-    void CreateVulkanDebugMessenger();
+	void AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions);
+	void AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDebugUtilsMessengerCreateInfoEXT& VulkanDebugCreateInfo);
+	
 	void CreateVulkanWindowSurface();
+	
 	void SelectVulkanPhysicalDevice();
-	void CreateVulkanLogicalDevice();
-
-	bool DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysicalDevice);
 	uint32 RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice);
 	VulkanQueueFamilyIndices GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice);
+	bool DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysicalDevice);
 	
-    void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);
-    void AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, std::vector<const char*>& RequiredExtensions);
-    void AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDebugUtilsMessengerCreateInfoEXT& VulkanDebugCreateInfo);
+	void CreateVulkanLogicalDevice();
+
+	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
+	
+	void CreateVulkanDebugMessenger();
+	void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);
+    
 	VkResult CreateVulkanDebugUtilsMessenger(VkInstance VulkanInstance,
 		const VkDebugUtilsMessengerCreateInfoEXT* VulkanCreateInfo,
 		const VkAllocationCallbacks* VulkanAllocator,
 		VkDebugUtilsMessengerEXT* VulkanDebugMessenger
 	);
+	
     void DestroyVulkanDebugUtilsMessengerEXT(
         VkInstance VulkanInstance,
         VkDebugUtilsMessengerEXT VulkanDebugMessenger,
         const VkAllocationCallbacks* VulkanAllocator
     );
+	
     static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT MessageType,

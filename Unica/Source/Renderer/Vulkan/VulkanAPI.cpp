@@ -107,6 +107,12 @@ uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysica
 	{
 		return 0;
 	}
+
+	const VulkanSwapChainSupportDetails SwapChainSupportDetails = QuerySwapChainSupport(VulkanPhysicalDevice);
+	if (SwapChainSupportDetails.SurfaceFormats.empty() || SwapChainSupportDetails.PresentModes.empty())
+	{
+		return 0;
+	}
 	
 	uint32 Score = 1;
 
@@ -176,6 +182,31 @@ VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevic
 	}
 	
 	return QueueFamilyIndices;
+}
+
+VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice)
+{
+	VulkanSwapChainSupportDetails SwapChainSupportDetails;
+
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(VulkanPhysicalDevice, m_VulkanWindowSurface, &SwapChainSupportDetails.SurfaceCapabilities);
+
+	uint32 SurfaceFormatsCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(VulkanPhysicalDevice, m_VulkanWindowSurface, &SurfaceFormatsCount, nullptr);
+	if (SurfaceFormatsCount > 0)
+	{
+		SwapChainSupportDetails.SurfaceFormats.resize(SurfaceFormatsCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(VulkanPhysicalDevice, m_VulkanWindowSurface, &SurfaceFormatsCount, SwapChainSupportDetails.SurfaceFormats.data());
+	}
+
+	uint32 PresentModesCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(VulkanPhysicalDevice, m_VulkanWindowSurface, &PresentModesCount, nullptr);
+	if (PresentModesCount > 0)
+	{
+		SwapChainSupportDetails.PresentModes.resize(PresentModesCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(VulkanPhysicalDevice, m_VulkanWindowSurface, &PresentModesCount, SwapChainSupportDetails.PresentModes.data());
+	}
+	
+	return SwapChainSupportDetails;
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()
