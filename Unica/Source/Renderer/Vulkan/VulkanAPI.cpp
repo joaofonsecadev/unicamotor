@@ -24,6 +24,7 @@ VulkanAPI::VulkanAPI(const RenderManager* OwningRenderManager)
 	SelectVulkanPhysicalDevice();
 	CreateVulkanLogicalDevice();
 	CreateSwapChain();
+	CreateImageViews();
 }
 
 void VulkanAPI::CreateVulkanInstance()
@@ -303,6 +304,46 @@ void VulkanAPI::CreateSwapChain()
 		UNICA_LOG(Fatal, "LogVulkanAPI", "Failed to create VulkanSwapChain");
 		return;
 	}
+
+	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, &SwapImageCount, nullptr);
+	m_VulkanSwapChainImages.resize(SwapImageCount);
+	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, &SwapImageCount, m_VulkanSwapChainImages.data());
+
+	m_VulkanSwapChainImageFormat = SurfaceFormat.format;
+	m_VulkanSwapChainExtent = Extent;
+}
+
+void VulkanAPI::CreateImageViews()
+{
+	uint32 SwapChainImageIteration = 0;
+	m_VulkanSwapChainImageViews.resize(m_VulkanSwapChainImages.size());
+	for (const VkImage& SwapChainImage : m_VulkanSwapChainImages)
+	{
+		VkImageViewCreateInfo ImageViewCreateInfo;
+		ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		ImageViewCreateInfo.image = SwapChainImage;
+		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		ImageViewCreateInfo.format = m_VulkanSwapChainImageFormat;
+
+		ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+		ImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+		ImageViewCreateInfo.subresourceRange.levelCount = 1;
+		ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+		ImageViewCreateInfo.subresourceRange.layerCount = 1;
+
+		if (vkCreateImageView(m_VulkanLogicalDevice, &ImageViewCreateInfo, nullptr, &m_VulkanSwapChainImageViews[SwapChainImageIteration]) != VK_SUCCESS)
+		{
+			UNICA_LOG(Fatal, "LogVulkanAPI", "Failed to create VulkanImageViews");
+			return;
+		}
+
+		SwapChainImageIteration++;
+	}
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()
@@ -518,6 +559,10 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 
 VulkanAPI::~VulkanAPI()
 {
+	for (const VkImageView& SwapChainImageView : m_VulkanSwapChainImageViews)
+	{
+		vkDestroyImageView(m_VulkanLogicalDevice, SwapChainImageView, nullptr);
+	}
 	vkDestroySwapchainKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, nullptr);
 	vkDestroyDevice(m_VulkanLogicalDevice, nullptr);
 	vkDestroySurfaceKHR(m_VulkanInstance, m_VulkanWindowSurface, nullptr);

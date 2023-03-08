@@ -36,6 +36,8 @@ private:
 	VkPresentModeKHR SelectSwapPresentMode(const std::vector<VkPresentModeKHR>& AvailablePresentModes);
 	VkExtent2D SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCapabilities);
 	void CreateSwapChain();
+
+	void CreateImageViews();
 	
 	void CreateVulkanDebugMessenger();
 	void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);
@@ -66,7 +68,12 @@ private:
 	VkPhysicalDevice m_VulkanPhysicalDevice = VK_NULL_HANDLE;
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 	VkSurfaceKHR m_VulkanWindowSurface = VK_NULL_HANDLE;
+	
 	VkSwapchainKHR m_VulkanSwapChain = VK_NULL_HANDLE;
+	VkFormat m_VulkanSwapChainImageFormat;
+	VkExtent2D m_VulkanSwapChainExtent;
+	std::vector<VkImage> m_VulkanSwapChainImages;
+	std::vector<VkImageView> m_VulkanSwapChainImageViews;
 
 	const RenderManager* m_OwningRenderManager = nullptr;
 };
