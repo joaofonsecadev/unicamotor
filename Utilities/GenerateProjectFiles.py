@@ -37,14 +37,17 @@ def ensurecmake():
     return cmakepath
 
 def generateSourceFilesList():
-    sourceFiles = unicaMainDir.glob("Source/**/*")
-    configFiles = unicaMainDir.glob("Config/**/*.ini")
-    
+    globsArray = [
+        unicaMainDir.glob("Source/**/*"),
+        unicaMainDir.glob("Config/**/*.ini"),
+        unicaMainDir.glob("Shaders/**/*")
+    ]
+
     allFiles: list[pathlib.Path] = []
-    for file in configFiles:
-        allFiles.append(file)
-    for file in sourceFiles:
-        allFiles.append(file)
+    for glob in globsArray:
+        for file in glob:
+            allFiles.append(file)
+    
 
     cmakeReadySourceFileStrings = []
     linuxStyleUnicaPath = unicaMainDir.as_posix() + "/"
@@ -53,6 +56,8 @@ def generateSourceFilesList():
             continue
         linuxStyleFilePath = file.as_posix()
         cmakeReadySourceFileStrings.append("    " + linuxStyleFilePath.replace(linuxStyleUnicaPath, "") + "\n")
+
+    cmakeReadySourceFileStrings.sort()
     return cmakeReadySourceFileStrings
 
 def updateSourceFiles():
@@ -80,9 +85,6 @@ def updateSourceFiles():
 
         for line in originalFilelinesList[finalSourceFileIndex+1:]:
             finalCmakeListsFile.append(line)
-
-        if (finalCmakeListsFile == originalFilelinesList):
-            return
         
         print("Updating Unica CMakeLists.txt")
         cmakeFile.writelines(finalCmakeListsFile)
@@ -106,7 +108,7 @@ if sys.version_info < (3, 10):
     endexecution()
 
 if systemType == 'Windows':
-    projectType = '-GVisual Studio 17 2022'
+    projectType = '-GVisual Studio 16 2019'
 elif systemType == 'Darwin':
     projectType = '-GXcode'
 else:
