@@ -89,11 +89,11 @@ def updateSourceFiles():
 
 def generateproject():
     updateSourceFiles()
-    #subprocess.run([ensurecmake(),
-    #                "-S.",
-    #                "-B{0}/Intermediate".format(os.getcwd()),
-    #                projectType
-    #                ])
+    subprocess.run([ensurecmake(),
+                    "-S.",
+                    "-B{0}/Intermediate".format(os.getcwd()),
+                    projectType
+                    ])
 
 
 def endexecution():
