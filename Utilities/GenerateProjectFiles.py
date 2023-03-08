@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import shutil
+import pathlib
 import platform
 import subprocess
 
@@ -25,6 +26,8 @@ buildHelperDir = os.path.dirname(__file__)
 os.chdir(buildHelperDir)
 os.chdir('..')
 
+pythonScriptDir = pathlib.Path(os.path.dirname(__file__))
+unicaMainDir = pythonScriptDir.joinpath("../Unica/").resolve()
 
 def ensurecmake():
     cmakepath = shutil.which("cmake")
@@ -33,13 +36,64 @@ def ensurecmake():
         endexecution()
     return cmakepath
 
+def generateSourceFilesList():
+    sourceFiles = unicaMainDir.glob("Source/**/*")
+    configFiles = unicaMainDir.glob("Config/**/*.ini")
+    
+    allFiles: list[pathlib.Path] = []
+    for file in configFiles:
+        allFiles.append(file)
+    for file in sourceFiles:
+        allFiles.append(file)
+
+    cmakeReadySourceFileStrings = []
+    linuxStyleUnicaPath = unicaMainDir.as_posix() + "/"
+    for file in allFiles:
+        if file.is_dir():
+            continue
+        linuxStyleFilePath = file.as_posix()
+        cmakeReadySourceFileStrings.append("    " + linuxStyleFilePath.replace(linuxStyleUnicaPath, "") + "\n")
+    return cmakeReadySourceFileStrings
+
+def updateSourceFiles():
+    sourceFilesList = generateSourceFilesList()
+    originalFilelinesList: list[str] = []
+    finalCmakeListsFile: list[str] = []
+
+    with open(unicaMainDir.joinpath("CMakeLists.txt"), "r") as cmakeFile:
+        originalFilelinesList = cmakeFile.readlines()
+
+    with open(unicaMainDir.joinpath("CMakeLists.txt"), "w") as cmakeFile:
+        finalSourceFileIndex = -1
+        for line in originalFilelinesList:
+            finalSourceFileIndex += 1
+            finalCmakeListsFile.append(line)
+            if "set(SourceFiles" in line:
+                for sourceLine in originalFilelinesList[finalSourceFileIndex+1:]:
+                    finalSourceFileIndex += 1
+                    if ")" in sourceLine:
+                        finalSourceFileIndex -= 1
+                        break
+                break
+        for line in sourceFilesList:
+            finalCmakeListsFile.append(line)
+
+        for line in originalFilelinesList[finalSourceFileIndex+1:]:
+            finalCmakeListsFile.append(line)
+
+        if (finalCmakeListsFile == originalFilelinesList):
+            return
+        
+        print("Updating Unica CMakeLists.txt")
+        cmakeFile.writelines(finalCmakeListsFile)
 
 def generateproject():
-    subprocess.run([ensurecmake(),
-                    "-S.",
-                    "-B{0}/Intermediate".format(os.getcwd()),
-                    projectType
-                    ])
+    updateSourceFiles()
+    #subprocess.run([ensurecmake(),
+    #                "-S.",
+    #                "-B{0}/Intermediate".format(os.getcwd()),
+    #                projectType
+    #                ])
 
 
 def endexecution():

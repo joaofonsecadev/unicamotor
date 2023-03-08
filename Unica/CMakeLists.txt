@@ -1,28 +1,28 @@
 cmake_minimum_required(VERSION 3.21)
 
 set(SourceFiles
-        Config/DefaultEngine.ini
-        Source/Main.cpp
-        Source/Core/UnicaInstance.cpp
-        Source/Core/UnicaInstance.h
-        Source/Core/UnicaMinimal.h
-        Source/Core/UnicaSettings.h
-        Source/Log/Logger.cpp
-        Source/Log/Logger.h
-        Source/Renderer/RenderManager.cpp
-        Source/Renderer/RenderManager.h
-        Source/Renderer/RenderWindow.cpp
-        Source/Renderer/RenderWindow.h
-        Source/Renderer/Vulkan/VulkanAPI.cpp
-        Source/Renderer/Vulkan/VulkanAPI.h
-        Source/Renderer/Vulkan/VulkanQueueFamilyIndices.cpp
-        Source/Renderer/Vulkan/VulkanQueueFamilyIndices.h
-        Source/Renderer/Vulkan/VulkanSwapChainSupportDetails.h
-        Source/Subsystem/SubsystemBase.h
-        Source/Subsystem/SubsystemManager.cpp
-        Source/Subsystem/SubsystemManager.h
-        Source/Timer/TimeManager.cpp
-        Source/Timer/TimeManager.h
+    Config/DefaultEngine.ini
+    Source/Main.cpp
+    Source/Core/UnicaInstance.cpp
+    Source/Core/UnicaInstance.h
+    Source/Core/UnicaMinimal.h
+    Source/Core/UnicaSettings.h
+    Source/Log/Logger.cpp
+    Source/Log/Logger.h
+    Source/Renderer/RenderManager.cpp
+    Source/Renderer/RenderManager.h
+    Source/Renderer/RenderWindow.cpp
+    Source/Renderer/RenderWindow.h
+    Source/Renderer/Vulkan/VulkanAPI.cpp
+    Source/Renderer/Vulkan/VulkanAPI.h
+    Source/Renderer/Vulkan/VulkanQueueFamilyIndices.cpp
+    Source/Renderer/Vulkan/VulkanQueueFamilyIndices.h
+    Source/Renderer/Vulkan/VulkanSwapChainSupportDetails.h
+    Source/Subsystem/SubsystemBase.h
+    Source/Subsystem/SubsystemManager.cpp
+    Source/Subsystem/SubsystemManager.h
+    Source/Timer/TimeManager.cpp
+    Source/Timer/TimeManager.h
 )
 add_executable("Unica" ${SourceFiles})
 
