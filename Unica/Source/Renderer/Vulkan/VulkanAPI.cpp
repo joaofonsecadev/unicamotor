@@ -2,6 +2,7 @@
 
 #include "VulkanAPI.h"
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <vector>
@@ -22,6 +23,7 @@ VulkanAPI::VulkanAPI(const RenderManager* OwningRenderManager)
 	CreateVulkanWindowSurface();
 	SelectVulkanPhysicalDevice();
 	CreateVulkanLogicalDevice();
+	CreateSwapChain();
 }
 
 void VulkanAPI::CreateVulkanInstance()
@@ -32,7 +34,7 @@ void VulkanAPI::CreateVulkanInstance()
 	VulkanAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 	VulkanAppInfo.pEngineName = UnicaSettings::EngineName.c_str();
 	VulkanAppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	VulkanAppInfo.apiVersion = VK_API_VERSION_1_0;
+	VulkanAppInfo.apiVersion = VK_API_VERSION_1_3;
 
 	VkInstanceCreateInfo VulkanCreateInfo{ };
 	VkDebugUtilsMessengerCreateInfoEXT VulkanDebugCreateInfo;
@@ -131,14 +133,12 @@ uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysica
 
 bool VulkanAPI::DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysicalDevice)
 {
-	const std::vector<const char*> RequiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
-	
 	uint32_t AvailableDeviceExtensionCount;
 	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, nullptr);
 	std::vector<VkExtensionProperties> AvailableDeviceExtensions(AvailableDeviceExtensionCount);
 	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, AvailableDeviceExtensions.data());
 
-	std::set<std::string> DeviceExtensions(RequiredDeviceExtensions.begin(), RequiredDeviceExtensions.end());
+	std::set<std::string> DeviceExtensions(UnicaSettings::RequiredDeviceExtensions.begin(), UnicaSettings::RequiredDeviceExtensions.end());
 	for (const VkExtensionProperties& DeviceExtension : AvailableDeviceExtensions)
 	{
 		DeviceExtensions.erase(DeviceExtension.extensionName);
@@ -209,6 +209,102 @@ VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalD
 	return SwapChainSupportDetails;
 }
 
+VkSurfaceFormatKHR VulkanAPI::SelectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& AvailableSurfaceFormats)
+{
+	for (const VkSurfaceFormatKHR& SurfaceFormat : AvailableSurfaceFormats)
+	{
+		if (SurfaceFormat.format == VK_FORMAT_B8G8R8A8_SRGB && SurfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+		{
+			return SurfaceFormat;
+		}
+	}
+
+	// TODO: Rank surface formats to default to the best possible one
+	return AvailableSurfaceFormats[0];
+}
+
+VkPresentModeKHR VulkanAPI::SelectSwapPresentMode(const std::vector<VkPresentModeKHR>& AvailablePresentModes)
+{
+	for (const VkPresentModeKHR& PresentMode : AvailablePresentModes)
+	{
+		if (PresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+		{
+			return PresentMode;
+		}
+	}
+
+	return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D VulkanAPI::SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCapabilities)
+{
+	if (SurfaceCapabilities.currentExtent.width != std::numeric_limits<uint32>::max())
+	{
+		return SurfaceCapabilities.currentExtent;
+	}
+
+	int32 Width, Height;
+	glfwGetFramebufferSize(m_OwningRenderManager->GetRenderWindow()->GetGlfwWindow(), &Width, &Height);
+
+	VkExtent2D VulkanExtent = { static_cast<uint32>(Width), static_cast<uint32>(Height) };
+	VulkanExtent.width = std::clamp(VulkanExtent.width, SurfaceCapabilities.minImageExtent.width, SurfaceCapabilities.maxImageExtent.width);
+	VulkanExtent.height = std::clamp(VulkanExtent.height, SurfaceCapabilities.minImageExtent.height, SurfaceCapabilities.maxImageExtent.height);
+
+	return VulkanExtent;
+}
+
+void VulkanAPI::CreateSwapChain()
+{
+	const VulkanSwapChainSupportDetails SwapChainSupportDetails = QuerySwapChainSupport(m_VulkanPhysicalDevice);
+	const VkSurfaceFormatKHR SurfaceFormat = SelectSwapSurfaceFormat(SwapChainSupportDetails.SurfaceFormats);
+	const VkPresentModeKHR PresentMode = SelectSwapPresentMode(SwapChainSupportDetails.PresentModes);
+	const VkExtent2D Extent = SelectSwapExtent(SwapChainSupportDetails.SurfaceCapabilities);
+
+	uint32 SwapImageCount = SwapChainSupportDetails.SurfaceCapabilities.minImageCount + 1;
+	if (SwapChainSupportDetails.SurfaceCapabilities.maxImageCount > 0 && SwapImageCount > SwapChainSupportDetails.SurfaceCapabilities.maxImageCount)
+	{
+		SwapImageCount = SwapChainSupportDetails.SurfaceCapabilities.maxImageCount;
+	}
+
+	VkSwapchainCreateInfoKHR SwapChainCreateInfo { };
+	SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	SwapChainCreateInfo.surface = m_VulkanWindowSurface;
+	SwapChainCreateInfo.minImageCount = SwapImageCount;
+	SwapChainCreateInfo.imageFormat = SurfaceFormat.format;
+	SwapChainCreateInfo.imageColorSpace = SurfaceFormat.colorSpace;
+	SwapChainCreateInfo.imageExtent = Extent;
+	SwapChainCreateInfo.imageArrayLayers = 1;
+	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
+	const uint32 QueueFamilyIndicesArray[] = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetPresentImagesFamily().value() };
+
+	if (QueueFamilyIndices.GetGraphicsFamily() != QueueFamilyIndices.GetPresentImagesFamily())
+	{
+		SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+		SwapChainCreateInfo.queueFamilyIndexCount = 2;
+		SwapChainCreateInfo.pQueueFamilyIndices = QueueFamilyIndicesArray;
+	}
+	else
+	{
+		SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		SwapChainCreateInfo.queueFamilyIndexCount = 0;
+		SwapChainCreateInfo.pQueueFamilyIndices = nullptr;
+	}
+
+	SwapChainCreateInfo.preTransform = SwapChainSupportDetails.SurfaceCapabilities.currentTransform;
+	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	SwapChainCreateInfo.presentMode = PresentMode;
+	SwapChainCreateInfo.clipped = VK_TRUE;
+	SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
+	if (vkCreateSwapchainKHR(m_VulkanLogicalDevice, &SwapChainCreateInfo, nullptr, &m_VulkanSwapChain) != VK_SUCCESS)
+	{
+		UNICA_LOG(Fatal, "LogVulkanAPI", "Failed to create VulkanSwapChain");
+		return;
+	}
+}
+
 void VulkanAPI::CreateVulkanLogicalDevice()
 {
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
@@ -240,11 +336,25 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 	DeviceCreateInfo.pQueueCreateInfos = QueueCreateInfos.data();
 	DeviceCreateInfo.pEnabledFeatures = &DeviceFeatures;
 
+	DeviceCreateInfo.enabledExtensionCount = static_cast<uint32>(UnicaSettings::RequiredDeviceExtensions.size());
+	DeviceCreateInfo.ppEnabledExtensionNames = UnicaSettings::RequiredDeviceExtensions.data();
+
+	if (UnicaSettings::bValidationLayersEnabled)
+	{
+		DeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(UnicaSettings::RequestedValidationLayers.size());
+		DeviceCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
+	}
+	else
+	{
+		DeviceCreateInfo.enabledLayerCount = 0;
+	}
+
 	if (vkCreateDevice(m_VulkanPhysicalDevice, &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
 	{
 		UNICA_LOG(Fatal, "LogVulkanAPI", "Couldn't create a VulkanLogicalDevice");
 		return;
 	}
+	
 	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGraphicsFamily().value(), 0, &m_VulkanGraphicsQueue);
 	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetPresentImagesFamily().value(), 0, &m_VulkanPresentImagesQueue);
 }
@@ -408,6 +518,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 
 VulkanAPI::~VulkanAPI()
 {
+	vkDestroySwapchainKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, nullptr);
 	vkDestroyDevice(m_VulkanLogicalDevice, nullptr);
 	vkDestroySurfaceKHR(m_VulkanInstance, m_VulkanWindowSurface, nullptr);
 	if (UnicaSettings::bValidationLayersEnabled)

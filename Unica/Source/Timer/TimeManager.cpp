@@ -25,8 +25,8 @@ void TimeManager::Init()
 void TimeManager::Tick()
 {
     CalculateLastFrameTime();
-    fmt::print(fg(fmt::color::light_gray), "\33[2K\rWorkFrameTime: {:.2f}; SleepFrameTime: {:.2f}; TotalFrameTime: {:.2f}",
-        m_FrameWorkDuration, m_FrameSleepDuration, m_FrameWorkDuration + m_FrameSleepDuration);
+    //fmt::print(fg(fmt::color::light_gray), "\33[2K\rWorkFrameTime: {:.2f}; SleepFrameTime: {:.2f}; TotalFrameTime: {:.2f}",
+    //    m_FrameWorkDuration, m_FrameSleepDuration, m_FrameWorkDuration + m_FrameSleepDuration);
 }
 
 void TimeManager::CalculateLastFrameTime()
