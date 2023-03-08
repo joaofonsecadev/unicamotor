@@ -38,6 +38,8 @@ private:
 	void CreateSwapChain();
 
 	void CreateImageViews();
+
+	void CreateGraphicsPipeline();
 	
 	void CreateVulkanDebugMessenger();
 	void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);

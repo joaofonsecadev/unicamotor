@@ -25,6 +25,7 @@ VulkanAPI::VulkanAPI(const RenderManager* OwningRenderManager)
 	CreateVulkanLogicalDevice();
 	CreateSwapChain();
 	CreateImageViews();
+	CreateGraphicsPipeline();
 }
 
 void VulkanAPI::CreateVulkanInstance()
@@ -319,7 +320,7 @@ void VulkanAPI::CreateImageViews()
 	m_VulkanSwapChainImageViews.resize(m_VulkanSwapChainImages.size());
 	for (const VkImage& SwapChainImage : m_VulkanSwapChainImages)
 	{
-		VkImageViewCreateInfo ImageViewCreateInfo;
+		VkImageViewCreateInfo ImageViewCreateInfo { };
 		ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		ImageViewCreateInfo.image = SwapChainImage;
 		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -344,6 +345,10 @@ void VulkanAPI::CreateImageViews()
 
 		SwapChainImageIteration++;
 	}
+}
+
+void VulkanAPI::CreateGraphicsPipeline()
+{
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()

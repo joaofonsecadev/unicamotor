@@ -86,7 +86,7 @@ def updateSourceFiles():
         for line in originalFilelinesList[finalSourceFileIndex+1:]:
             finalCmakeListsFile.append(line)
         
-        print("Updating Unica CMakeLists.txt")
+        print("Updating {}".format(cmakeFile.name))
         cmakeFile.writelines(finalCmakeListsFile)
 
 def generateproject():
