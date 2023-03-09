@@ -7,3 +7,6 @@
 [submodule "Libraries/glm"]
 	path = Libraries/glm
 	url = git@github.com:g-truc/glm.git
+[submodule "Libraries/shaderc"]
+	path = Libraries/shaderc
+	url = https://github.com/google/shaderc
