@@ -22,12 +22,13 @@ set(SHADERC_SPIRV_TOOLS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries/spirv-tools" 
 set(SHADERC_SPIRV_HEADERS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries/spirv-headers" CACHE STRING "" FORCE)
 set(SHADERC_GLSLANG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries/glslang" CACHE STRING "" FORCE)
 
+set(SPIRV_SKIP_TESTS ON CACHE BOOL "" FORCE)
+set(SPIRV_SKIP_EXECUTABLES ON CACHE BOOL "" FORCE)
+
 add_subdirectory("Libraries/fmt")
 add_subdirectory("Libraries/glm")
 add_subdirectory("Libraries/glfw")
-
 add_subdirectory("Libraries/shaderc")
-set_property(DIRECTORY "Libraries/shaderc" PROPERTY FOLDER "Libraries/shaderc")
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
 
