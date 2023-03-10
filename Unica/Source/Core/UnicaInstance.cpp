@@ -6,11 +6,11 @@
 #include <fstream>
 
 #include "UnicaMinimal.h"
-#include "UnicaSystemUtilities.h"
+#include "UnicaFileUtilities.h"
 #include "Timer/TimeManager.h"
 
 bool UnicaInstance::m_bHasRequestedExit = false;
-std::filesystem::path UnicaInstance::m_ExecutableDirectory;
+std::filesystem::path UnicaInstance::m_UnicaRootDirectory;
 
 void UnicaInstance::Init()
 {
@@ -55,7 +55,7 @@ void UnicaInstance::SetUnicaRootDirectory(char* SystemStyledExecutableDirectory)
     const std::filesystem::path ExecutablePath(SystemStyledExecutableDirectory);
 
     // TODO: This is only valid for development. Must adapt for the packaging system
-    m_ExecutableDirectory = ExecutablePath.parent_path().parent_path().parent_path();
+    m_UnicaRootDirectory = ExecutablePath.parent_path().parent_path().parent_path().append("Unica");
 }
 
 void UnicaInstance::Shutdown()

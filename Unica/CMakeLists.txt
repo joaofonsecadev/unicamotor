@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.21)
 
 set(SourceFiles
     Config/DefaultEngine.ini
+    Source/Core/UnicaFileUtilities.cpp
+    Source/Core/UnicaFileUtilities.h
     Source/Core/UnicaInstance.cpp
     Source/Core/UnicaInstance.h
     Source/Core/UnicaMinimal.h
     Source/Core/UnicaSettings.h
-    Source/Core/UnicaSystemUtilities.cpp
-    Source/Core/UnicaSystemUtilities.h
     Source/Log/Logger.cpp
     Source/Log/Logger.h
     Source/Main.cpp

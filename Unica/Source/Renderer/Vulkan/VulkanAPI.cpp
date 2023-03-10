@@ -7,6 +7,7 @@
 #include <set>
 #include <vector>
 
+#include "UnicaFileUtilities.h"
 #include "GLFW/glfw3.h"
 #include "fmt/format.h"
 #include "shaderc/shaderc.hpp"
@@ -355,8 +356,7 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 void VulkanAPI::CompileShaders()
 {
-	shaderc::Compiler ShaderCompiler;
-	shaderc::CompileOptions CompileOptions;
+	
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()
