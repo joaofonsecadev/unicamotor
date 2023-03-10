@@ -351,6 +351,11 @@ void VulkanAPI::CreateGraphicsPipeline()
 {
 }
 
+void VulkanAPI::CompileShaders()
+{
+	
+}
+
 void VulkanAPI::CreateVulkanLogicalDevice()
 {
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);

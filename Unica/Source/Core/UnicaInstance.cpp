@@ -3,11 +3,14 @@
 #include "UnicaInstance.h"
 
 #include <chrono>
+#include <fstream>
 
 #include "UnicaMinimal.h"
+#include "UnicaSystemUtilities.h"
 #include "Timer/TimeManager.h"
 
 bool UnicaInstance::m_bHasRequestedExit = false;
+std::filesystem::path UnicaInstance::m_ExecutableDirectory;
 
 void UnicaInstance::Init()
 {
@@ -45,6 +48,14 @@ void UnicaInstance::Tick()
     
 	TimeManager::SetFrameSleepDuration(static_cast<float>(SleepDuration.count()) / 1'000'000);
     while (std::chrono::steady_clock::now() < NextFrameTimeTarget);
+}
+
+void UnicaInstance::SetUnicaRootDirectory(char* SystemStyledExecutableDirectory)
+{
+    const std::filesystem::path ExecutablePath(SystemStyledExecutableDirectory);
+
+    // TODO: This is only valid for development. Must adapt for the packaging system
+    m_ExecutableDirectory = ExecutablePath.parent_path().parent_path().parent_path();
 }
 
 void UnicaInstance::Shutdown()

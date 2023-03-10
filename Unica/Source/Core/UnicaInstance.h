@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
+#include <string>
 
 #include "Subsystem/SubsystemManager.h"
 
@@ -15,10 +17,15 @@ public:
 
     static bool HasRequestedExit() { return m_bHasRequestedExit; }
     static void RequestExit() { m_bHasRequestedExit = true; }
+    
+    static std::filesystem::path GetUnicaRootDirectory() { return m_ExecutableDirectory; }
+    static void SetUnicaRootDirectory(char* SystemStyledExecutableDirectory);
 
 private:
-    std::unique_ptr<SubsystemManager> m_SubsystemManager;
-    static bool m_bHasRequestedExit;
-
     void TickLogic();
+    
+    std::unique_ptr<SubsystemManager> m_SubsystemManager;
+    
+    static bool m_bHasRequestedExit;
+    static std::filesystem::path m_ExecutableDirectory;
 };
