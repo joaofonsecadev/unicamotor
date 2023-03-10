@@ -51,6 +51,12 @@ void ShaderUtilities::CompileShaders()
     UNICA_LOG(Log, __FUNCTION__, std::format("Shader compilation completed in {} milliseconds", ShaderCompilationTimeTaken.count()));
 }
 
+std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
+{
+    const std::string SpvFileLocation = FileLocation + ".spv";
+    return UnicaFileUtilities::ReadFileAsBinary(SpvFileLocation);
+}
+
 shaderc_shader_kind ShaderUtilities::DeduceShaderKind(const std::filesystem::path& GlslShaderFile)
 {
     const std::string GlslShaderFileExtension = GlslShaderFile.extension().string();

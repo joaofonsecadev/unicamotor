@@ -40,7 +40,6 @@ private:
 	void CreateImageViews();
 
 	void CreateGraphicsPipeline();
-	void CompileShaders();
 	
 	void CreateVulkanDebugMessenger();
 	void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);

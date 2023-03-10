@@ -64,6 +64,11 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
 {
     const std::filesystem::path FileDirectory = ResolveUnicaDirectory(FileLocation);
     std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate, std::ios::binary);
+    if (!FileAsBinary.is_open())
+    {
+        UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}'", FileDirectory.string()));
+        return std::vector<char>();
+    }
 
     const std::streamsize FileSize = FileAsBinary.tellg();
     std::vector<char> Buffer(FileSize);
