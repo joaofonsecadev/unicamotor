@@ -5,11 +5,11 @@
 #include "UnicaInstance.h"
 #include "Log/Logger.h"
 
-std::filesystem::path UnicaFileUtilities::ResolveUnicaDirectory(const std::string& UnicaFileLocation)
+std::filesystem::path UnicaFileUtilities::ResolveUnicaDirectory(const std::string& FileLocation)
 {
     std::filesystem::path BaseDirectory = UnicaInstance::GetUnicaRootDirectory();
     
-    std::filesystem::path UnicaFilePath(UnicaFileLocation);
+    std::filesystem::path UnicaFilePath(FileLocation);
     UnicaFilePath.make_preferred();
     
     if (UnicaFilePath.is_absolute())
@@ -60,9 +60,9 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
     return FinalFilesVector;
 }
 
-std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& UnicaFileLocation)
+std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLocation)
 {
-    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(UnicaFileLocation);
+    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(FileLocation);
     std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate, std::ios::binary);
 
     const std::streamsize FileSize = FileAsBinary.tellg();
@@ -74,11 +74,11 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& UnicaF
     return Buffer;
 }
 
-std::string UnicaFileUtilities::ReadFileAsString(const std::string& UnicaFileLocation)
+std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation)
 {
-    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(UnicaFileLocation);
-    std::ifstream FileAsString(UnicaFileLocation);
-
+    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(FileLocation);
+    
+    std::ifstream FileAsString(FileLocation);
     if (!FileAsString.is_open())
     {
         UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}'", FileDirectory.string()));
@@ -89,4 +89,25 @@ std::string UnicaFileUtilities::ReadFileAsString(const std::string& UnicaFileLoc
     StringBuffer << FileAsString.rdbuf();
     FileAsString.close();
     return StringBuffer.str();
+}
+
+bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const std::string& FileDestination)
+{
+    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(FileDestination);
+    std::ofstream OutputFile(FileDirectory.string(), std::ios::trunc);
+
+    if (!OutputFile)
+    {
+        UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}' for writting", FileDirectory.string()));
+        return false;
+    }
+
+    OutputFile.write(FileSource.data(), static_cast<std::streamsize>(FileSource.size()));
+    return true;
+}
+
+bool UnicaFileUtilities::WriteFile(const std::string& FileSource, const std::string& FileDestination)
+{
+    const std::vector<char> StringToCharVector(FileSource.begin(), FileSource.end());
+    return WriteFile(StringToCharVector, FileDestination);
 }

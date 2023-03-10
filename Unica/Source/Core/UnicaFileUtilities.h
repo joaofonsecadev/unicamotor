@@ -15,10 +15,12 @@ public:
     static std::vector<std::filesystem::path> GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::string& FileExtensionString);
     static std::vector<std::filesystem::path> GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::vector<std::string>& FileExtensions);
     
-    static std::vector<char> ReadFileAsBinary(const std::string& UnicaFileLocation);
-    static std::string ReadFileAsString(const std::string& UnicaFileLocation);
+    static std::vector<char> ReadFileAsBinary(const std::string& FileLocation);
+    static std::string ReadFileAsString(const std::string& FileLocation);
+    static bool WriteFile(const std::vector<char>& FileSource, const std::string& FileDestination);
+    static bool WriteFile(const std::string& FileSource, const std::string& FileDestination);
 
 private:
-    static std::filesystem::path ResolveUnicaDirectory(const std::string& UnicaFileLocation);
+    static std::filesystem::path ResolveUnicaDirectory(const std::string& FileLocation);
 
 };
