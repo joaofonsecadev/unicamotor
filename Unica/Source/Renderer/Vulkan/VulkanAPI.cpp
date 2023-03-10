@@ -9,6 +9,7 @@
 
 #include "GLFW/glfw3.h"
 #include "fmt/format.h"
+#include "shaderc/shaderc.hpp"
 
 #include "UnicaMinimal.h"
 #include "VulkanQueueFamilyIndices.h"
@@ -349,11 +350,13 @@ void VulkanAPI::CreateImageViews()
 
 void VulkanAPI::CreateGraphicsPipeline()
 {
+	CompileShaders();
 }
 
 void VulkanAPI::CompileShaders()
 {
-	
+	shaderc::Compiler ShaderCompiler;
+	shaderc::CompileOptions CompileOptions;
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()

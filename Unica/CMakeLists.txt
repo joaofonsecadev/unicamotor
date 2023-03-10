@@ -43,6 +43,7 @@ target_include_directories("Unica" PUBLIC
 )
 target_link_libraries("Unica"
         glfw
+        shaderc
         fmt::fmt
         glm::glm
         ${Vulkan_LIBRARIES}
