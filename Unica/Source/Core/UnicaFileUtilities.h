@@ -15,7 +15,8 @@ public:
     static std::vector<std::filesystem::path> GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::string& FileExtensionString);
     static std::vector<std::filesystem::path> GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::vector<std::string>& FileExtensions);
     
-    static std::vector<char> ReadFileAsBytes(const std::string& UnicaFileLocation);
+    static std::vector<char> ReadFileAsBinary(const std::string& UnicaFileLocation);
+    static std::string ReadFileAsString(const std::string& UnicaFileLocation);
 
 private:
     static std::filesystem::path ResolveUnicaDirectory(const std::string& UnicaFileLocation);

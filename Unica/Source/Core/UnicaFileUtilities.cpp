@@ -12,6 +12,11 @@ std::filesystem::path UnicaFileUtilities::ResolveUnicaDirectory(const std::strin
     std::filesystem::path UnicaFilePath(UnicaFileLocation);
     UnicaFilePath.make_preferred();
     
+    if (UnicaFilePath.is_absolute())
+    {
+        return UnicaFilePath;
+    }
+    
     return BaseDirectory.append(UnicaFilePath.c_str());
 }
 
@@ -55,16 +60,33 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
     return FinalFilesVector;
 }
 
-std::vector<char> UnicaFileUtilities::ReadFileAsBytes(const std::string& UnicaFileLocation)
+std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& UnicaFileLocation)
 {
     const std::filesystem::path FileDirectory = ResolveUnicaDirectory(UnicaFileLocation);
-    std::ifstream FileAsBytes(FileDirectory.c_str(), std::ios::ate, std::ios::binary);
+    std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate, std::ios::binary);
 
-    const std::streamsize FileSize = FileAsBytes.tellg();
+    const std::streamsize FileSize = FileAsBinary.tellg();
     std::vector<char> Buffer(FileSize);
 
-    FileAsBytes.seekg(0);
-    FileAsBytes.read(Buffer.data(), FileSize);
+    FileAsBinary.seekg(0);
+    FileAsBinary.read(Buffer.data(), FileSize);
     
     return Buffer;
+}
+
+std::string UnicaFileUtilities::ReadFileAsString(const std::string& UnicaFileLocation)
+{
+    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(UnicaFileLocation);
+    std::ifstream FileAsString(UnicaFileLocation);
+
+    if (!FileAsString.is_open())
+    {
+        UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}'", FileDirectory.string()));
+        return "";
+    }
+
+    std::stringstream StringBuffer;
+    StringBuffer << FileAsString.rdbuf();
+    FileAsString.close();
+    return StringBuffer.str();
 }

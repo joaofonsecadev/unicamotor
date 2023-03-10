@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 set(SourceFiles
     Config/DefaultEngine.ini
+    Shaders/shader.frag
+    Shaders/shader.vert
     Source/Core/UnicaFileUtilities.cpp
     Source/Core/UnicaFileUtilities.h
     Source/Core/UnicaInstance.cpp
@@ -52,7 +54,7 @@ target_link_libraries("Unica"
 set_target_properties(fmt PROPERTIES FOLDER "Libraries")
 set_target_properties(glfw update_mappings PROPERTIES FOLDER "Libraries/glfw")
 set_target_properties(add-copyright build-version check-copyright shaderc_combined-pkg-config
-    shaderc_static-pkg-config shaderc-pkg-config glslc glslc_exe shaderc testdata shaderc-online-compile
+    shaderc_static-pkg-config shaderc-pkg-config glslc glslc_exe shaderc testdata
     shaderc_combined_genfile shaderc_shared shaderc_util PROPERTIES FOLDER "Libraries/shaderc")
 set_target_properties(Continuous Experimental Nightly NightlyMemoryCheck GenericCodeGen glslang
     glslang-default-resource-limits MachineIndependent OGLCompiler OSDependent SPIRV SPVRemapper HLSL glslangValidator

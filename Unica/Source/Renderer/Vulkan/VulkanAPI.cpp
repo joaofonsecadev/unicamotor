@@ -356,15 +356,28 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 void VulkanAPI::CompileShaders()
 {
-	std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("Shaders", ".glsl");
+	const std::vector<std::string> ShaderFileExtensionsToCompile = { ".frag", ".vert" };
+	const std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("Shaders", ShaderFileExtensionsToCompile);
 	if (GlslShaderFiles.empty())
 	{
 		UNICA_LOG(Log, __FUNCTION__, "No GLSL shaders to compile");
 		return;
 	}
 	
-	shaderc::Compiler ShaderCompiler;
-	shaderc::CompileOptions CompileOptions;
+	shaderc::Compiler Compiler;
+	shaderc::CompileOptions CompilerOptions;
+
+	for (const std::filesystem::path& GlslShaderFile : GlslShaderFiles)
+	{
+		std::string GlslShaderString = UnicaFileUtilities::ReadFileAsString(GlslShaderFile.string());
+		
+		shaderc::PreprocessedSourceCompilationResult PreProcessedShaderResult = Compiler.PreprocessGlsl(GlslShaderString,
+			shaderc_glsl_fragment_shader, GlslShaderFile.filename().string().c_str(), CompilerOptions);
+
+		std::string PreProcessedShaderSource(PreProcessedShaderResult.begin(), PreProcessedShaderResult.end());
+		shaderc::SpvCompilationResult ShaderSpvResult = Compiler.CompileGlslToSpv(PreProcessedShaderSource, shaderc_glsl_fragment_shader,
+			GlslShaderFile.filename().string().c_str(), CompilerOptions);
+	}
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()
