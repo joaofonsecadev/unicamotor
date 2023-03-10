@@ -16,10 +16,12 @@ void ShaderUtilities::CompileShaders()
         UNICA_LOG(Log, __FUNCTION__, "No GLSL shaders to compile");
         return;
     }
+
+    const std::chrono::time_point ShaderCompilationStartTime = std::chrono::high_resolution_clock::now();
+    UNICA_LOG(Log, __FUNCTION__, "Starting shader compilation");
 	
     shaderc::Compiler Compiler;
     shaderc::CompileOptions CompilerOptions;
-
     for (const std::filesystem::path& GlslShaderFile : GlslShaderFiles)
     {
         std::string GlslShaderString = UnicaFileUtilities::ReadFileAsString(GlslShaderFile.string());
@@ -33,10 +35,20 @@ void ShaderUtilities::CompileShaders()
         shaderc::PreprocessedSourceCompilationResult PreProcessedShaderResult = Compiler.PreprocessGlsl(GlslShaderString,
             ShaderKind, GlslShaderFile.filename().string().c_str(), CompilerOptions);
 
+        const std::vector<char> PreProcessedShaderBinary(PreProcessedShaderResult.begin(), PreProcessedShaderResult.end());
+        UnicaFileUtilities::WriteFile(PreProcessedShaderBinary, GlslShaderFile.string().append(".preprocessed"));
+
         std::string PreProcessedShaderSource(PreProcessedShaderResult.begin(), PreProcessedShaderResult.end());
         shaderc::SpvCompilationResult ShaderSpvResult = Compiler.CompileGlslToSpv(PreProcessedShaderSource, ShaderKind,
             GlslShaderFile.filename().string().c_str(), CompilerOptions);
+
+        const std::vector<char> ShaderSpvResultBinary(ShaderSpvResult.begin(), ShaderSpvResult.end());
+        UnicaFileUtilities::WriteFile(ShaderSpvResultBinary, GlslShaderFile.string().append(".spv"));
     }
+
+    const std::chrono::time_point ShaderCompilationEndTime = std::chrono::high_resolution_clock::now();
+    const auto ShaderCompilationTimeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(ShaderCompilationEndTime - ShaderCompilationStartTime);
+    UNICA_LOG(Log, __FUNCTION__, std::format("Shader compilation completed in {} milliseconds", ShaderCompilationTimeTaken.count()));
 }
 
 shaderc_shader_kind ShaderUtilities::DeduceShaderKind(const std::filesystem::path& GlslShaderFile)
