@@ -13,6 +13,8 @@ public:
      * @param FileExtensionString The file extension, with the preceding dot (e.g, '.jpg')
      */
     static std::vector<std::filesystem::path> GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::string& FileExtensionString);
+    static std::vector<std::filesystem::path> GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::vector<std::string>& FileExtensions);
+    
     static std::vector<char> ReadFileAsBytes(const std::string& UnicaFileLocation);
 
 private:

@@ -17,6 +17,13 @@ std::filesystem::path UnicaFileUtilities::ResolveUnicaDirectory(const std::strin
 
 std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::string& FileExtensionString)
 {
+    std::vector<std::string> FileExtension(1);
+    FileExtension[0] = FileExtensionString;
+    return GetFilesInPathWithExtension(PathToSearchString, FileExtension);
+}
+
+std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::vector<std::string>& FileExtensions)
+{
     std::vector<std::filesystem::path> FinalFilesVector;
     const std::filesystem::path PathToSearch = ResolveUnicaDirectory(PathToSearchString);
 
@@ -34,12 +41,15 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
             continue;
         }
 
-        if (PathEntry.path().extension() != FileExtensionString)
+        std::filesystem::path PathEntryExtension = PathEntry.path().extension();
+        for (const std::string& FileExtension : FileExtensions)
         {
-            continue;
+            if (PathEntryExtension == FileExtension)
+            {
+                FinalFilesVector.push_back(PathEntry);
+                break;
+            }
         }
-
-        FinalFilesVector.push_back(PathEntry);
     }
     
     return FinalFilesVector;
