@@ -45,17 +45,6 @@ target_link_libraries("Unica"
         glm::glm
         ${Vulkan_LIBRARIES}
 )
-set_target_properties(glfw update_mappings fmt PROPERTIES FOLDER "Libraries")
 
-# @TODO
-#
-# targetdir ("../Build/" .. outputdir .. "/%{prj.name}")
-# objdir ("../Intermediate/" .. outputdir .. "%{prj.name}")
-# 
-# filter "configurations:Debug"
-#     defines "UNICA_DEBUG"
-#     symbols "on"
-# 
-# filter "configurations:Release"
-#     defines "UNICA_RELEASE"
-#     optimize "on"
+set_target_properties(fmt PROPERTIES FOLDER "Libraries")
+set_target_properties(glfw update_mappings PROPERTIES FOLDER "Libraries/glfw")
