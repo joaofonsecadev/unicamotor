@@ -65,10 +65,10 @@ void VulkanAPI::CreateVulkanInstance()
 
 	if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanInstance) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "Couldn't create Vulkan instance");
+		UNICA_LOG(Fatal, __FUNCTION__, "Couldn't create Vulkan instance");
 		return;
 	}
-	UNICA_LOG(Log, "LogVulkanAPI", "Vulkan instance created");
+	UNICA_LOG(Log, __FUNCTION__, "Vulkan instance created");
 }
 
 void VulkanAPI::SelectVulkanPhysicalDevice()
@@ -77,7 +77,7 @@ void VulkanAPI::SelectVulkanPhysicalDevice()
 	vkEnumeratePhysicalDevices(m_VulkanInstance, &VulkanPhysicalDeviceCount, nullptr);
 	if (VulkanPhysicalDeviceCount < 1)
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "No GPUs with Vulkan support found");
+		UNICA_LOG(Fatal, __FUNCTION__, "No GPUs with Vulkan support found");
 		return;
 	}
 
@@ -97,7 +97,7 @@ void VulkanAPI::SelectVulkanPhysicalDevice()
 	}
 	else
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "No suitable GPU found");
+		UNICA_LOG(Fatal, __FUNCTION__, "No suitable GPU found");
 		return;
 	}
 }
@@ -304,7 +304,7 @@ void VulkanAPI::CreateSwapChain()
 
 	if (vkCreateSwapchainKHR(m_VulkanLogicalDevice, &SwapChainCreateInfo, nullptr, &m_VulkanSwapChain) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "Failed to create VulkanSwapChain");
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanSwapChain");
 		return;
 	}
 
@@ -341,7 +341,7 @@ void VulkanAPI::CreateImageViews()
 
 		if (vkCreateImageView(m_VulkanLogicalDevice, &ImageViewCreateInfo, nullptr, &m_VulkanSwapChainImageViews[SwapChainImageIteration]) != VK_SUCCESS)
 		{
-			UNICA_LOG(Fatal, "LogVulkanAPI", "Failed to create VulkanImageViews");
+			UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanImageViews");
 			return;
 		}
 
@@ -356,7 +356,15 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 void VulkanAPI::CompileShaders()
 {
+	std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("Shaders", ".glsl");
+	if (GlslShaderFiles.empty())
+	{
+		UNICA_LOG(Log, __FUNCTION__, "No GLSL shaders to compile");
+		return;
+	}
 	
+	shaderc::Compiler ShaderCompiler;
+	shaderc::CompileOptions CompileOptions;
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()
@@ -364,7 +372,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
 	if (!QueueFamilyIndices.WasSet())
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "No support for graphics and image presentation queues");
+		UNICA_LOG(Fatal, __FUNCTION__, "No support for graphics and image presentation queues");
 		return;
 	}
 
@@ -405,7 +413,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 
 	if (vkCreateDevice(m_VulkanPhysicalDevice, &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "Couldn't create a VulkanLogicalDevice");
+		UNICA_LOG(Fatal, __FUNCTION__, "Couldn't create a VulkanLogicalDevice");
 		return;
 	}
 	
@@ -425,7 +433,7 @@ void VulkanAPI::CreateVulkanDebugMessenger()
 
 	if (CreateVulkanDebugUtilsMessenger(m_VulkanInstance, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
 	{
-		UNICA_LOG(Error, "LogVulkanAPI", "Couldn't setup VulkanDebugMessenger");
+		UNICA_LOG(Error, __FUNCTION__, "Couldn't setup VulkanDebugMessenger");
 	}
 }
 
@@ -433,7 +441,7 @@ void VulkanAPI::CreateVulkanWindowSurface()
 {
 	if (glfwCreateWindowSurface(m_VulkanInstance, m_OwningRenderManager->GetRenderWindow()->GetGlfwWindow(), nullptr, &m_VulkanWindowSurface))
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "Failed to create VulkanWindowSurface");
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanWindowSurface");
 		return;
 	}
 }
@@ -473,13 +481,13 @@ void VulkanAPI::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, st
 		}
 		if (!bWasExtensionFound)
 		{
-			UNICA_LOG(Error, "LogVulkanAPI", fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
+			UNICA_LOG(Error, __FUNCTION__, fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
 			bAllExtensionsFound = false;
 		}
 	}
 	if (!bAllExtensionsFound)
 	{
-		UNICA_LOG(Fatal, "LogVulkanAPI", "Not all required instance extensions found");
+		UNICA_LOG(Fatal, __FUNCTION__, "Not all required instance extensions found");
 		return;
 	}
 
@@ -514,13 +522,13 @@ void VulkanAPI::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDe
 		}
 		if (!bWasLayerFound)
 		{
-			UNICA_LOG(Error, "LogVulkanAPI", fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
+			UNICA_LOG(Error, __FUNCTION__, fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
 			bAllLayersFound = false;
 		}
 	}
 	if (!bAllLayersFound)
 	{
-		UNICA_LOG(Error, "LogVulkanAPI", "Won't enable VulkanValidationLayers since not all of them are available");
+		UNICA_LOG(Error, __FUNCTION__, "Won't enable VulkanValidationLayers since not all of them are available");
 		return;
 	}
 
@@ -566,7 +574,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 		LogLvl = Error;
 	}
 
-	UNICA_LOG(LogLvl, "LogVulkanAPI", CallbackData->pMessage);
+	UNICA_LOG(LogLvl, __FUNCTION__, CallbackData->pMessage);
 	return VK_FALSE;
 }
 
@@ -584,6 +592,6 @@ VulkanAPI::~VulkanAPI()
 		DestroyVulkanDebugUtilsMessengerEXT(m_VulkanInstance, m_VulkanDebugMessenger, nullptr);
 	}
 	vkDestroyInstance(m_VulkanInstance, nullptr);
-	UNICA_LOG(Log, "LogVulkanAPI", "Vulkan instance has been destroyed");
+	UNICA_LOG(Log, __FUNCTION__, "Vulkan instance has been destroyed");
 }
 

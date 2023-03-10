@@ -23,7 +23,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
     if (!std::filesystem::is_directory(PathToSearch))
     {
         const std::string ErrorMessage = std::format("Path '{}' is not valid", PathToSearch.string());
-        UNICA_LOG(Error, "LogUnicaFileUtilities", ErrorMessage);
+        UNICA_LOG(Error, __FUNCTION__, ErrorMessage);
         return FinalFilesVector;
     }
     

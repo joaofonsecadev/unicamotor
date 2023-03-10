@@ -18,7 +18,7 @@ RenderWindow::RenderWindow()
         UnicaSettings::EngineName.c_str(),
         nullptr, nullptr);
 
-    UNICA_LOG(Log, "LogRenderWindow", "Created application window");
+    UNICA_LOG(Log, __FUNCTION__, "Created application window");
 }
 
 void RenderWindow::Tick()
@@ -35,5 +35,5 @@ RenderWindow::~RenderWindow()
     glfwDestroyWindow(m_GlfwWindow);
     glfwTerminate();
 
-    UNICA_LOG(Log, "LogRenderWindow", "Destroyed application window");
+    UNICA_LOG(Log, __FUNCTION__, "Destroyed application window");
 }
