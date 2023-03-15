@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+
+#include <fmt/format.h>
 #include <shaderc/shaderc.hpp>
 
 #include "UnicaFileUtilities.h"
@@ -27,7 +29,7 @@ void ShaderUtilities::CompileShaders()
         std::string GlslShaderString = UnicaFileUtilities::ReadFileAsString(GlslShaderFile.string());
         if (GlslShaderString.empty())
         {
-            UNICA_LOG(Error, __FUNCTION__, std::format("Can't read shader file '{}'", GlslShaderFile.string()));
+            UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't read shader file '{}'", GlslShaderFile.string()));
             continue;
         }
         
@@ -48,7 +50,7 @@ void ShaderUtilities::CompileShaders()
 
     const std::chrono::time_point ShaderCompilationEndTime = std::chrono::high_resolution_clock::now();
     const auto ShaderCompilationTimeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(ShaderCompilationEndTime - ShaderCompilationStartTime);
-    UNICA_LOG(Log, __FUNCTION__, std::format("Shader compilation completed in {} milliseconds", ShaderCompilationTimeTaken.count()));
+    UNICA_LOG(Log, __FUNCTION__, fmt::format("Shader compilation completed in {} milliseconds", ShaderCompilationTimeTaken.count()));
 }
 
 std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)

@@ -1,10 +1,14 @@
 ﻿#include "UnicaFileUtilities.h"
 
 #include <fstream>
+#include <fmt/format.h>
 
 #include "UnicaInstance.h"
-#include "fmt/format.h"
 #include "Log/Logger.h"
+
+#ifdef __APPLE__
+#include <sstream>
+#endif
 
 std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocation)
 {
@@ -56,7 +60,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 
     if (!std::filesystem::is_directory(PathToSearch))
     {
-        const std::string ErrorMessage = std::format("Path '{}' is not valid", PathToSearch.string());
+        const std::string ErrorMessage = fmt::format("Path '{}' is not valid", PathToSearch.string());
         UNICA_LOG(Error, __FUNCTION__, ErrorMessage);
         return FinalFilesVector;
     }
@@ -85,10 +89,16 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLocation)
 {
     const std::filesystem::path FileDirectory = ResolveDirectory(FileLocation);
+
+#ifdef __APPLE__
+    std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate);
+#else
     std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate, std::ios::binary);
+#endif
+
     if (!FileAsBinary.is_open())
     {
-        UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}'", FileDirectory.string()));
+        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}'", FileDirectory.string()));
         return { };
     }
 
@@ -108,11 +118,16 @@ std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation
     std::ifstream FileAsString(FileLocation);
     if (!FileAsString.is_open())
     {
-        UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}'", FileDirectory.string()));
+        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}'", FileDirectory.string()));
         return "";
     }
 
+#ifdef __APPLE__
+    std::basic_stringstream<char> StringBuffer;
+#else
     std::stringstream StringBuffer;
+#endif
+
     StringBuffer << FileAsString.rdbuf();
     FileAsString.close();
     return StringBuffer.str();
@@ -125,7 +140,7 @@ bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const st
 
     if (!OutputFile)
     {
-        UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}' for writting", FileDirectory.string()));
+        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}' for writting", FileDirectory.string()));
         return false;
     }
 
