@@ -40,7 +40,8 @@ def generateSourceFilesList():
     globsArray = [
         unicaMainDir.glob("Source/**/*"),
         unicaMainDir.glob("Config/**/*.ini"),
-        unicaMainDir.glob("Shaders/**/*")
+        unicaMainDir.glob("Shaders/**/*.frag"),
+        unicaMainDir.glob("Shaders/**/*.vert")
     ]
 
     allFiles: list[pathlib.Path] = []
