@@ -18,7 +18,6 @@ add_subdirectory("fmt")
 add_subdirectory("glm")
 add_subdirectory("glfw")
 add_subdirectory("shaderc")
-find_package(Vulkan REQUIRED FATAL_ERROR)
 
 set_target_properties(fmt PROPERTIES FOLDER "Libraries")
 set_target_properties(glfw update_mappings PROPERTIES FOLDER "Libraries/glfw")

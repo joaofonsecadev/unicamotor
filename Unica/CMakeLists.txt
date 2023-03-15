@@ -40,6 +40,8 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
     source_group(${GroupPath} FILES ${SourceFile})
 endforeach()
 
+find_package(Vulkan REQUIRED FATAL_ERROR)
+
 target_include_directories("Unica" PUBLIC
         Source/
         Source/Core
