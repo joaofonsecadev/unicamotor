@@ -3,20 +3,42 @@
 #include <fstream>
 
 #include "UnicaInstance.h"
+#include "fmt/format.h"
 #include "Log/Logger.h"
 
-std::filesystem::path UnicaFileUtilities::ResolveUnicaDirectory(const std::string& FileLocation)
+std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocation)
 {
-    std::filesystem::path BaseDirectory = UnicaInstance::GetUnicaRootDirectory();
-    
     std::filesystem::path UnicaFilePath(FileLocation);
-    UnicaFilePath.make_preferred();
-    
     if (UnicaFilePath.is_absolute())
     {
         return UnicaFilePath;
     }
     
+    std::filesystem::path BaseDirectory = UnicaInstance::GetProjectRootDirectory();
+    const std::string EnginePrefix = "engine:";
+    const std::string GamePrefix = "game:";
+    
+    if (!FileLocation.rfind("engine:", 0))
+    {
+        BaseDirectory.append("Unica");
+        FileLocation.erase(0, EnginePrefix.length());
+    }
+    else if (!FileLocation.rfind("game:", 0))
+    {
+        BaseDirectory.append("Game");
+        FileLocation.erase(0, GamePrefix.length());
+    }
+    else
+    {
+        const std::string ErrorMessage = fmt::format(
+            "Provided file location '{}' lacks an engine or game prefix, according to the resource location ('{}' or '{}')",
+            FileLocation, EnginePrefix, GamePrefix);
+        
+        UNICA_LOG(Error, __FUNCTION__, ErrorMessage);
+    }
+    
+    UnicaFilePath = std::filesystem::path(FileLocation);
+    UnicaFilePath.make_preferred();
     return BaseDirectory.append(UnicaFilePath.c_str());
 }
 
@@ -30,7 +52,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::vector<std::string>& FileExtensions)
 {
     std::vector<std::filesystem::path> FinalFilesVector;
-    const std::filesystem::path PathToSearch = ResolveUnicaDirectory(PathToSearchString);
+    const std::filesystem::path PathToSearch = ResolveDirectory(PathToSearchString);
 
     if (!std::filesystem::is_directory(PathToSearch))
     {
@@ -62,7 +84,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 
 std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLocation)
 {
-    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(FileLocation);
+    const std::filesystem::path FileDirectory = ResolveDirectory(FileLocation);
     std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate, std::ios::binary);
     if (!FileAsBinary.is_open())
     {
@@ -81,7 +103,7 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
 
 std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation)
 {
-    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(FileLocation);
+    const std::filesystem::path FileDirectory = ResolveDirectory(FileLocation);
     
     std::ifstream FileAsString(FileLocation);
     if (!FileAsString.is_open())
@@ -98,7 +120,7 @@ std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation
 
 bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const std::string& FileDestination)
 {
-    const std::filesystem::path FileDirectory = ResolveUnicaDirectory(FileDestination);
+    const std::filesystem::path FileDirectory = ResolveDirectory(FileDestination);
     std::ofstream OutputFile(FileDirectory.string(), std::ios::trunc);
 
     if (!OutputFile)

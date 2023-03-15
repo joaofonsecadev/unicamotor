@@ -10,7 +10,7 @@
 #include "Timer/TimeManager.h"
 
 bool UnicaInstance::m_bHasRequestedExit = false;
-std::filesystem::path UnicaInstance::m_UnicaRootDirectory;
+std::filesystem::path UnicaInstance::m_ProjectRootDirectory;
 
 void UnicaInstance::Init()
 {
@@ -50,12 +50,12 @@ void UnicaInstance::Tick()
     while (std::chrono::steady_clock::now() < NextFrameTimeTarget);
 }
 
-void UnicaInstance::SetUnicaRootDirectory(char* SystemStyledExecutableDirectory)
+void UnicaInstance::SetProjectRootDirectory(char* SystemStyledExecutableDirectory)
 {
     const std::filesystem::path ExecutablePath(SystemStyledExecutableDirectory);
 
     // TODO: This is only valid for development. Must adapt for the packaging system
-    m_UnicaRootDirectory = ExecutablePath.parent_path().parent_path().parent_path().append("Unica");
+    m_ProjectRootDirectory = ExecutablePath.parent_path().parent_path().parent_path();
 }
 
 void UnicaInstance::Shutdown()

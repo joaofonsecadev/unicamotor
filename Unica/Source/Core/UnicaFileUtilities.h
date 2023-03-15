@@ -21,6 +21,5 @@ public:
     static bool WriteFile(const std::string& FileSource, const std::string& FileDestination);
 
 private:
-    static std::filesystem::path ResolveUnicaDirectory(const std::string& FileLocation);
-
+    static std::filesystem::path ResolveDirectory(std::string FileLocation);
 };

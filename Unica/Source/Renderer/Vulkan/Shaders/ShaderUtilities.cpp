@@ -10,7 +10,7 @@
 void ShaderUtilities::CompileShaders()
 {
     const std::vector<std::string> ShaderFileExtensionsToCompile = { ".frag", ".vert" };
-    const std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("Shaders", ShaderFileExtensionsToCompile);
+    const std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("engine:Shaders", ShaderFileExtensionsToCompile);
     if (GlslShaderFiles.empty())
     {
         UNICA_LOG(Log, __FUNCTION__, "No GLSL shaders to compile");

@@ -18,8 +18,8 @@ public:
     static bool HasRequestedExit() { return m_bHasRequestedExit; }
     static void RequestExit() { m_bHasRequestedExit = true; }
     
-    static std::filesystem::path GetUnicaRootDirectory() { return m_UnicaRootDirectory; }
-    static void SetUnicaRootDirectory(char* SystemStyledExecutableDirectory);
+    static std::filesystem::path GetProjectRootDirectory() { return m_ProjectRootDirectory; }
+    static void SetProjectRootDirectory(char* SystemStyledExecutableDirectory);
 
 private:
     void TickLogic();
@@ -27,5 +27,5 @@ private:
     std::unique_ptr<SubsystemManager> m_SubsystemManager;
     
     static bool m_bHasRequestedExit;
-    static std::filesystem::path m_UnicaRootDirectory;
+    static std::filesystem::path m_ProjectRootDirectory;
 };

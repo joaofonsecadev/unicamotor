@@ -352,10 +352,12 @@ void VulkanAPI::CreateImageViews()
 
 void VulkanAPI::CreateGraphicsPipeline()
 {
+#ifndef NDEBUG
 	ShaderUtilities::CompileShaders();
+#endif
 
-	std::vector<char> VertShaderBinary = ShaderUtilities::LoadShader("Shaders/shader.vert");
-	std::vector<char> FragShaderBinary = ShaderUtilities::LoadShader("Shaders/shader.frag");
+	std::vector<char> VertShaderBinary = ShaderUtilities::LoadShader("engine:Shaders/shader.vert");
+	std::vector<char> FragShaderBinary = ShaderUtilities::LoadShader("engine:Shaders/shader.frag");
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()
