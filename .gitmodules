@@ -19,3 +19,6 @@
 [submodule "Libraries/spirv-headers"]
 	path = Libraries/spirv-headers
 	url = https://github.com/KhronosGroup/SPIRV-headers
+[submodule "Tools/tracy"]
+	path = Tools/tracy
+	url = https://github.com/wolfpld/tracy
