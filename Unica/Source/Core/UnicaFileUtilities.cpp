@@ -15,15 +15,15 @@ std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocat
     }
     
     std::filesystem::path BaseDirectory = UnicaInstance::GetProjectRootDirectory();
-    const std::string EnginePrefix = "engine:";
-    const std::string GamePrefix = "game:";
+    const std::string EnginePrefix = "Engine:";
+    const std::string GamePrefix = "Game:";
     
-    if (!FileLocation.rfind("engine:", 0))
+    if (!FileLocation.rfind(EnginePrefix, 0))
     {
         BaseDirectory.append("Unica");
         FileLocation.erase(0, EnginePrefix.length());
     }
-    else if (!FileLocation.rfind("game:", 0))
+    else if (!FileLocation.rfind(GamePrefix, 0))
     {
         BaseDirectory.append("Game");
         FileLocation.erase(0, GamePrefix.length());
@@ -31,7 +31,7 @@ std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocat
     else
     {
         const std::string ErrorMessage = fmt::format(
-            "Provided file location '{}' lacks an engine or game prefix, according to the resource location ('{}' or '{}')",
+            "Provided file location '{}' lacks a prefix '{}' or '{}', according to its location",
             FileLocation, EnginePrefix, GamePrefix);
         
         UNICA_LOG(Error, __FUNCTION__, ErrorMessage);
@@ -89,7 +89,7 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
     if (!FileAsBinary.is_open())
     {
         UNICA_LOG(Error, __FUNCTION__, std::format("Can't open file '{}'", FileDirectory.string()));
-        return std::vector<char>();
+        return { };
     }
 
     const std::streamsize FileSize = FileAsBinary.tellg();

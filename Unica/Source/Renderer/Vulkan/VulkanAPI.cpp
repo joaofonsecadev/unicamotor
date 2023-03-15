@@ -356,8 +356,8 @@ void VulkanAPI::CreateGraphicsPipeline()
 	ShaderUtilities::CompileShaders();
 #endif
 
-	std::vector<char> VertShaderBinary = ShaderUtilities::LoadShader("engine:Shaders/shader.vert");
-	std::vector<char> FragShaderBinary = ShaderUtilities::LoadShader("engine:Shaders/shader.frag");
+	std::vector<char> VertShaderBinary = ShaderUtilities::LoadShader("Engine:Shaders/shader.vert");
+	std::vector<char> FragShaderBinary = ShaderUtilities::LoadShader("Engine:Shaders/shader.frag");
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()

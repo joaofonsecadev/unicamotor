@@ -10,7 +10,7 @@
 void ShaderUtilities::CompileShaders()
 {
     const std::vector<std::string> ShaderFileExtensionsToCompile = { ".frag", ".vert" };
-    const std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("engine:Shaders", ShaderFileExtensionsToCompile);
+    const std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("Engine:Shaders", ShaderFileExtensionsToCompile);
     if (GlslShaderFiles.empty())
     {
         UNICA_LOG(Log, __FUNCTION__, "No GLSL shaders to compile");
@@ -54,7 +54,14 @@ void ShaderUtilities::CompileShaders()
 std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
 {
     const std::string SpvFileLocation = FileLocation + ".spv";
-    return UnicaFileUtilities::ReadFileAsBinary(SpvFileLocation);
+    std::vector<char> SpvShaderBinary = UnicaFileUtilities::ReadFileAsBinary(SpvFileLocation);
+
+    if (SpvShaderBinary.empty())
+    {
+        UNICA_LOG(Error, __FUNCTION__, std::format("Shader '{}' may not be compiled", FileLocation));
+    }
+    
+    return SpvShaderBinary;
 }
 
 shaderc_shader_kind ShaderUtilities::DeduceShaderKind(const std::filesystem::path& GlslShaderFile)
