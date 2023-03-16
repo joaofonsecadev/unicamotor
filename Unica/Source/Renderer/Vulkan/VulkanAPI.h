@@ -40,6 +40,7 @@ private:
 	void CreateImageViews();
 
 	void CreateGraphicsPipeline();
+	VkShaderModule CreateShaderModule(const std::vector<char>& ShaderBinary);
 	
 	void CreateVulkanDebugMessenger();
 	void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);

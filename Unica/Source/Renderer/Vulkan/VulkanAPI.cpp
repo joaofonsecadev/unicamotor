@@ -358,6 +358,43 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 	std::vector<char> VertShaderBinary = ShaderUtilities::LoadShader("Engine:Shaders/shader.vert");
 	std::vector<char> FragShaderBinary = ShaderUtilities::LoadShader("Engine:Shaders/shader.frag");
+
+	VkShaderModule VertShaderModule = CreateShaderModule(VertShaderBinary);
+	VkShaderModule FragShaderModule = CreateShaderModule(FragShaderBinary);
+
+	VkPipelineShaderStageCreateInfo VertPipelineShaderStageCreateInfo { };
+	VertPipelineShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	VertPipelineShaderStageCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+	VertPipelineShaderStageCreateInfo.module = VertShaderModule;
+	VertPipelineShaderStageCreateInfo.pName = "main";
+
+	VkPipelineShaderStageCreateInfo FragPipelineShaderStageCreateInfo { };
+	FragPipelineShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	FragPipelineShaderStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	FragPipelineShaderStageCreateInfo.module = FragShaderModule;
+	FragPipelineShaderStageCreateInfo.pName = "main";
+
+	VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfos[] = { VertPipelineShaderStageCreateInfo, FragPipelineShaderStageCreateInfo };
+
+	// Cleanup shader modules since they've already been created
+	vkDestroyShaderModule(m_VulkanLogicalDevice, VertShaderModule, nullptr);
+	vkDestroyShaderModule(m_VulkanLogicalDevice, FragShaderModule, nullptr);
+}
+
+VkShaderModule VulkanAPI::CreateShaderModule(const std::vector<char>& ShaderBinary)
+{
+	VkShaderModuleCreateInfo ShaderModuleCreateInfo { };
+	ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	ShaderModuleCreateInfo.codeSize = ShaderBinary.size();
+	ShaderModuleCreateInfo.pCode = reinterpret_cast<const uint32*>(ShaderBinary.data());
+
+	VkShaderModule ShaderModule;
+	if (!vkCreateShaderModule(m_VulkanLogicalDevice, &ShaderModuleCreateInfo, nullptr, &ShaderModule))
+	{
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanShaderModule");
+	}
+	
+	return ShaderModule;
 }
 
 void VulkanAPI::CreateVulkanLogicalDevice()
