@@ -63,7 +63,7 @@ add_library("{create_project_name}" ${{SourceFiles}})
 foreach(SourceFile IN ITEMS ${{SourceFiles}})
     get_filename_component(SourcePath ${{SourceFile}} PATH)
     string(REPLACE ${{CMAKE_SOURCE_DIR}} "" GroupPath ${{SourcePath}})
-    string(REPLACE "/" "\\" GroupPath ${{GroupPath}})
+    string(REPLACE "/" "\\\\" GroupPath ${{GroupPath}})
     source_group(${{GroupPath}} FILES ${{SourceFile}})
 endforeach()
 

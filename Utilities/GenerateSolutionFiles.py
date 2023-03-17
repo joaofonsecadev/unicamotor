@@ -108,7 +108,7 @@ def generateproject():
 
 
 def endexecution():
-    print("Execution finished in {0} seconds".format(time.time() - startTime))
+    print("Execution finished in {0:.2f} seconds".format(time.time() - startTime))
     sys.exit()
 
 
