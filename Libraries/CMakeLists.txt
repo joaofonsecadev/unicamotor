@@ -20,7 +20,7 @@ add_subdirectory("glfw")
 add_subdirectory("shaderc")
 
 set_target_properties(fmt PROPERTIES FOLDER "Libraries")
-set_target_properties(glfw update_mappings PROPERTIES FOLDER "Libraries/glfw")
+set_target_properties(glfw PROPERTIES FOLDER "Libraries")
 set_target_properties(add-copyright build-version check-copyright shaderc_combined-pkg-config
     shaderc_static-pkg-config shaderc-pkg-config glslc glslc_exe shaderc testdata
     shaderc_combined_genfile shaderc_shared shaderc_util PROPERTIES FOLDER "Libraries/shaderc")
