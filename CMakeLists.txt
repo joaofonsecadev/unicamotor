@@ -20,4 +20,3 @@ target_compile_definitions(Unica PRIVATE
   $<$<CONFIG:RelWithDebInfo>:UNICA_SHIPPING>
   $<$<CONFIG:MinSizeRel>:UNICA_SHIPPING>
 )
-add_subdirectory("UnicaSandbox")
