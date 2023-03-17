@@ -389,7 +389,7 @@ VkShaderModule VulkanAPI::CreateShaderModule(const std::vector<char>& ShaderBina
 	ShaderModuleCreateInfo.pCode = reinterpret_cast<const uint32*>(ShaderBinary.data());
 
 	VkShaderModule ShaderModule;
-	if (!vkCreateShaderModule(m_VulkanLogicalDevice, &ShaderModuleCreateInfo, nullptr, &ShaderModule))
+	if (vkCreateShaderModule(m_VulkanLogicalDevice, &ShaderModuleCreateInfo, nullptr, &ShaderModule) != VK_SUCCESS)
 	{
 		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanShaderModule");
 	}

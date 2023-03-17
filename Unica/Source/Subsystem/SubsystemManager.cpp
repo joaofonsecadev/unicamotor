@@ -3,6 +3,7 @@
 #include "SubsystemManager.h"
 
 #include <memory>
+#include <tracy/Tracy.hpp>
 
 #include "fmt/format.h"
 

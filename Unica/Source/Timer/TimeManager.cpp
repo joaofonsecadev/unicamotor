@@ -4,6 +4,7 @@
 
 #include <ratio>
 #include <chrono>
+#include <tracy/Tracy.hpp>
 
 #include "fmt/color.h"
 

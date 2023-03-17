@@ -19,7 +19,6 @@ public:
     static std::string ReadFileAsString(const std::string& FileLocation);
     static bool WriteFile(const std::vector<char>& FileSource, const std::string& FileDestination);
     static bool WriteFile(const std::string& FileSource, const std::string& FileDestination);
-
-private:
+    
     static std::filesystem::path ResolveDirectory(std::string FileLocation);
 };

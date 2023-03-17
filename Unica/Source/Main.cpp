@@ -5,6 +5,8 @@
 #include "UnicaInstance.h"
 #include "Subsystem/SubsystemManager.h"
 
+#include "tracy/Tracy.hpp"
+
 int main(int argc, char* argv[])
 {
     const std::unique_ptr<UnicaInstance> EngineInstance(new class UnicaInstance);

@@ -1,5 +1,6 @@
 #include "ShaderUtilities.h"
 
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -38,14 +39,12 @@ void ShaderUtilities::CompileShaders()
             ShaderKind, GlslShaderFile.filename().string().c_str(), CompilerOptions);
 
         const std::vector<char> PreProcessedShaderBinary(PreProcessedShaderResult.begin(), PreProcessedShaderResult.end());
-        UnicaFileUtilities::WriteFile(PreProcessedShaderBinary, GlslShaderFile.string().append(".preprocessed"));
-
         std::string PreProcessedShaderSource(PreProcessedShaderResult.begin(), PreProcessedShaderResult.end());
         shaderc::SpvCompilationResult ShaderSpvResult = Compiler.CompileGlslToSpv(PreProcessedShaderSource, ShaderKind,
             GlslShaderFile.filename().string().c_str(), CompilerOptions);
 
-        const std::vector<char> ShaderSpvResultBinary(ShaderSpvResult.begin(), ShaderSpvResult.end());
-        UnicaFileUtilities::WriteFile(ShaderSpvResultBinary, GlslShaderFile.string().append(".spv"));
+        const std::vector<uint32> ShaderSpvResultBinary(ShaderSpvResult.begin(), ShaderSpvResult.end());
+        WriteCompiledSpirvFile(ShaderSpvResultBinary, GlslShaderFile.string().append(".spv"));
     }
 
     const std::chrono::time_point ShaderCompilationEndTime = std::chrono::high_resolution_clock::now();
@@ -55,8 +54,8 @@ void ShaderUtilities::CompileShaders()
 
 std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
 {
-    const std::string SpvFileLocation = FileLocation + ".spv";
-    std::vector<char> SpvShaderBinary = UnicaFileUtilities::ReadFileAsBinary(SpvFileLocation);
+    const std::string SpvFileName = FileLocation + ".spv";
+    std::vector<char> SpvShaderBinary = UnicaFileUtilities::ReadFileAsBinary(SpvFileName);
 
     if (SpvShaderBinary.empty())
     {
@@ -64,6 +63,21 @@ std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
     }
     
     return SpvShaderBinary;
+}
+
+bool ShaderUtilities::WriteCompiledSpirvFile(const std::vector<uint32>& ShaderBinary, const std::string& AbsoluteFileDestination)
+{
+    const std::filesystem::path FileDirectory(AbsoluteFileDestination);
+    std::ofstream OutputFile(FileDirectory.string(), std::ios::trunc | std::ios::binary);
+
+    if (!OutputFile)
+    {
+        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}' for writting", FileDirectory.string()));
+        return false;
+    }
+
+    OutputFile.write(reinterpret_cast<const char*>(ShaderBinary.data()), ShaderBinary.size() * sizeof(uint32));
+    return true;
 }
 
 shaderc_shader_kind ShaderUtilities::DeduceShaderKind(const std::filesystem::path& GlslShaderFile)

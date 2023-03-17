@@ -93,7 +93,7 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
 #ifdef __APPLE__
     std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate);
 #else
-    std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate, std::ios::binary);
+    std::ifstream FileAsBinary(FileDirectory.c_str(), std::ios::ate | std::ios::binary);
 #endif
 
     if (!FileAsBinary.is_open())

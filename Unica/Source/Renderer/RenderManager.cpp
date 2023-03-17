@@ -2,6 +2,8 @@
 
 #include "RenderManager.h"
 
+#include <tracy/Tracy.hpp>
+
 void RenderManager::Init()
 {
     m_RenderWindow = std::make_unique<RenderWindow>();

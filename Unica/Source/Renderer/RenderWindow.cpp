@@ -2,6 +2,8 @@
 
 #include "RenderWindow.h"
 
+#include <tracy/Tracy.hpp>
+
 #include "UnicaInstance.h"
 #include "UnicaMinimal.h"
 
