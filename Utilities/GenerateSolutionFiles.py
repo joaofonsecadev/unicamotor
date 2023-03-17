@@ -29,6 +29,9 @@ os.chdir('..')
 pythonScriptDir = pathlib.Path(os.path.dirname(__file__))
 unicaMainDir = pythonScriptDir.joinpath("../Unica/").resolve()
 
+def getProjectName():
+    return ""
+
 def ensurecmake():
     cmakepath = shutil.which("cmake")
     if cmakepath is None:
@@ -36,12 +39,12 @@ def ensurecmake():
         endexecution()
     return cmakepath
 
-def generateSourceFilesList():
+def generateSourceFilesList(directory: pathlib.Path):
     globsArray = [
-        unicaMainDir.glob("Source/**/*"),
-        unicaMainDir.glob("Config/**/*.ini"),
-        unicaMainDir.glob("Shaders/**/*.frag"),
-        unicaMainDir.glob("Shaders/**/*.vert")
+        directory.glob("Source/**/*"),
+        directory.glob("Config/**/*.ini"),
+        directory.glob("Shaders/**/*.frag"),
+        directory.glob("Shaders/**/*.vert")
     ]
 
     allFiles: list[pathlib.Path] = []
@@ -51,7 +54,7 @@ def generateSourceFilesList():
     
 
     cmakeReadySourceFileStrings = []
-    linuxStyleUnicaPath = unicaMainDir.as_posix() + "/"
+    linuxStyleUnicaPath = directory.as_posix() + "/"
     for file in allFiles:
         if file.is_dir():
             continue
@@ -61,15 +64,15 @@ def generateSourceFilesList():
     cmakeReadySourceFileStrings.sort()
     return cmakeReadySourceFileStrings
 
-def updateSourceFiles():
-    sourceFilesList = generateSourceFilesList()
+def updateSourceFiles(directory: pathlib.Path):
+    sourceFilesList = generateSourceFilesList(directory)
     originalFilelinesList: list[str] = []
     finalCmakeListsFile: list[str] = []
 
-    with open(unicaMainDir.joinpath("CMakeLists.txt"), "r") as cmakeFile:
+    with open(directory.joinpath("CMakeLists.txt"), "r") as cmakeFile:
         originalFilelinesList = cmakeFile.readlines()
 
-    with open(unicaMainDir.joinpath("CMakeLists.txt"), "w") as cmakeFile:
+    with open(directory.joinpath("CMakeLists.txt"), "w") as cmakeFile:
         finalSourceFileIndex = -1
         for line in originalFilelinesList:
             finalSourceFileIndex += 1
@@ -91,7 +94,12 @@ def updateSourceFiles():
         cmakeFile.writelines(finalCmakeListsFile)
 
 def generateproject():
-    updateSourceFiles()
+    updateSourceFiles(unicaMainDir)
+
+    if len(getProjectName()) > 0:
+        unicaProjectDir = pythonScriptDir.joinpath("../UnicaProject/").resolve()
+        updateSourceFiles(unicaProjectDir)
+    
     subprocess.run([ensurecmake(),
                     "-S.",
                     "-B{0}/Intermediate".format(os.getcwd()),
