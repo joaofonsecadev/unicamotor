@@ -59,7 +59,7 @@ std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
 
     if (SpvShaderBinary.empty())
     {
-        UNICA_LOG(Error, __FUNCTION__, std::format("Shader '{}' may not be compiled", FileLocation));
+        UNICA_LOG(Error, __FUNCTION__, fmt::format("Shader '{}' may not be compiled", FileLocation));
     }
     
     return SpvShaderBinary;
