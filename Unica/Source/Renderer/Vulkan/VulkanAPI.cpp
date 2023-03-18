@@ -376,6 +376,52 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 	VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfos[] = { VertPipelineShaderStageCreateInfo, FragPipelineShaderStageCreateInfo };
 
+	std::vector<VkDynamicState> PipelineDynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+	VkPipelineDynamicStateCreateInfo PipelineDynamicCreateInfo { };
+	PipelineDynamicCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	PipelineDynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(PipelineDynamicStates.size());
+	PipelineDynamicCreateInfo.pDynamicStates = PipelineDynamicStates.data();
+
+	VkPipelineVertexInputStateCreateInfo PipelineVertexInputCreateInfo { };
+	PipelineVertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	PipelineVertexInputCreateInfo.vertexBindingDescriptionCount = 0;
+	PipelineVertexInputCreateInfo.pVertexBindingDescriptions = nullptr;
+	PipelineVertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
+	PipelineVertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;
+
+	VkPipelineInputAssemblyStateCreateInfo PipelineInputAssemblyCreateInfo{};
+	PipelineInputAssemblyCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	PipelineInputAssemblyCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	PipelineInputAssemblyCreateInfo.primitiveRestartEnable = VK_FALSE;
+
+	VkViewport Viewport{};
+	Viewport.x = 0.0f;
+	Viewport.y = 0.0f;
+	Viewport.width = static_cast<float>(m_VulkanSwapChainExtent.width);
+	Viewport.height = static_cast<float>(m_VulkanSwapChainExtent.height);
+	Viewport.minDepth = 0.0f;
+	Viewport.maxDepth = 1.0f;
+
+	VkRect2D ScissorRectangle{};
+	ScissorRectangle.offset = {0, 0};
+	ScissorRectangle.extent = m_VulkanSwapChainExtent;
+
+	VkPipelineViewportStateCreateInfo PipelineViewportCreateInfo { };
+	PipelineViewportCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	PipelineViewportCreateInfo.viewportCount = 1;
+	PipelineViewportCreateInfo.pViewports = &Viewport;
+	PipelineViewportCreateInfo.scissorCount = 1;
+	PipelineViewportCreateInfo.pScissors = &ScissorRectangle;
+
+	VkPipelineMultisampleStateCreateInfo PipelineMultisampleCreateInfo { };
+	PipelineMultisampleCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	PipelineMultisampleCreateInfo.sampleShadingEnable = VK_FALSE;
+	PipelineMultisampleCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+	PipelineMultisampleCreateInfo.minSampleShading = 1.0f;
+	PipelineMultisampleCreateInfo.pSampleMask = nullptr;
+	PipelineMultisampleCreateInfo.alphaToCoverageEnable = VK_FALSE;
+	PipelineMultisampleCreateInfo.alphaToOneEnable = VK_FALSE;
+
 	// Cleanup shader modules since they've already been created
 	vkDestroyShaderModule(m_VulkanLogicalDevice, VertShaderModule, nullptr);
 	vkDestroyShaderModule(m_VulkanLogicalDevice, FragShaderModule, nullptr);
