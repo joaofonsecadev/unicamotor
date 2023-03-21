@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include <memory>
-
 #include "Subsystem/SubsystemBase.h"
-#include "RenderWindow.h"
 #include "Vulkan/VulkanAPI.h"
 
 class RenderManager final : public SubsystemBase
@@ -15,10 +12,4 @@ private:
     void Tick() override;
     void Shutdown() override { }
     bool ShouldTick() override { return true; }
-
-    std::unique_ptr<RenderWindow> m_RenderWindow;
-    std::unique_ptr<VulkanAPI> m_RenderInterface;
-
-public:
-    RenderWindow* GetRenderWindow() const { return m_RenderWindow.get(); }
 };

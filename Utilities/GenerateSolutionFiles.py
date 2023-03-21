@@ -50,6 +50,8 @@ def generateSourceFilesList(directory: pathlib.Path):
     allFiles: list[pathlib.Path] = []
     for glob in globsArray:
         for file in glob:
+            if "Source/Renderer/Vulkan/" in file.as_posix():
+                continue
             allFiles.append(file)
     
 
