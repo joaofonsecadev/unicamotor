@@ -28,6 +28,7 @@ VulkanAPI::VulkanAPI(const RenderManager* OwningRenderManager)
 	CreateVulkanLogicalDevice();
 	CreateSwapChain();
 	CreateImageViews();
+	CreateRenderPass();
 	CreateGraphicsPipeline();
 }
 
@@ -350,9 +351,42 @@ void VulkanAPI::CreateImageViews()
 	}
 }
 
+void VulkanAPI::CreateRenderPass()
+{
+	VkAttachmentDescription VulkanColorAttachment { };
+	VulkanColorAttachment.format = m_VulkanSwapChainImageFormat;
+	VulkanColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	VulkanColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	VulkanColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	VulkanColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	VulkanColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	VulkanColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	VkAttachmentReference VulkanColorAttachmentRef{};
+	VulkanColorAttachmentRef.attachment = 0;
+	VulkanColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription VulkanSubpass{};
+	VulkanSubpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	VulkanSubpass.colorAttachmentCount = 1;
+	VulkanSubpass.pColorAttachments = &VulkanColorAttachmentRef;
+
+	VkRenderPassCreateInfo VulkanRenderPassCreateInfo{};
+	VulkanRenderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	VulkanRenderPassCreateInfo.attachmentCount = 1;
+	VulkanRenderPassCreateInfo.pAttachments = &VulkanColorAttachment;
+	VulkanRenderPassCreateInfo.subpassCount = 1;
+	VulkanRenderPassCreateInfo.pSubpasses = &VulkanSubpass;
+
+	if (vkCreateRenderPass(m_VulkanLogicalDevice, &VulkanRenderPassCreateInfo, nullptr, &m_VulkanRenderPass) != VK_SUCCESS)
+	{
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanRenderPass");
+	}
+}
+
 void VulkanAPI::CreateGraphicsPipeline()
 {
-#ifdef UNICA_SHIPPING
+#ifndef UNICA_SHIPPING
 	ShaderUtilities::CompileShaders();
 #endif
 
@@ -448,6 +482,26 @@ void VulkanAPI::CreateGraphicsPipeline()
 	if (vkCreatePipelineLayout(m_VulkanLogicalDevice, &PipelineLayoutInfo, nullptr, &m_VulkanPipelineLayout) != VK_SUCCESS)
 	{
 		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanPipelineLayout");
+	}
+
+	VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo { };
+	GraphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	GraphicsPipelineCreateInfo.stageCount = 2;
+	GraphicsPipelineCreateInfo.pStages = PipelineShaderStageCreateInfos;
+	GraphicsPipelineCreateInfo.pVertexInputState = &PipelineVertexInputCreateInfo;
+	GraphicsPipelineCreateInfo.pInputAssemblyState = &PipelineInputAssemblyCreateInfo;
+	GraphicsPipelineCreateInfo.pViewportState = &PipelineViewportCreateInfo;
+	GraphicsPipelineCreateInfo.pRasterizationState = &PipelineRasterizationCreateInfo;
+	GraphicsPipelineCreateInfo.pMultisampleState = &PipelineMultisampleCreateInfo;
+	GraphicsPipelineCreateInfo.pColorBlendState = &PipelineColorBlend;
+	GraphicsPipelineCreateInfo.pDynamicState = &PipelineDynamicCreateInfo;
+	GraphicsPipelineCreateInfo.layout = m_VulkanPipelineLayout;
+	GraphicsPipelineCreateInfo.renderPass = m_VulkanRenderPass;
+	GraphicsPipelineCreateInfo.subpass = 0;
+
+	if (vkCreateGraphicsPipelines(m_VulkanLogicalDevice, VK_NULL_HANDLE, 1, &GraphicsPipelineCreateInfo, nullptr, &m_VulkanGraphicsPipeline) != VK_SUCCESS)
+	{
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create the VulkanGraphicsPipeline");
 	}
 
 	// Cleanup shader modules since they've already been created
@@ -684,7 +738,9 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 
 VulkanAPI::~VulkanAPI()
 {
+	vkDestroyPipeline(m_VulkanLogicalDevice, m_VulkanGraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(m_VulkanLogicalDevice, m_VulkanPipelineLayout, nullptr);
+	vkDestroyRenderPass(m_VulkanLogicalDevice, m_VulkanRenderPass, nullptr);
 	for (const VkImageView& SwapChainImageView : m_VulkanSwapChainImageViews)
 	{
 		vkDestroyImageView(m_VulkanLogicalDevice, SwapChainImageView, nullptr);

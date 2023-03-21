@@ -16,8 +16,8 @@ public:
     GLFWwindow* GetGlfwWindow() const { return m_GlfwWindow; }
 
 private:
-    void GlfwWindowCloseRequested();
-    void GlfwPoolEvents();
+    void WindowCloseRequested();
+    void PoolEvents();
     
     GLFWwindow* m_GlfwWindow;
 };

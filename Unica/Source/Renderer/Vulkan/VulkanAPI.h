@@ -39,8 +39,11 @@ private:
 
 	void CreateImageViews();
 
+	void CreateRenderPass();
+
 	void CreateGraphicsPipeline();
 	VkShaderModule CreateShaderModule(const std::vector<char>& ShaderBinary);
+
 	
 	void CreateVulkanDebugMessenger();
 	void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);
@@ -78,7 +81,9 @@ private:
 	std::vector<VkImage> m_VulkanSwapChainImages;
 	std::vector<VkImageView> m_VulkanSwapChainImageViews;
 
+	VkRenderPass m_VulkanRenderPass;
 	VkPipelineLayout m_VulkanPipelineLayout;
+	VkPipeline m_VulkanGraphicsPipeline;
 
 	const RenderManager* m_OwningRenderManager = nullptr;
 };

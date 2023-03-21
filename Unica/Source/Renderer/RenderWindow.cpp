@@ -26,23 +26,33 @@ RenderWindow::RenderWindow()
 void RenderWindow::Tick()
 {
     UNICA_PROFILE_FUNCTION
-    GlfwWindowCloseRequested();
-    GlfwPoolEvents();
+    WindowCloseRequested();
+    PoolEvents();
 }
 
-void RenderWindow::GlfwWindowCloseRequested()
+void RenderWindow::WindowCloseRequested()
 {
     UNICA_PROFILE_FUNCTION
-    if (glfwWindowShouldClose(m_GlfwWindow))
+    
+    bool glfwWindowCloseRequest;
+    {
+        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwWindowShouldClose")
+        glfwWindowCloseRequest = glfwWindowShouldClose(m_GlfwWindow);
+    }
+    
+    if (glfwWindowCloseRequest)
     {
         UnicaInstance::RequestExit();
     }
 }
 
-void RenderWindow::GlfwPoolEvents()
+void RenderWindow::PoolEvents()
 {
     UNICA_PROFILE_FUNCTION
-    glfwPollEvents();
+    {
+        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwPollEvents")
+        glfwPollEvents();
+    }
 }
 
 RenderWindow::~RenderWindow()
