@@ -22,3 +22,6 @@
 [submodule "Tools/tracy"]
 	path = Tools/tracy
 	url = https://github.com/wolfpld/tracy
+[submodule "Libraries/sdl"]
+	path = Libraries/sdl
+	url = git@github.com:libsdl-org/SDL.git
