@@ -17,9 +17,9 @@
 #include "Renderer/RenderManager.h"
 #include "Shaders/ShaderUtilities.h"
 
-VulkanAPI::VulkanAPI(const RenderManager* OwningRenderManager)
+void VulkanAPI::Init()
 {
-	m_OwningRenderManager = OwningRenderManager;
+	m_GlfwRenderWindow = std::make_unique_for_overwrite<GlfwRenderWindow>();
 	
 	CreateVulkanInstance();
 	CreateVulkanDebugMessenger();
@@ -30,6 +30,11 @@ VulkanAPI::VulkanAPI(const RenderManager* OwningRenderManager)
 	CreateImageViews();
 	CreateRenderPass();
 	CreateGraphicsPipeline();
+}
+
+void VulkanAPI::Tick()
+{
+	m_GlfwRenderWindow->Tick();
 }
 
 void VulkanAPI::CreateVulkanInstance()
@@ -57,7 +62,7 @@ void VulkanAPI::CreateVulkanInstance()
 	const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
 	std::vector<const char*> RequiredExtensions(GlfwExtensions, GlfwExtensions + GlfwExtensionCount);
 
-	if (UnicaSettings::bValidationLayersEnabled)
+	if (m_bValidationLayersEnabled)
 	{
 		RequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
@@ -144,7 +149,7 @@ bool VulkanAPI::DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysic
 	std::vector<VkExtensionProperties> AvailableDeviceExtensions(AvailableDeviceExtensionCount);
 	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, AvailableDeviceExtensions.data());
 
-	std::set<std::string> DeviceExtensions(UnicaSettings::RequiredDeviceExtensions.begin(), UnicaSettings::RequiredDeviceExtensions.end());
+	std::set<std::string> DeviceExtensions(m_RequiredDeviceExtensions.begin(), m_RequiredDeviceExtensions.end());
 	for (const VkExtensionProperties& DeviceExtension : AvailableDeviceExtensions)
 	{
 		DeviceExtensions.erase(DeviceExtension.extensionName);
@@ -250,7 +255,7 @@ VkExtent2D VulkanAPI::SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCa
 	}
 
 	int32 Width, Height;
-	glfwGetFramebufferSize(m_OwningRenderManager->GetRenderWindow()->GetGlfwWindow(), &Width, &Height);
+	glfwGetFramebufferSize(m_GlfwRenderWindow->GetGlfwWindow(), &Width, &Height);
 
 	VkExtent2D VulkanExtent = { static_cast<uint32>(Width), static_cast<uint32>(Height) };
 	VulkanExtent.width = std::clamp(VulkanExtent.width, SurfaceCapabilities.minImageExtent.width, SurfaceCapabilities.maxImageExtent.width);
@@ -386,7 +391,7 @@ void VulkanAPI::CreateRenderPass()
 
 void VulkanAPI::CreateGraphicsPipeline()
 {
-#ifndef UNICA_SHIPPING
+#if !UNICA_SHIPPING
 	ShaderUtilities::CompileShaders();
 #endif
 
@@ -556,13 +561,13 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 	DeviceCreateInfo.pQueueCreateInfos = QueueCreateInfos.data();
 	DeviceCreateInfo.pEnabledFeatures = &DeviceFeatures;
 
-	DeviceCreateInfo.enabledExtensionCount = static_cast<uint32>(UnicaSettings::RequiredDeviceExtensions.size());
-	DeviceCreateInfo.ppEnabledExtensionNames = UnicaSettings::RequiredDeviceExtensions.data();
+	DeviceCreateInfo.enabledExtensionCount = static_cast<uint32>(m_RequiredDeviceExtensions.size());
+	DeviceCreateInfo.ppEnabledExtensionNames = m_RequiredDeviceExtensions.data();
 
-	if (UnicaSettings::bValidationLayersEnabled)
+	if (m_bValidationLayersEnabled)
 	{
-		DeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(UnicaSettings::RequestedValidationLayers.size());
-		DeviceCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
+		DeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_RequestedValidationLayers.size());
+		DeviceCreateInfo.ppEnabledLayerNames = m_RequestedValidationLayers.data();
 	}
 	else
 	{
@@ -581,7 +586,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 
 void VulkanAPI::CreateVulkanDebugMessenger()
 {
-	if (!UnicaSettings::bValidationLayersEnabled)
+	if (m_bValidationLayersEnabled)
 	{
 		return;
 	}
@@ -597,7 +602,7 @@ void VulkanAPI::CreateVulkanDebugMessenger()
 
 void VulkanAPI::CreateVulkanWindowSurface()
 {
-	if (glfwCreateWindowSurface(m_VulkanInstance, m_OwningRenderManager->GetRenderWindow()->GetGlfwWindow(), nullptr, &m_VulkanWindowSurface))
+	if (glfwCreateWindowSurface(m_VulkanInstance, m_GlfwRenderWindow->GetGlfwWindow(), nullptr, &m_VulkanWindowSurface))
 	{
 		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanWindowSurface");
 		return;
@@ -655,7 +660,7 @@ void VulkanAPI::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInfo, st
 
 void VulkanAPI::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDebugUtilsMessengerCreateInfoEXT& VulkanDebugCreateInfo)
 {
-	if (!UnicaSettings::bValidationLayersEnabled)
+	if (!m_bValidationLayersEnabled)
 	{
 		return;
 	}
@@ -667,7 +672,7 @@ void VulkanAPI::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDe
 	vkEnumerateInstanceLayerProperties(&LayerCount, AvailableLayers.data());
 
 	bool bAllLayersFound = true;
-	for (const char* RequestedLayerName : UnicaSettings::RequestedValidationLayers)
+	for (const char* RequestedLayerName : m_RequestedValidationLayers)
 	{
 		bool bWasLayerFound = false;
 		for (const VkLayerProperties& AvailableLayer : AvailableLayers)
@@ -690,8 +695,8 @@ void VulkanAPI::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo, VkDe
 		return;
 	}
 
-	VulkanCreateInfo.enabledLayerCount = static_cast<uint32>(UnicaSettings::RequestedValidationLayers.size());
-	VulkanCreateInfo.ppEnabledLayerNames = UnicaSettings::RequestedValidationLayers.data();
+	VulkanCreateInfo.enabledLayerCount = static_cast<uint32>(m_RequestedValidationLayers.size());
+	VulkanCreateInfo.ppEnabledLayerNames = m_RequestedValidationLayers.data();
 
 	PopulateVulkanDebugMessengerInfo(VulkanDebugCreateInfo);
 	VulkanCreateInfo.pNext = &VulkanDebugCreateInfo;
@@ -736,7 +741,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 	return VK_FALSE;
 }
 
-VulkanAPI::~VulkanAPI()
+void VulkanAPI::Shutdown()
 {
 	vkDestroyPipeline(m_VulkanLogicalDevice, m_VulkanGraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(m_VulkanLogicalDevice, m_VulkanPipelineLayout, nullptr);
@@ -748,7 +753,7 @@ VulkanAPI::~VulkanAPI()
 	vkDestroySwapchainKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, nullptr);
 	vkDestroyDevice(m_VulkanLogicalDevice, nullptr);
 	vkDestroySurfaceKHR(m_VulkanInstance, m_VulkanWindowSurface, nullptr);
-	if (UnicaSettings::bValidationLayersEnabled)
+	if (m_bValidationLayersEnabled)
 	{
 		DestroyVulkanDebugUtilsMessengerEXT(m_VulkanInstance, m_VulkanDebugMessenger, nullptr);
 	}

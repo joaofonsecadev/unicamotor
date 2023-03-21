@@ -3,10 +3,11 @@
 #include "RenderManager.h"
 #include "UnicaMinimal.h"
 #include "SDL/SdlAPI.h"
+#include "Vulkan/VulkanAPI.h"
 
 void RenderManager::Init()
 {
-    m_RenderInterface = std::make_unique_for_overwrite<SdlAPI>();
+    m_RenderInterface = std::make_unique_for_overwrite<VulkanAPI>();
     m_RenderInterface->Init();
 }
 

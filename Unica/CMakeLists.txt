@@ -13,8 +13,20 @@ set(SourceFiles
     Source/Log/Logger.cpp
     Source/Log/Logger.h
     Source/Main.cpp
+    Source/Renderer/RenderInterface.h
     Source/Renderer/RenderManager.cpp
     Source/Renderer/RenderManager.h
+    Source/Renderer/SDL/SdlAPI.cpp
+    Source/Renderer/SDL/SdlAPI.h
+    Source/Renderer/Vulkan/Shaders/ShaderUtilities.cpp
+    Source/Renderer/Vulkan/Shaders/ShaderUtilities.h
+    Source/Renderer/Vulkan/VulkanAPI.cpp
+    Source/Renderer/Vulkan/VulkanAPI.h
+    Source/Renderer/Vulkan/VulkanQueueFamilyIndices.cpp
+    Source/Renderer/Vulkan/VulkanQueueFamilyIndices.h
+    Source/Renderer/Vulkan/VulkanRenderWindow.cpp
+    Source/Renderer/Vulkan/VulkanRenderWindow.h
+    Source/Renderer/Vulkan/VulkanSwapChainSupportDetails.h
     Source/Subsystem/SubsystemBase.h
     Source/Subsystem/SubsystemManager.cpp
     Source/Subsystem/SubsystemManager.h
@@ -31,19 +43,19 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
     source_group(${GroupPath} FILES ${SourceFile})
 endforeach()
 
-# find_package(Vulkan REQUIRED FATAL_ERROR)
+find_package(Vulkan REQUIRED FATAL_ERROR)
 
 target_include_directories("Unica" PUBLIC
         Source/
         Source/Core
-        # ${Vulkan_INCLUDE_DIRS}
+        ${Vulkan_INCLUDE_DIRS}
 )
 target_link_libraries("Unica"
-        # glfw
-        # shaderc
+        glfw
+        shaderc
         fmt::fmt
-        # glm::glm
+        glm::glm
         SDL3-static
         Tracy::TracyClient
-        # ${Vulkan_LIBRARIES}
+        ${Vulkan_LIBRARIES}
 )

@@ -17,9 +17,9 @@ typedef uint64_t uint64;
 #include "tracy/Tracy.hpp"
 
 #ifdef NDEBUG
-#define UNICA_SHIPPING = 1
+#define UNICA_SHIPPING 1
 #else
-#define UNICA_SHIPPING = 0
+#define UNICA_SHIPPING 0
 #endif
 
 #define UNICA_PROFILE_FUNCTION ZoneScoped;

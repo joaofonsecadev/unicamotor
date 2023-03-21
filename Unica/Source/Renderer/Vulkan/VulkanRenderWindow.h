@@ -5,11 +5,11 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-class RenderWindow
+class GlfwRenderWindow
 {
 public:
-    RenderWindow();
-    ~RenderWindow();
+    GlfwRenderWindow();
+    ~GlfwRenderWindow();
 
     void Tick();
 

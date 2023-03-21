@@ -6,16 +6,19 @@
 #include <vulkan/vulkan_core.h>
 
 #include "UnicaMinimal.h"
+#include "VulkanRenderWindow.h"
 #include "VulkanSwapChainSupportDetails.h"
+#include "Renderer/RenderInterface.h"
 
 class RenderManager;
 class VulkanQueueFamilyIndices;
 
-class VulkanAPI
+class VulkanAPI : public RenderInterface
 {
 public:
-    VulkanAPI(const RenderManager* OwningRenderManager);
-    ~VulkanAPI();
+	void Init() override;
+	void Tick() override;
+	void Shutdown() override;
 
 private:
     void CreateVulkanInstance();
@@ -67,6 +70,8 @@ private:
         void* UserData
     );
 
+	std::unique_ptr<GlfwRenderWindow> m_GlfwRenderWindow;
+
     VkInstance m_VulkanInstance = VK_NULL_HANDLE;
 	VkQueue m_VulkanGraphicsQueue = VK_NULL_HANDLE;
 	VkQueue m_VulkanPresentImagesQueue = VK_NULL_HANDLE;
@@ -85,5 +90,12 @@ private:
 	VkPipelineLayout m_VulkanPipelineLayout;
 	VkPipeline m_VulkanGraphicsPipeline;
 
-	const RenderManager* m_OwningRenderManager = nullptr;
+	const std::vector<const char*> m_RequiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+	const std::vector<const char*> m_RequestedValidationLayers = { "VK_LAYER_KHRONOS_validation" };
+
+#if UNICA_SHIPPING
+	const bool m_bValidationLayersEnabled = false;
+#else
+	const bool m_bValidationLayersEnabled = true;
+#endif
 };

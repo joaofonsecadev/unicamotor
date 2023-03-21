@@ -1,13 +1,13 @@
 // 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
 
-#include "RenderWindow.h"
+#include "VulkanRenderWindow.h"
 
 #include <tracy/Tracy.hpp>
 
 #include "UnicaInstance.h"
 #include "UnicaMinimal.h"
 
-RenderWindow::RenderWindow()
+GlfwRenderWindow::GlfwRenderWindow()
 {
     glfwInit();
 
@@ -23,14 +23,14 @@ RenderWindow::RenderWindow()
     UNICA_LOG(Log, __FUNCTION__, "Created application window");
 }
 
-void RenderWindow::Tick()
+void GlfwRenderWindow::Tick()
 {
     UNICA_PROFILE_FUNCTION
     WindowCloseRequested();
     PoolEvents();
 }
 
-void RenderWindow::WindowCloseRequested()
+void GlfwRenderWindow::WindowCloseRequested()
 {
     UNICA_PROFILE_FUNCTION
     
@@ -46,7 +46,7 @@ void RenderWindow::WindowCloseRequested()
     }
 }
 
-void RenderWindow::PoolEvents()
+void GlfwRenderWindow::PoolEvents()
 {
     UNICA_PROFILE_FUNCTION
     {
@@ -55,7 +55,7 @@ void RenderWindow::PoolEvents()
     }
 }
 
-RenderWindow::~RenderWindow()
+GlfwRenderWindow::~GlfwRenderWindow()
 {
     glfwDestroyWindow(m_GlfwWindow);
     glfwTerminate();
