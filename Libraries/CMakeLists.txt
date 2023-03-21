@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+
 # set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 # set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 # set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)

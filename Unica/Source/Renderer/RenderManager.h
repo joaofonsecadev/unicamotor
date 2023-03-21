@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Subsystem/SubsystemBase.h"
-#include "Vulkan/VulkanAPI.h"
 
 class RenderManager final : public SubsystemBase
 {
