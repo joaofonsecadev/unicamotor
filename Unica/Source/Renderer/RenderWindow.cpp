@@ -26,10 +26,22 @@ RenderWindow::RenderWindow()
 void RenderWindow::Tick()
 {
     UNICA_PROFILE_FUNCTION
+    GlfwWindowCloseRequested();
+    GlfwPoolEvents();
+}
+
+void RenderWindow::GlfwWindowCloseRequested()
+{
+    UNICA_PROFILE_FUNCTION
     if (glfwWindowShouldClose(m_GlfwWindow))
     {
         UnicaInstance::RequestExit();
     }
+}
+
+void RenderWindow::GlfwPoolEvents()
+{
+    UNICA_PROFILE_FUNCTION
     glfwPollEvents();
 }
 
