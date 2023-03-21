@@ -78,5 +78,7 @@ private:
 	std::vector<VkImage> m_VulkanSwapChainImages;
 	std::vector<VkImageView> m_VulkanSwapChainImageViews;
 
+	VkPipelineLayout m_VulkanPipelineLayout;
+
 	const RenderManager* m_OwningRenderManager = nullptr;
 };

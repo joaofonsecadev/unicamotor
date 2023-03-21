@@ -413,6 +413,16 @@ void VulkanAPI::CreateGraphicsPipeline()
 	PipelineViewportCreateInfo.scissorCount = 1;
 	PipelineViewportCreateInfo.pScissors = &ScissorRectangle;
 
+	VkPipelineRasterizationStateCreateInfo PipelineRasterizationCreateInfo { };
+	PipelineRasterizationCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	PipelineRasterizationCreateInfo.depthClampEnable = VK_FALSE;
+	PipelineRasterizationCreateInfo.rasterizerDiscardEnable = VK_FALSE;
+	PipelineRasterizationCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+	PipelineRasterizationCreateInfo.lineWidth = 1.0f;
+	PipelineRasterizationCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+	PipelineRasterizationCreateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	PipelineRasterizationCreateInfo.depthBiasEnable = VK_FALSE;
+
 	VkPipelineMultisampleStateCreateInfo PipelineMultisampleCreateInfo { };
 	PipelineMultisampleCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	PipelineMultisampleCreateInfo.sampleShadingEnable = VK_FALSE;
@@ -421,6 +431,24 @@ void VulkanAPI::CreateGraphicsPipeline()
 	PipelineMultisampleCreateInfo.pSampleMask = nullptr;
 	PipelineMultisampleCreateInfo.alphaToCoverageEnable = VK_FALSE;
 	PipelineMultisampleCreateInfo.alphaToOneEnable = VK_FALSE;
+
+	VkPipelineColorBlendAttachmentState PipelineColorBlendAttachment { };
+	PipelineColorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	PipelineColorBlendAttachment.blendEnable = VK_FALSE;
+
+	VkPipelineColorBlendStateCreateInfo PipelineColorBlend { };
+	PipelineColorBlend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	PipelineColorBlend.logicOpEnable = VK_FALSE;
+	PipelineColorBlend.attachmentCount = 1;
+	PipelineColorBlend.pAttachments = &PipelineColorBlendAttachment;
+
+	VkPipelineLayoutCreateInfo PipelineLayoutInfo { };
+	PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+	if (vkCreatePipelineLayout(m_VulkanLogicalDevice, &PipelineLayoutInfo, nullptr, &m_VulkanPipelineLayout) != VK_SUCCESS)
+	{
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create the VulkanGraphicsPipeline");
+	}
 
 	// Cleanup shader modules since they've already been created
 	vkDestroyShaderModule(m_VulkanLogicalDevice, VertShaderModule, nullptr);
@@ -656,6 +684,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 
 VulkanAPI::~VulkanAPI()
 {
+	vkDestroyPipelineLayout(m_VulkanLogicalDevice, m_VulkanPipelineLayout, nullptr);
 	for (const VkImageView& SwapChainImageView : m_VulkanSwapChainImageViews)
 	{
 		vkDestroyImageView(m_VulkanLogicalDevice, SwapChainImageView, nullptr);
