@@ -12,5 +12,6 @@ void RenderManager::Init()
 
 void RenderManager::Tick()
 {
+    UNICA_PROFILE_FUNCTION
     m_RenderWindow->Tick();
 }

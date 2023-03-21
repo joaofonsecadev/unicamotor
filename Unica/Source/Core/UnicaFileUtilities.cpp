@@ -12,6 +12,7 @@
 
 std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocation)
 {
+    UNICA_PROFILE_FUNCTION
     std::filesystem::path UnicaFilePath(FileLocation);
     if (UnicaFilePath.is_absolute())
     {
@@ -48,6 +49,7 @@ std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocat
 
 std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::string& FileExtensionString)
 {
+    UNICA_PROFILE_FUNCTION
     std::vector<std::string> FileExtension(1);
     FileExtension[0] = FileExtensionString;
     return GetFilesInPathWithExtension(PathToSearchString, FileExtension);
@@ -55,6 +57,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 
 std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::vector<std::string>& FileExtensions)
 {
+    UNICA_PROFILE_FUNCTION
     std::vector<std::filesystem::path> FinalFilesVector;
     const std::filesystem::path PathToSearch = ResolveDirectory(PathToSearchString);
 
@@ -88,6 +91,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 
 std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLocation)
 {
+    UNICA_PROFILE_FUNCTION
     const std::filesystem::path FileDirectory = ResolveDirectory(FileLocation);
 
 #ifdef __APPLE__
@@ -113,6 +117,7 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
 
 std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation)
 {
+    UNICA_PROFILE_FUNCTION
     const std::filesystem::path FileDirectory = ResolveDirectory(FileLocation);
     
     std::ifstream FileAsString(FileLocation);
@@ -135,6 +140,7 @@ std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation
 
 bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const std::string& FileDestination)
 {
+    UNICA_PROFILE_FUNCTION
     const std::filesystem::path FileDirectory = ResolveDirectory(FileDestination);
     std::ofstream OutputFile(FileDirectory.string(), std::ios::trunc);
 
@@ -150,6 +156,7 @@ bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const st
 
 bool UnicaFileUtilities::WriteFile(const std::string& FileSource, const std::string& FileDestination)
 {
+    UNICA_PROFILE_FUNCTION
     const std::vector<char> StringToCharVector(FileSource.begin(), FileSource.end());
     return WriteFile(StringToCharVector, FileDestination);
 }

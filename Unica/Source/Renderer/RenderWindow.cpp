@@ -25,6 +25,7 @@ RenderWindow::RenderWindow()
 
 void RenderWindow::Tick()
 {
+    UNICA_PROFILE_FUNCTION
     if (glfwWindowShouldClose(m_GlfwWindow))
     {
         UnicaInstance::RequestExit();

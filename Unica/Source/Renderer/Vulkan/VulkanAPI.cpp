@@ -352,7 +352,7 @@ void VulkanAPI::CreateImageViews()
 
 void VulkanAPI::CreateGraphicsPipeline()
 {
-#ifndef NDEBUG
+#ifdef UNICA_SHIPPING
 	ShaderUtilities::CompileShaders();
 #endif
 
@@ -447,7 +447,7 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 	if (vkCreatePipelineLayout(m_VulkanLogicalDevice, &PipelineLayoutInfo, nullptr, &m_VulkanPipelineLayout) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create the VulkanGraphicsPipeline");
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanPipelineLayout");
 	}
 
 	// Cleanup shader modules since they've already been created

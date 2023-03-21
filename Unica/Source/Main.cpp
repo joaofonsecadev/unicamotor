@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "UnicaInstance.h"
+#include "UnicaMinimal.h"
 #include "Subsystem/SubsystemManager.h"
 
 #include "tracy/Tracy.hpp"
@@ -17,6 +18,7 @@ int main(int argc, char* argv[])
     while (!UnicaInstance::HasRequestedExit())
     {
         EngineInstance->Tick();
+        UNICA_PROFILE_FRAME("EngineLoop")
     }
 
     EngineInstance->Shutdown();

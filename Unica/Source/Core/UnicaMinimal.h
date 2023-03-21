@@ -14,3 +14,13 @@ typedef unsigned long long  uint64;
 
 #include "Log/Logger.h"
 #include "UnicaSettings.h"
+#include "tracy/Tracy.hpp"
+
+#ifdef NDEBUG
+#define UNICA_SHIPPING
+#endif
+
+#define UNICA_PROFILE_FUNCTION ZoneScoped;
+#define UNICA_PROFILE_FRAME_START(x) FrameMarkStart(x);
+#define UNICA_PROFILE_FRAME_END(x) FrameMarkEnd(x);
+#define UNICA_PROFILE_FRAME(x) FrameMarkNamed(x);

@@ -20,11 +20,14 @@ void UnicaInstance::Init()
 
 void UnicaInstance::TickLogic()
 {
+    UNICA_PROFILE_FUNCTION
 	m_SubsystemManager->TickSubsystems();
 }
 
 void UnicaInstance::Tick()
 {
+    UNICA_PROFILE_FUNCTION
+    
     if (UnicaSettings::FrameTimeLimit <= 0)
     {
         TickLogic();

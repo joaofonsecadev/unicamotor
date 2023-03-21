@@ -71,12 +71,6 @@ find_package(Vulkan REQUIRED FATAL_ERROR)
 
 target_include_directories("{create_project_name}" PUBLIC
     Source/
-)
-
-target_compile_definitions({create_project_name} PRIVATE
-    $<$<CONFIG:Release>:UNICA_SHIPPING>
-    $<$<CONFIG:RelWithDebInfo>:UNICA_SHIPPING>
-    $<$<CONFIG:MinSizeRel>:UNICA_SHIPPING>
 )"""
 
     write_file.write(file_contents)
