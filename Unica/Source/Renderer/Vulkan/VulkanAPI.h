@@ -7,6 +7,7 @@
 
 #include "UnicaMinimal.h"
 #include "VulkanInstance.h"
+#include "VulkanPhysicalDevice.h"
 #include "VulkanRenderWindow.h"
 #include "VulkanSwapChainSupportDetails.h"
 #include "VulkanWindowSurface.h"
@@ -28,16 +29,15 @@ public:
 
 	bool GetValidationLayersEnabled() const { return m_bValidationLayersEnabled; }
 	const std::vector<const char*>& GetRequestedValidationLayers() const { return m_RequestedValidationLayers; }
+	const std::vector<const char*>& GetRequiredDeviceExtensions() const { return m_RequiredDeviceExtensions; }
+
+	VulkanQueueFamilyIndices GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice);
+	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 
 private:
-	void SelectVulkanPhysicalDevice();
-	uint32 RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice);
-	VulkanQueueFamilyIndices GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice);
-	bool DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysicalDevice);
 	
 	void CreateVulkanLogicalDevice();
 
-	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 	VkSurfaceFormatKHR SelectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& AvailableSurfaceFormats);
 	VkPresentModeKHR SelectSwapPresentMode(const std::vector<VkPresentModeKHR>& AvailablePresentModes);
 	VkExtent2D SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCapabilities);
@@ -58,12 +58,11 @@ private:
 
 	std::unique_ptr<VulkanInstance> m_VulkanInstance = std::make_unique<VulkanInstance>(this);
 	std::unique_ptr<VulkanWindowSurface> m_VulkanWindowSurface = std::make_unique<VulkanWindowSurface>(this);
-
+	std::unique_ptr<VulkanPhysicalDevice> m_VulkanPhysicalDevice = std::make_unique<VulkanPhysicalDevice>(this);
 
 	VkQueue m_VulkanGraphicsQueue = VK_NULL_HANDLE;
 	VkQueue m_VulkanPresentImagesQueue = VK_NULL_HANDLE;
 	VkDevice m_VulkanLogicalDevice = VK_NULL_HANDLE;
-	VkPhysicalDevice m_VulkanPhysicalDevice = VK_NULL_HANDLE;
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 	
 	VkSwapchainKHR m_VulkanSwapChain = VK_NULL_HANDLE;

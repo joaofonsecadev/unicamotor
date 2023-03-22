@@ -21,7 +21,7 @@ void VulkanAPI::Init()
 {
 	m_VulkanInstance->Init();
 	m_VulkanWindowSurface->Init();
-	SelectVulkanPhysicalDevice();
+	m_VulkanPhysicalDevice->Init();
 	CreateVulkanLogicalDevice();
 	CreateSwapChain();
 	CreateImageViews();
@@ -32,86 +32,6 @@ void VulkanAPI::Init()
 void VulkanAPI::Tick()
 {
 	m_GlfwRenderWindow->Tick();
-}
-
-void VulkanAPI::SelectVulkanPhysicalDevice()
-{
-	uint32 VulkanPhysicalDeviceCount = 0;
-	vkEnumeratePhysicalDevices(m_VulkanInstance->GetVulkanObject(), &VulkanPhysicalDeviceCount, nullptr);
-	if (VulkanPhysicalDeviceCount < 1)
-	{
-		UNICA_LOG(Fatal, __FUNCTION__, "No GPUs with Vulkan support found");
-		return;
-	}
-
-	std::vector<VkPhysicalDevice> VulkanPhysicalDevices(VulkanPhysicalDeviceCount);
-	vkEnumeratePhysicalDevices(m_VulkanInstance->GetVulkanObject(), &VulkanPhysicalDeviceCount, VulkanPhysicalDevices.data());
-
-	std::multimap<uint32, VkPhysicalDevice> VulkanPhysicalDeviceCandidates;
-	for (const VkPhysicalDevice& VulkanPhysicalDevice : VulkanPhysicalDevices)
-	{
-		uint32 VulkanPhysicalDeviceScore = RateVulkanPhysicalDevice(VulkanPhysicalDevice);
-		VulkanPhysicalDeviceCandidates.insert(std::make_pair(VulkanPhysicalDeviceScore, VulkanPhysicalDevice));
-	}
-
-	if (VulkanPhysicalDeviceCandidates.rbegin()->first > 0)
-	{
-		m_VulkanPhysicalDevice = VulkanPhysicalDeviceCandidates.rbegin()->second;
-	}
-	else
-	{
-		UNICA_LOG(Fatal, __FUNCTION__, "No suitable GPU found");
-		return;
-	}
-}
-
-uint32 VulkanAPI::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice)
-{
-	if (!GetDeviceQueueFamilies(VulkanPhysicalDevice).WasSet())
-	{
-		return 0;
-	}
-
-	if (!DeviceHasRequiredExtensions(VulkanPhysicalDevice))
-	{
-		return 0;
-	}
-
-	const VulkanSwapChainSupportDetails SwapChainSupportDetails = QuerySwapChainSupport(VulkanPhysicalDevice);
-	if (SwapChainSupportDetails.SurfaceFormats.empty() || SwapChainSupportDetails.PresentModes.empty())
-	{
-		return 0;
-	}
-	
-	uint32 Score = 1;
-
-	VkPhysicalDeviceProperties VulkanPhysicalDeviceProperties;
-	VkPhysicalDeviceFeatures VulkanPhysicalDeviceFeatures;
-	vkGetPhysicalDeviceProperties(VulkanPhysicalDevice, &VulkanPhysicalDeviceProperties);
-	vkGetPhysicalDeviceFeatures(VulkanPhysicalDevice, &VulkanPhysicalDeviceFeatures);
-
-	if (VulkanPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-	{
-		Score += 1000;
-	}
-	
-	return Score;
-}
-
-bool VulkanAPI::DeviceHasRequiredExtensions(const VkPhysicalDevice& VulkanPhysicalDevice)
-{
-	uint32_t AvailableDeviceExtensionCount;
-	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, nullptr);
-	std::vector<VkExtensionProperties> AvailableDeviceExtensions(AvailableDeviceExtensionCount);
-	vkEnumerateDeviceExtensionProperties(VulkanPhysicalDevice, nullptr, &AvailableDeviceExtensionCount, AvailableDeviceExtensions.data());
-
-	std::set<std::string> DeviceExtensions(m_RequiredDeviceExtensions.begin(), m_RequiredDeviceExtensions.end());
-	for (const VkExtensionProperties& DeviceExtension : AvailableDeviceExtensions)
-	{
-		DeviceExtensions.erase(DeviceExtension.extensionName);
-	}
-
-	return DeviceExtensions.empty();
 }
 
 VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
@@ -222,7 +142,7 @@ VkExtent2D VulkanAPI::SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCa
 
 void VulkanAPI::CreateSwapChain()
 {
-	const VulkanSwapChainSupportDetails SwapChainSupportDetails = QuerySwapChainSupport(m_VulkanPhysicalDevice);
+	const VulkanSwapChainSupportDetails SwapChainSupportDetails = QuerySwapChainSupport(m_VulkanPhysicalDevice->GetVulkanObject());
 	const VkSurfaceFormatKHR SurfaceFormat = SelectSwapSurfaceFormat(SwapChainSupportDetails.SurfaceFormats);
 	const VkPresentModeKHR PresentMode = SelectSwapPresentMode(SwapChainSupportDetails.PresentModes);
 	const VkExtent2D Extent = SelectSwapExtent(SwapChainSupportDetails.SurfaceCapabilities);
@@ -243,7 +163,7 @@ void VulkanAPI::CreateSwapChain()
 	SwapChainCreateInfo.imageArrayLayers = 1;
 	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
+	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
 	const uint32 QueueFamilyIndicesArray[] = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetPresentImagesFamily().value() };
 
 	if (QueueFamilyIndices.GetGraphicsFamily() != QueueFamilyIndices.GetPresentImagesFamily())
@@ -513,7 +433,7 @@ void VulkanAPI::CreateFramebuffers()
 
 void VulkanAPI::CreateCommandPool()
 {
-	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
+	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
 
 	VkCommandPoolCreateInfo CommandPoolCreateInfo { };
 	CommandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -528,7 +448,7 @@ void VulkanAPI::CreateCommandPool()
 
 void VulkanAPI::CreateVulkanLogicalDevice()
 {
-	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
+	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
 	if (!QueueFamilyIndices.WasSet())
 	{
 		UNICA_LOG(Fatal, __FUNCTION__, "No support for graphics and image presentation queues");
@@ -570,7 +490,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 		DeviceCreateInfo.enabledLayerCount = 0;
 	}
 
-	if (vkCreateDevice(m_VulkanPhysicalDevice, &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
+	if (vkCreateDevice(m_VulkanPhysicalDevice->GetVulkanObject(), &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
 	{
 		UNICA_LOG(Fatal, __FUNCTION__, "Couldn't create a VulkanLogicalDevice");
 		return;
