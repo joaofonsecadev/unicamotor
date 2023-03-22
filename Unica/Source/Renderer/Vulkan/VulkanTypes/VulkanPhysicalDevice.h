@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "VulkanObjectInterface.h"
+#include "Renderer/Vulkan/VulkanTypeInterface.h"
 #include "UnicaMinimal.h"
 
-class VulkanPhysicalDevice : public VulkanObjectInterface<VkPhysicalDevice>
+class VulkanPhysicalDevice : public VulkanTypeInterface<VkPhysicalDevice>
 {
 public:
-    VulkanPhysicalDevice(VulkanAPI* OwningVulkanAPI) : VulkanObjectInterface(OwningVulkanAPI) { }
+    VulkanPhysicalDevice(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override { }

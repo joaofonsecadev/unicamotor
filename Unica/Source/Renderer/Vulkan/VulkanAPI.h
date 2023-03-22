@@ -6,12 +6,12 @@
 #include <vulkan/vulkan_core.h>
 
 #include "UnicaMinimal.h"
-#include "VulkanInstance.h"
-#include "VulkanPhysicalDevice.h"
 #include "VulkanRenderWindow.h"
 #include "VulkanSwapChainSupportDetails.h"
-#include "VulkanWindowSurface.h"
 #include "Renderer/RenderInterface.h"
+#include "Renderer/Vulkan/VulkanTypes/VulkanInstance.h"
+#include "Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h"
+#include "Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h"
 
 class RenderManager;
 class VulkanInstance;

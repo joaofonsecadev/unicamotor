@@ -1,12 +1,14 @@
 ﻿#pragma once
 
-#include "VulkanObjectInterface.h"
-#include "VulkanAPI.h"
+#include <vector>
 
-class VulkanInstance : public VulkanObjectInterface<VkInstance>
+#include "Renderer/Vulkan/VulkanAPI.h"
+#include "Renderer/Vulkan/VulkanTypeInterface.h"
+
+class VulkanInstance : public VulkanTypeInterface<VkInstance>
 {
 public:
-    VulkanInstance(VulkanAPI* OwningVulkanAPI) : VulkanObjectInterface(OwningVulkanAPI) { }
+    VulkanInstance(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override;

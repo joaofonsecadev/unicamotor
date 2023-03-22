@@ -4,8 +4,8 @@
 #include <set>
 
 #include "UnicaMinimal.h"
-#include "VulkanAPI.h"
-#include "VulkanQueueFamilyIndices.h"
+#include "Renderer/Vulkan/VulkanAPI.h"
+#include "Renderer/Vulkan/VulkanQueueFamilyIndices.h"
 
 void VulkanPhysicalDevice::Init()
 {

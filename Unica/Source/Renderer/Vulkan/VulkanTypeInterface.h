@@ -5,13 +5,13 @@
 class VulkanAPI;
 
 template <typename T>
-class VulkanObjectInterface
+class VulkanTypeInterface
 {
 public:
-    VulkanObjectInterface(VulkanAPI* OwningVulkanAPI) : m_OwningVulkanAPI(OwningVulkanAPI) { }
+    VulkanTypeInterface(VulkanAPI* OwningVulkanAPI) : m_OwningVulkanAPI(OwningVulkanAPI) { }
     virtual void Init() = 0;
     virtual void Destroy() = 0;
-    virtual ~VulkanObjectInterface() = default;
+    virtual ~VulkanTypeInterface() = default;
     
     virtual T GetVulkanObject() { return m_VulkanObject; }
     

@@ -27,6 +27,13 @@ set(SourceFiles
     Source/Renderer/Vulkan/VulkanRenderWindow.cpp
     Source/Renderer/Vulkan/VulkanRenderWindow.h
     Source/Renderer/Vulkan/VulkanSwapChainSupportDetails.h
+    Source/Renderer/Vulkan/VulkanTypeInterface.h
+    Source/Renderer/Vulkan/VulkanTypes/VulkanInstance.cpp
+    Source/Renderer/Vulkan/VulkanTypes/VulkanInstance.h
+    Source/Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.cpp
+    Source/Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h
+    Source/Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.cpp
+    Source/Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h
     Source/Subsystem/SubsystemBase.h
     Source/Subsystem/SubsystemManager.cpp
     Source/Subsystem/SubsystemManager.h
