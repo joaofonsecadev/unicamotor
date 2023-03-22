@@ -1,12 +1,9 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include <iostream>
 
-#include "UnicaInstance.h"
 #include "UnicaMinimal.h"
-#include "Subsystem/SubsystemManager.h"
-
-#include "tracy/Tracy.hpp"
+#include "UnicaInstance.h"
 
 int main(int argc, char* argv[])
 {

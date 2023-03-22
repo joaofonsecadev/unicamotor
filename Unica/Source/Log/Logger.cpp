@@ -1,11 +1,11 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "Logger.h"
 
 #include <chrono>
 
-#include "fmt/color.h"
-#include "fmt/chrono.h"
+#include <fmt/color.h>
+#include <fmt/chrono.h>
 
 #include "UnicaInstance.h"
 

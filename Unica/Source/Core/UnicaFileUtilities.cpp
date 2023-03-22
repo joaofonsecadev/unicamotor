@@ -1,14 +1,16 @@
+// 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
+
 ﻿#include "UnicaFileUtilities.h"
-
-#include <fstream>
-#include <fmt/format.h>
-
-#include "UnicaInstance.h"
-#include "Log/Logger.h"
 
 #ifdef __APPLE__
 #include <sstream>
 #endif
+#include <fstream>
+
+#include <fmt/format.h>
+
+#include "UnicaMinimal.h"
+#include "UnicaInstance.h"
 
 std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocation)
 {

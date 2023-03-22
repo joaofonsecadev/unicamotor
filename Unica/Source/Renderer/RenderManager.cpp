@@ -1,4 +1,4 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "RenderManager.h"
 #include "UnicaMinimal.h"

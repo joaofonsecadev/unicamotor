@@ -1,12 +1,9 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "TimeManager.h"
 
 #include <ratio>
 #include <chrono>
-#include <tracy/Tracy.hpp>
-
-#include "fmt/color.h"
 
 #include "UnicaMinimal.h"
 

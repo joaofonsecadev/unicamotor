@@ -1,15 +1,14 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "SubsystemManager.h"
 
 #include <memory>
-#include <tracy/Tracy.hpp>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 #include "UnicaMinimal.h"
-#include "Timer/TimeManager.h"
 #include "Renderer/RenderManager.h"
+#include "Timer/TimeManager.h"
 
 std::vector<std::unique_ptr<SubsystemBase>> SubsystemManager::m_SubsystemCollection;
 void SubsystemManager::Init()
