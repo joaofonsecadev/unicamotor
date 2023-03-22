@@ -555,6 +555,21 @@ void VulkanAPI::CreateFramebuffers()
 	}
 }
 
+void VulkanAPI::CreateCommandPool()
+{
+	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
+
+	VkCommandPoolCreateInfo CommandPoolCreateInfo { };
+	CommandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	CommandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	CommandPoolCreateInfo.queueFamilyIndex = QueueFamilyIndices.GetGraphicsFamily().value();
+
+	if (vkCreateCommandPool(m_VulkanLogicalDevice, &CommandPoolCreateInfo, nullptr, &m_VulkanCommandPool) != VK_SUCCESS)
+	{
+		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create the VulkanCommandPool");
+	}
+}
+
 void VulkanAPI::CreateVulkanLogicalDevice()
 {
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
@@ -768,6 +783,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 
 void VulkanAPI::Shutdown()
 {
+	vkDestroyCommandPool(m_VulkanLogicalDevice, m_VulkanCommandPool, nullptr);
 	for (VkFramebuffer_T* SwapChainFramebuffer : m_SwapChainFramebuffers)
 	{
 		vkDestroyFramebuffer(m_VulkanLogicalDevice, SwapChainFramebuffer, nullptr);

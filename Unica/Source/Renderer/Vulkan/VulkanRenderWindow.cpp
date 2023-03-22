@@ -27,7 +27,7 @@ void GlfwRenderWindow::Tick()
 {
     UNICA_PROFILE_FUNCTION
     WindowCloseRequested();
-    PoolEvents();
+    PollEvents();
 }
 
 void GlfwRenderWindow::WindowCloseRequested()
@@ -46,7 +46,7 @@ void GlfwRenderWindow::WindowCloseRequested()
     }
 }
 
-void GlfwRenderWindow::PoolEvents()
+void GlfwRenderWindow::PollEvents()
 {
     UNICA_PROFILE_FUNCTION
     {

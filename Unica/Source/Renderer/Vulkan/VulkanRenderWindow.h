@@ -17,7 +17,7 @@ public:
 
 private:
     void WindowCloseRequested();
-    void PoolEvents();
+    void PollEvents();
     
     GLFWwindow* m_GlfwWindow;
 };

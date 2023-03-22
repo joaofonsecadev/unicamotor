@@ -48,6 +48,8 @@ private:
 	VkShaderModule CreateShaderModule(const std::vector<char>& ShaderBinary);
 
 	void CreateFramebuffers();
+
+	void CreateCommandPool();
 	
 	void CreateVulkanDebugMessenger();
 	void PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreateInfoEXT& VulkanCreateInfo);
@@ -92,6 +94,8 @@ private:
 	VkPipeline m_VulkanGraphicsPipeline;
 
 	std::vector<VkFramebuffer> m_SwapChainFramebuffers;
+
+	VkCommandPool m_VulkanCommandPool;
 
 	const std::vector<const char*> m_RequiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	const std::vector<const char*> m_RequestedValidationLayers = { "VK_LAYER_KHRONOS_validation" };
