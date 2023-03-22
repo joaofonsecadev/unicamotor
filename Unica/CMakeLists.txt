@@ -55,7 +55,7 @@ target_link_libraries("Unica"
         shaderc
         fmt::fmt
         glm::glm
-        SDL3-static
+        SDL3::SDL3
         Tracy::TracyClient
         ${Vulkan_LIBRARIES}
 )

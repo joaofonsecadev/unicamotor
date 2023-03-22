@@ -26,11 +26,6 @@ void SdlAPI::Tick()
 {
     UNICA_PROFILE_FUNCTION
     SdlPoolEvents();
-
-    {
-        UNICA_PROFILE_FUNCTION_NAMED("SDL::UpdateWindowSurface")
-        SDL_UpdateWindowSurface(m_SdlWindow);
-    }
 }
 
 void SdlAPI::SdlPoolEvents()

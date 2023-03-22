@@ -530,6 +530,31 @@ VkShaderModule VulkanAPI::CreateShaderModule(const std::vector<char>& ShaderBina
 	return ShaderModule;
 }
 
+void VulkanAPI::CreateFramebuffers()
+{
+	uint32 SwapChainImageViewLoopIndex = 0;
+	m_SwapChainFramebuffers.resize(m_VulkanSwapChainImageViews.size());
+	for (VkImageView_T* SwapChainImageView : m_VulkanSwapChainImageViews)
+	{
+		const VkImageView ImageViewAttachments[] = { SwapChainImageView };
+		VkFramebufferCreateInfo FramebufferCreateInfo { };
+		FramebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		FramebufferCreateInfo.renderPass = m_VulkanRenderPass;
+		FramebufferCreateInfo.attachmentCount = 1;
+		FramebufferCreateInfo.pAttachments = ImageViewAttachments;
+		FramebufferCreateInfo.width = m_VulkanSwapChainExtent.width;
+		FramebufferCreateInfo.height = m_VulkanSwapChainExtent.height;
+		FramebufferCreateInfo.layers = 1;
+
+		if (vkCreateFramebuffer(m_VulkanLogicalDevice, &FramebufferCreateInfo, nullptr, &m_SwapChainFramebuffers[SwapChainImageViewLoopIndex]) != VK_SUCCESS)
+		{
+			UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanFramebuffer");
+		}
+		
+		SwapChainImageViewLoopIndex++;
+	}
+}
+
 void VulkanAPI::CreateVulkanLogicalDevice()
 {
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice);
@@ -743,6 +768,10 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::VulkanDebugCallback(VkDebugUtilsMessag
 
 void VulkanAPI::Shutdown()
 {
+	for (VkFramebuffer_T* SwapChainFramebuffer : m_SwapChainFramebuffers)
+	{
+		vkDestroyFramebuffer(m_VulkanLogicalDevice, SwapChainFramebuffer, nullptr);
+	}
 	vkDestroyPipeline(m_VulkanLogicalDevice, m_VulkanGraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(m_VulkanLogicalDevice, m_VulkanPipelineLayout, nullptr);
 	vkDestroyRenderPass(m_VulkanLogicalDevice, m_VulkanRenderPass, nullptr);
