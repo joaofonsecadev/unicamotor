@@ -27,6 +27,8 @@ void VulkanAPI::Init()
 	CreateImageViews();
 	CreateRenderPass();
 	CreateGraphicsPipeline();
+	CreateFramebuffers();
+	CreateCommandPool();
 }
 
 void VulkanAPI::Tick()
