@@ -189,7 +189,7 @@ void VulkanAPI::CreateSwapChain()
 
 	if (vkCreateSwapchainKHR(m_VulkanLogicalDevice, &SwapChainCreateInfo, nullptr, &m_VulkanSwapChain) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanSwapChain");
+		UNICA_LOG(spdlog::level::critical, "Failed to create VulkanSwapChain");
 		return;
 	}
 
@@ -226,7 +226,7 @@ void VulkanAPI::CreateImageViews()
 
 		if (vkCreateImageView(m_VulkanLogicalDevice, &ImageViewCreateInfo, nullptr, &m_VulkanSwapChainImageViews[SwapChainImageIteration]) != VK_SUCCESS)
 		{
-			UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanImageViews");
+			UNICA_LOG(spdlog::level::critical, "Failed to create VulkanImageViews");
 			return;
 		}
 
@@ -263,7 +263,7 @@ void VulkanAPI::CreateRenderPass()
 
 	if (vkCreateRenderPass(m_VulkanLogicalDevice, &VulkanRenderPassCreateInfo, nullptr, &m_VulkanRenderPass) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanRenderPass");
+		UNICA_LOG(spdlog::level::critical, "Failed to create VulkanRenderPass");
 	}
 }
 
@@ -364,7 +364,7 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 	if (vkCreatePipelineLayout(m_VulkanLogicalDevice, &PipelineLayoutInfo, nullptr, &m_VulkanPipelineLayout) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanPipelineLayout");
+		UNICA_LOG(spdlog::level::critical, "Failed to create a VulkanPipelineLayout");
 	}
 
 	VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo { };
@@ -384,7 +384,7 @@ void VulkanAPI::CreateGraphicsPipeline()
 
 	if (vkCreateGraphicsPipelines(m_VulkanLogicalDevice, VK_NULL_HANDLE, 1, &GraphicsPipelineCreateInfo, nullptr, &m_VulkanGraphicsPipeline) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create the VulkanGraphicsPipeline");
+		UNICA_LOG(spdlog::level::critical, "Failed to create the VulkanGraphicsPipeline");
 	}
 
 	// Cleanup shader modules since they've already been created
@@ -402,7 +402,7 @@ VkShaderModule VulkanAPI::CreateShaderModule(const std::vector<char>& ShaderBina
 	VkShaderModule ShaderModule;
 	if (vkCreateShaderModule(m_VulkanLogicalDevice, &ShaderModuleCreateInfo, nullptr, &ShaderModule) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanShaderModule");
+		UNICA_LOG(spdlog::level::critical, "Failed to create a VulkanShaderModule");
 	}
 	
 	return ShaderModule;
@@ -426,7 +426,7 @@ void VulkanAPI::CreateFramebuffers()
 
 		if (vkCreateFramebuffer(m_VulkanLogicalDevice, &FramebufferCreateInfo, nullptr, &m_SwapChainFramebuffers[SwapChainImageViewLoopIndex]) != VK_SUCCESS)
 		{
-			UNICA_LOG(Fatal, __FUNCTION__, "Failed to create a VulkanFramebuffer");
+			UNICA_LOG(spdlog::level::critical, "Failed to create a VulkanFramebuffer");
 		}
 		
 		SwapChainImageViewLoopIndex++;
@@ -444,7 +444,7 @@ void VulkanAPI::CreateCommandPool()
 
 	if (vkCreateCommandPool(m_VulkanLogicalDevice, &CommandPoolCreateInfo, nullptr, &m_VulkanCommandPool) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Failed to create the VulkanCommandPool");
+		UNICA_LOG(spdlog::level::critical, "Failed to create the VulkanCommandPool");
 	}
 }
 
@@ -453,7 +453,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
 	if (!QueueFamilyIndices.WasSet())
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "No support for graphics and image presentation queues");
+		UNICA_LOG(spdlog::level::critical, "No support for graphics and image presentation queues");
 		return;
 	}
 
@@ -494,7 +494,7 @@ void VulkanAPI::CreateVulkanLogicalDevice()
 
 	if (vkCreateDevice(m_VulkanPhysicalDevice->GetVulkanObject(), &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "Couldn't create a VulkanLogicalDevice");
+		UNICA_LOG(spdlog::level::critical, "Couldn't create a VulkanLogicalDevice");
 		return;
 	}
 	

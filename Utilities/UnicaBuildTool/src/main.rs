@@ -31,7 +31,6 @@ fn configure_tracing() {
     tracing::subscriber::set_global_default(FmtSubscriber::builder()
         .with_max_level(LevelFilter::TRACE)
         .with_target(false)
-        .with_timer(tracing_subscriber::fmt::time::uptime())
         .finish()).expect("Failed tracing subscriber creation");
 }
 

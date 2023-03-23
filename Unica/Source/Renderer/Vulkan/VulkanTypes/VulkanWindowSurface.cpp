@@ -8,7 +8,7 @@ void VulkanWindowSurface::Init()
 {
     if (glfwCreateWindowSurface(m_OwningVulkanAPI->GetVulkanInstance()->GetVulkanObject(), m_OwningVulkanAPI->GetGlfwRenderWindow()->GetGlfwWindow(), nullptr, &m_VulkanObject))
     {
-        UNICA_LOG(Fatal, __FUNCTION__, "Failed to create VulkanWindowSurface");
+        UNICA_LOG(spdlog::level::critical, "Failed to create VulkanWindowSurface");
     }
 }
 

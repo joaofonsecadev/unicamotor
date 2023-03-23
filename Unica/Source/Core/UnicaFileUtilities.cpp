@@ -14,7 +14,7 @@
 
 std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocation)
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     std::filesystem::path UnicaFilePath(FileLocation);
     if (UnicaFilePath.is_absolute())
     {
@@ -41,7 +41,7 @@ std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocat
             "Provided file location '{}' lacks a prefix '{}' or '{}', according to its location",
             FileLocation, EnginePrefix, GamePrefix);
         
-        UNICA_LOG(Error, __FUNCTION__, ErrorMessage);
+        UNICA_LOG(spdlog::level::err, ErrorMessage);
     }
     
     UnicaFilePath = std::filesystem::path(FileLocation);
@@ -51,7 +51,7 @@ std::filesystem::path UnicaFileUtilities::ResolveDirectory(std::string FileLocat
 
 std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::string& FileExtensionString)
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     std::vector<std::string> FileExtension(1);
     FileExtension[0] = FileExtensionString;
     return GetFilesInPathWithExtension(PathToSearchString, FileExtension);
@@ -59,14 +59,14 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 
 std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtension(const std::string& PathToSearchString, const std::vector<std::string>& FileExtensions)
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     std::vector<std::filesystem::path> FinalFilesVector;
     const std::filesystem::path PathToSearch = ResolveDirectory(PathToSearchString);
 
     if (!std::filesystem::is_directory(PathToSearch))
     {
         const std::string ErrorMessage = fmt::format("Path '{}' is not valid", PathToSearch.string());
-        UNICA_LOG(Error, __FUNCTION__, ErrorMessage);
+        UNICA_LOG(spdlog::level::err, ErrorMessage);
         return FinalFilesVector;
     }
     
@@ -93,7 +93,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 
 std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLocation)
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     const std::filesystem::path FileDirectory = ResolveDirectory(FileLocation);
 
 #ifdef __APPLE__
@@ -104,7 +104,7 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
 
     if (!FileAsBinary.is_open())
     {
-        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}'", FileDirectory.string()));
+        UNICA_LOG(spdlog::level::err, fmt::format("Can't open file '{}'", FileDirectory.string()));
         return { };
     }
 
@@ -119,13 +119,13 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
 
 std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation)
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     const std::filesystem::path FileDirectory = ResolveDirectory(FileLocation);
     
     std::ifstream FileAsString(FileLocation);
     if (!FileAsString.is_open())
     {
-        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}'", FileDirectory.string()));
+        UNICA_LOG(spdlog::level::err, fmt::format("Can't open file '{}'", FileDirectory.string()));
         return "";
     }
 
@@ -142,13 +142,13 @@ std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation
 
 bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const std::string& FileDestination)
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     const std::filesystem::path FileDirectory = ResolveDirectory(FileDestination);
     std::ofstream OutputFile(FileDirectory.string(), std::ios::trunc);
 
     if (!OutputFile)
     {
-        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}' for writting", FileDirectory.string()));
+        UNICA_LOG(spdlog::level::err, fmt::format("Can't open file '{}' for writting", FileDirectory.string()));
         return false;
     }
 
@@ -158,7 +158,7 @@ bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const st
 
 bool UnicaFileUtilities::WriteFile(const std::string& FileSource, const std::string& FileDestination)
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     const std::vector<char> StringToCharVector(FileSource.begin(), FileSource.end());
     return WriteFile(StringToCharVector, FileDestination);
 }

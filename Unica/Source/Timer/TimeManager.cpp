@@ -15,14 +15,14 @@ void TimeManager::Init()
 {
 	if (std::chrono::steady_clock::period::den != std::nano::den)
 	{
-		UNICA_LOG(Fatal, __FUNCTION__, "HighResClock unit is not nanoseconds");
+		UNICA_LOG(spdlog::level::critical, "HighResClock unit is not nanoseconds");
 		return;
 	}
 }
 
 void TimeManager::Tick()
 {
-	UNICA_PROFILE_FUNCTION
+	UNICA_PROFILE_FUNCTION;
     CalculateLastFrameTime();
     //fmt::print(fg(fmt::color::light_gray), "\33[2K\rWorkFrameTime: {:.2f}; SleepFrameTime: {:.2f}; TotalFrameTime: {:.2f}",
     //    m_FrameWorkDuration, m_FrameSleepDuration, m_FrameWorkDuration + m_FrameSleepDuration);
@@ -30,7 +30,7 @@ void TimeManager::Tick()
 
 void TimeManager::CalculateLastFrameTime()
 {
-	UNICA_PROFILE_FUNCTION
+	UNICA_PROFILE_FUNCTION;
     const std::chrono::time_point CurrentFrameTime = std::chrono::steady_clock::now();
     const std::chrono::nanoseconds DeltaTime = CurrentFrameTime - m_LastFrameTime;
 

@@ -39,10 +39,10 @@ void VulkanInstance::Init()
 
     if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanObject) != VK_SUCCESS)
     {
-        UNICA_LOG(Fatal, __FUNCTION__, "Couldn't create Vulkan instance");
+        UNICA_LOG(spdlog::level::critical, "Couldn't create Vulkan instance");
         return;
     }
-    UNICA_LOG(Log, __FUNCTION__, "Vulkan instance created");
+    UNICA_LOG(spdlog::level::info, "Vulkan instance created");
 
     CreateVulkanDebugMessenger();
 }
@@ -73,13 +73,13 @@ void VulkanInstance::AddRequiredExtensions(VkInstanceCreateInfo& VulkanCreateInf
         }
         if (!bWasExtensionFound)
         {
-            UNICA_LOG(Error, __FUNCTION__, fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
+            UNICA_LOG(spdlog::level::err, fmt::format("Graphic instance extension \"{}\" not found", RequiredExtensionName));
             bAllExtensionsFound = false;
         }
     }
     if (!bAllExtensionsFound)
     {
-        UNICA_LOG(Fatal, __FUNCTION__, "Not all required instance extensions found");
+        UNICA_LOG(spdlog::level::critical, "Not all required instance extensions found");
         return;
     }
 
@@ -114,13 +114,13 @@ void VulkanInstance::AddValidationLayers(VkInstanceCreateInfo& VulkanCreateInfo,
         }
         if (!bWasLayerFound)
         {
-            UNICA_LOG(Error, __FUNCTION__, fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
+            UNICA_LOG(spdlog::level::err, fmt::format("VulkanValidationLayer \"{}\" not found", RequestedLayerName));
             bAllLayersFound = false;
         }
     }
     if (!bAllLayersFound)
     {
-        UNICA_LOG(Error, __FUNCTION__, "Won't enable VulkanValidationLayers since not all of them are available");
+        UNICA_LOG(spdlog::level::err, "Won't enable VulkanValidationLayers since not all of them are available");
         return;
     }
 
@@ -143,7 +143,7 @@ void VulkanInstance::CreateVulkanDebugMessenger()
 
     if (CreateVulkanDebugUtilsMessenger(m_VulkanObject, &VulkanCreateInfo, nullptr, &m_VulkanDebugMessenger) != VK_SUCCESS)
     {
-        UNICA_LOG(Error, __FUNCTION__, "Couldn't setup VulkanDebugMessenger");
+        UNICA_LOG(spdlog::level::err, "Couldn't setup VulkanDebugMessenger");
     }
 }
 
@@ -180,18 +180,15 @@ void VulkanInstance::PopulateVulkanDebugMessengerInfo(VkDebugUtilsMessengerCreat
 
 VKAPI_ATTR VkBool32 VKAPI_CALL VulkanInstance::VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT MessageType, const VkDebugUtilsMessengerCallbackDataEXT* CallbackData, void* UserData)
 {
-    LogLevel LogLvl = Log;
-
     if ((MessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
     {
-        LogLvl = Warning;
+        UNICA_LOG_WARN(CallbackData->pMessage);
     }
     else if ((MessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
     {
-        LogLvl = Error;
+        UNICA_LOG_ERROR(CallbackData->pMessage);
     }
 
-    UNICA_LOG(LogLvl, __FUNCTION__, CallbackData->pMessage);
     return VK_FALSE;
 }
 

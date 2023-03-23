@@ -1,6 +1,6 @@
 // 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-﻿#include "SdlAPI.h"
+#include "SdlAPI.h"
 
 #include "UnicaInstance.h"
 #include "Log/Logger.h"
@@ -10,14 +10,14 @@ void SdlAPI::Init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        UNICA_LOG(Fatal, __FUNCTION__, "Couldn't initialize SDL");
+        UNICA_LOG(spdlog::level::critical, "Couldn't initialize SDL");
         return;
     }
 
     m_SdlWindow = SDL_CreateWindow(UnicaSettings::ApplicationName.c_str(), UnicaSettings::WindowWidth, UnicaSettings::WindowHeight, 0);
     if (m_SdlWindow == nullptr)
     {
-        UNICA_LOG(Fatal, __FUNCTION__, "SDL window creation failed");
+        UNICA_LOG(spdlog::level::critical, "SDL window creation failed");
         return;
     }
 
@@ -26,13 +26,13 @@ void SdlAPI::Init()
 
 void SdlAPI::Tick()
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     SdlPoolEvents();
 }
 
 void SdlAPI::SdlPoolEvents()
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     SDL_Event SdlEvent;
     SDL_PollEvent(&SdlEvent);
     if (SdlEvent.type == SDL_EVENT_QUIT)

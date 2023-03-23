@@ -19,7 +19,7 @@ void SubsystemManager::Init()
 
 void SubsystemManager::InitializeSubsystem(SubsystemBase* const Subsystem)
 {
-    UNICA_LOG(Log, __FUNCTION__, fmt::format("Initializing {}", typeid(*Subsystem).name()));
+    UNICA_LOG(spdlog::level::info, fmt::format("Initializing {}", typeid(*Subsystem).name()));
     Subsystem->Init();
     m_SubsystemCollection.push_back(std::unique_ptr<SubsystemBase>(Subsystem));
 }
@@ -30,7 +30,7 @@ void SubsystemManager::Shutdown()
     {
         SubsystemBase* const Subsystem = m_SubsystemCollection.back().get();
 
-        UNICA_LOG(Log, __FUNCTION__, fmt::format("Shutting down {}", typeid(*Subsystem).name()));
+        UNICA_LOG(spdlog::level::info, fmt::format("Shutting down {}", typeid(*Subsystem).name()));
         Subsystem->Shutdown();
 
         m_SubsystemCollection.pop_back();
@@ -39,7 +39,7 @@ void SubsystemManager::Shutdown()
 
 void SubsystemManager::TickSubsystems()
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     for (const std::unique_ptr<SubsystemBase>& Subsystem : m_SubsystemCollection)
     {
         if (!Subsystem->ShouldTick())

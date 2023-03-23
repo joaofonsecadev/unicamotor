@@ -20,23 +20,23 @@ GlfwRenderWindow::GlfwRenderWindow()
         UnicaSettings::EngineName.c_str(),
         nullptr, nullptr);
 
-    UNICA_LOG(Log, __FUNCTION__, "Created application window");
+    UNICA_LOG(spdlog::level::info, "Created application window");
 }
 
 void GlfwRenderWindow::Tick()
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     WindowCloseRequested();
     PollEvents();
 }
 
 void GlfwRenderWindow::WindowCloseRequested()
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     
     bool glfwWindowCloseRequest;
     {
-        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwWindowShouldClose")
+        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwWindowShouldClose");
         glfwWindowCloseRequest = glfwWindowShouldClose(m_GlfwWindow);
     }
     
@@ -48,9 +48,9 @@ void GlfwRenderWindow::WindowCloseRequested()
 
 void GlfwRenderWindow::PollEvents()
 {
-    UNICA_PROFILE_FUNCTION
+    UNICA_PROFILE_FUNCTION;
     {
-        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwPollEvents")
+        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwPollEvents");
         glfwPollEvents();
     }
 }
@@ -60,5 +60,5 @@ GlfwRenderWindow::~GlfwRenderWindow()
     glfwDestroyWindow(m_GlfwWindow);
     glfwTerminate();
 
-    UNICA_LOG(Log, __FUNCTION__, "Destroyed application window");
+    UNICA_LOG(spdlog::level::info, "Destroyed application window");
 }

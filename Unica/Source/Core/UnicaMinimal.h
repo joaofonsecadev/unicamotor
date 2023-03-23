@@ -23,7 +23,7 @@ typedef uint64_t uint64;
 #endif
 
 #define UNICA_PROFILE_FUNCTION ZoneScoped;
-#define UNICA_PROFILE_FUNCTION_NAMED(x) ZoneScopedN(x);
-#define UNICA_PROFILE_FRAME_START(x) FrameMarkStart(x);
-#define UNICA_PROFILE_FRAME_END(x) FrameMarkEnd(x);
-#define UNICA_PROFILE_FRAME(x) FrameMarkNamed(x);
+#define UNICA_PROFILE_FUNCTION_NAMED(x) ZoneScopedN(x)
+#define UNICA_PROFILE_FRAME_START(x) FrameMarkStart(x)
+#define UNICA_PROFILE_FRAME_END(x) FrameMarkEnd(x)
+#define UNICA_PROFILE_FRAME(x) FrameMarkNamed(x)

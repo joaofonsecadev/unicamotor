@@ -15,7 +15,7 @@ void VulkanPhysicalDevice::Init()
     vkEnumeratePhysicalDevices(m_OwningVulkanAPI->GetVulkanInstance()->GetVulkanObject(), &VulkanPhysicalDeviceCount, nullptr);
     if (VulkanPhysicalDeviceCount < 1)
     {
-        UNICA_LOG(Fatal, __FUNCTION__, "No GPUs with Vulkan support found");
+        UNICA_LOG(spdlog::level::critical, "No GPUs with Vulkan support found");
         return;
     }
 
@@ -35,7 +35,7 @@ void VulkanPhysicalDevice::Init()
     }
     else
     {
-        UNICA_LOG(Fatal, __FUNCTION__, "No suitable GPU found");
+        UNICA_LOG(spdlog::level::critical, "No suitable GPU found");
         return;
     }
 }

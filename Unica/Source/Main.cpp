@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     while (!UnicaInstance::HasRequestedExit())
     {
         EngineInstance->Tick();
-        UNICA_PROFILE_FRAME("EngineLoop")
+        UNICA_PROFILE_FRAME("EngineLoop");
     }
 
     EngineInstance->Shutdown();

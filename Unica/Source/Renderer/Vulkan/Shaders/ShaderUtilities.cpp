@@ -18,12 +18,12 @@ void ShaderUtilities::CompileShaders()
     const std::vector<std::filesystem::path> GlslShaderFiles = UnicaFileUtilities::GetFilesInPathWithExtension("Engine:Shaders", ShaderFileExtensionsToCompile);
     if (GlslShaderFiles.empty())
     {
-        UNICA_LOG(Log, __FUNCTION__, "No GLSL shaders to compile");
+        UNICA_LOG(spdlog::level::info, "No GLSL shaders to compile");
         return;
     }
 
     const std::chrono::time_point ShaderCompilationStartTime = std::chrono::high_resolution_clock::now();
-    UNICA_LOG(Log, __FUNCTION__, "Starting shader compilation");
+    UNICA_LOG(spdlog::level::info, "Starting shader compilation");
 	
     shaderc::Compiler Compiler;
     shaderc::CompileOptions CompilerOptions;
@@ -32,7 +32,7 @@ void ShaderUtilities::CompileShaders()
         std::string GlslShaderString = UnicaFileUtilities::ReadFileAsString(GlslShaderFile.string());
         if (GlslShaderString.empty())
         {
-            UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't read shader file '{}'", GlslShaderFile.string()));
+            UNICA_LOG(spdlog::level::err, fmt::format("Can't read shader file '{}'", GlslShaderFile.string()));
             continue;
         }
         
@@ -51,7 +51,7 @@ void ShaderUtilities::CompileShaders()
 
     const std::chrono::time_point ShaderCompilationEndTime = std::chrono::high_resolution_clock::now();
     const auto ShaderCompilationTimeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(ShaderCompilationEndTime - ShaderCompilationStartTime);
-    UNICA_LOG(Log, __FUNCTION__, fmt::format("Shader compilation completed in {} milliseconds", ShaderCompilationTimeTaken.count()));
+    UNICA_LOG(spdlog::level::info, fmt::format("Shader compilation completed in {} milliseconds", ShaderCompilationTimeTaken.count()));
 }
 
 std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
@@ -61,7 +61,7 @@ std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
 
     if (SpvShaderBinary.empty())
     {
-        UNICA_LOG(Error, __FUNCTION__, std::format("Shader '{}' may not be compiled", FileLocation));
+        UNICA_LOG(spdlog::level::err, std::format("Shader '{}' may not be compiled", FileLocation));
     }
     
     return SpvShaderBinary;
@@ -74,7 +74,7 @@ bool ShaderUtilities::WriteCompiledSpirvFile(const std::vector<uint32>& ShaderBi
 
     if (!OutputFile)
     {
-        UNICA_LOG(Error, __FUNCTION__, fmt::format("Can't open file '{}' for writting", FileDirectory.string()));
+        UNICA_LOG(spdlog::level::err, fmt::format("Can't open file '{}' for writting", FileDirectory.string()));
         return false;
     }
 

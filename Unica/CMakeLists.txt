@@ -63,6 +63,7 @@ target_link_libraries("Unica"
         fmt::fmt
         glm::glm
         SDL3::SDL3
+        spdlog::spdlog
         Tracy::TracyClient
         ${Vulkan_LIBRARIES}
 )
