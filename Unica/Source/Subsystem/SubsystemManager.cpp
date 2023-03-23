@@ -39,7 +39,7 @@ void SubsystemManager::Shutdown()
 
 void SubsystemManager::TickSubsystems()
 {
-    UNICA_PROFILE_FUNCTION;
+    UNICA_PROFILE_FUNCTION
     for (const std::unique_ptr<SubsystemBase>& Subsystem : m_SubsystemCollection)
     {
         if (!Subsystem->ShouldTick())

@@ -13,7 +13,7 @@ void RenderManager::Init()
 
 void RenderManager::Tick()
 {
-    UNICA_PROFILE_FUNCTION;
+    UNICA_PROFILE_FUNCTION
     m_RenderInterface->Tick();
 }
 

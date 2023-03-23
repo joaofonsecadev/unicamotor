@@ -26,13 +26,13 @@ void SdlAPI::Init()
 
 void SdlAPI::Tick()
 {
-    UNICA_PROFILE_FUNCTION;
+    UNICA_PROFILE_FUNCTION
     SdlPoolEvents();
 }
 
 void SdlAPI::SdlPoolEvents()
 {
-    UNICA_PROFILE_FUNCTION;
+    UNICA_PROFILE_FUNCTION
     SDL_Event SdlEvent;
     SDL_PollEvent(&SdlEvent);
     if (SdlEvent.type == SDL_EVENT_QUIT)
