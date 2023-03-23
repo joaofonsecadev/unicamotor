@@ -1,6 +1,6 @@
 // 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-﻿#pragma once
+#pragma once
 
 #include "Renderer/Vulkan/VulkanTypeInterface.h"
 

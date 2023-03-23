@@ -1,6 +1,6 @@
 // 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-﻿#include "UnicaFileUtilities.h"
+#include "UnicaFileUtilities.h"
 
 #ifdef __APPLE__
 #include <sstream>

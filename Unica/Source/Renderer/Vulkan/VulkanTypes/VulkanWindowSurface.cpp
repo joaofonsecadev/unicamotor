@@ -1,6 +1,6 @@
 // 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-﻿#include "VulkanWindowSurface.h"
+#include "VulkanWindowSurface.h"
 
 #include "Renderer/Vulkan/VulkanAPI.h"
 

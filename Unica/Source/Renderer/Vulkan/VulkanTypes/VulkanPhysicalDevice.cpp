@@ -1,6 +1,6 @@
 // 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-﻿#include "VulkanPhysicalDevice.h"
+#include "VulkanPhysicalDevice.h"
 
 #include <map>
 #include <set>

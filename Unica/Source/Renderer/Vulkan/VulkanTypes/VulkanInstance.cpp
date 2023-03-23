@@ -1,6 +1,6 @@
 // 2021-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-﻿#include "VulkanInstance.h"
+#include "VulkanInstance.h"
 
 #include <fmt/format.h>
 
