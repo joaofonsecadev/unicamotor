@@ -1,12 +1,12 @@
 // 2022-2023 Copyright joaofonseca.dev, All Rights Reserved
 
 use std::path::PathBuf;
-use clap::Parser;
+use clap::{Parser, Arg};
 use tracing::{info, metadata::LevelFilter, debug};
 use tracing_subscriber::FmtSubscriber;
-use crate::utils::get_project_root_dir;
 
 mod copyright_disclaimer;
+mod generate_solution;
 mod utils;
 
 #[derive(Parser)]
@@ -18,10 +18,14 @@ struct CliArgs {
 
     /// Generate OS appropriate solution files
     #[arg(short, long)]
-    generate_solution_files: bool,
+    generate_solution: bool,
+
+    /// Generate solution files using the specified generator
+    #[arg(long)]
+    generate_solution_with_gen_type: Option<String>,
 
     /// Write/update the copyright disclaimer in source files
-    #[arg(long, value_name = "PROJECT_NAME")]
+    #[arg(long)]
     write_copyright_disclaimer: bool
 }
 
@@ -40,17 +44,20 @@ fn main() {
     configure_tracing();
     info!("Version {}", env!("CARGO_PKG_VERSION"));
 
-    let global_values = GlobalValues { unica_root_path: get_project_root_dir() };
+    let global_values = GlobalValues { unica_root_path: utils::get_project_root_dir() };
     
     let command_line_args = CliArgs::parse();
 
-    let mut will_generate_solution_files = command_line_args.generate_solution_files;
-
     if command_line_args.create_unica_project.is_some() {
-        debug!("Forcing generation of solution files");
-        will_generate_solution_files = true;
     }
-    if will_generate_solution_files {
+
+    let mut has_generated_solution = false;
+    if command_line_args.generate_solution_with_gen_type.is_some() {
+        generate_solution::generate_solution(&command_line_args.generate_solution_with_gen_type.unwrap(), &global_values);
+        has_generated_solution = true;
+    }
+    if command_line_args.generate_solution && !has_generated_solution {
+        generate_solution::generate_solution(&generate_solution::get_default_cmake_generator(), &global_values);
     }
     if command_line_args.write_copyright_disclaimer {
         copyright_disclaimer::write_copyright_disclaimer(&global_values);

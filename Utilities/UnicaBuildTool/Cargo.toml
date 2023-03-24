@@ -13,3 +13,4 @@ clap = { version = "4.1.11", features = ["derive"] }
 tracing = "0.1.37"
 tracing-subscriber = "0.3.16"
 walkdir = "2.3.3"
+which = "4.4.0"

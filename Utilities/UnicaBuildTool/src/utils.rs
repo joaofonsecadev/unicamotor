@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use tracing::{error, debug, trace};
 
 pub fn get_project_root_dir() -> PathBuf{
-    let executable_path_result = std::env::current_dir();
+    let executable_path_result = std::env::current_exe();
     if executable_path_result.is_err() {
         error!("Couldn't get the directory of the executable");
         panic!();
