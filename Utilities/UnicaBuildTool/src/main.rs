@@ -51,6 +51,6 @@ fn main() {
     if will_generate_solution_files {
     }
     if command_line_args.write_copyright_disclaimer {
-        copyright_disclaimer::write_copyright_disclaimer(global_values);
+        copyright_disclaimer::write_copyright_disclaimer(&global_values);
     }
 }

@@ -4,8 +4,10 @@
 
 #include <string>
 
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#include <spdlog/spdlog.h>
+
 #include "UnicaMinimal.h"
-#include "spdlog/spdlog.h"
 
 #define UNICA_LOG(LogLevel, ...) SPDLOG_LOGGER_CALL(Logger::GetCoreLogger(), LogLevel, __VA_ARGS__)
 #define UNICA_LOG_TRACE(...) SPDLOG_LOGGER_TRACE(Logger::GetCoreLogger(), __VA_ARGS__)
