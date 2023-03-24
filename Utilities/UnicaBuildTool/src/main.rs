@@ -1,3 +1,5 @@
+// 2022-2023 Copyright joaofonseca.dev, All Rights Reserved
+
 use std::path::PathBuf;
 use clap::Parser;
 use tracing::{info, metadata::LevelFilter, debug};
