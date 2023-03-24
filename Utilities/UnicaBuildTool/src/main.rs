@@ -1,8 +1,8 @@
 // 2022-2023 Copyright joaofonseca.dev, All Rights Reserved
 
 use std::path::PathBuf;
-use clap::{Parser, Arg};
-use tracing::{info, metadata::LevelFilter, debug};
+use clap::{Parser};
+use tracing::{info, metadata::LevelFilter};
 use tracing_subscriber::FmtSubscriber;
 
 mod copyright_disclaimer;
