@@ -9,13 +9,13 @@
 
 #include "UnicaMinimal.h"
 
-#define UNICA_LOG(LogLevel, ...) SPDLOG_LOGGER_CALL(Logger::GetCoreLogger(), LogLevel, __VA_ARGS__)
+#define UNICA_LOG(LogLevel, ...) SPDLOG_LOGGER_CALL(Logger::GetCoreLogger(), LogLevel, __VA_ARGS__);if(LogLevel==spdlog::level::critical)throw
 #define UNICA_LOG_TRACE(...) SPDLOG_LOGGER_TRACE(Logger::GetCoreLogger(), __VA_ARGS__)
 #define UNICA_LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(Logger::GetCoreLogger(), __VA_ARGS__)
 #define UNICA_LOG_INFO(...) SPDLOG_LOGGER_INFO(Logger::GetCoreLogger(), __VA_ARGS__)
 #define UNICA_LOG_WARN(...) SPDLOG_LOGGER_WARN(Logger::GetCoreLogger(), __VA_ARGS__)
 #define UNICA_LOG_ERROR(...) SPDLOG_LOGGER_ERROR(Logger::GetCoreLogger(), __VA_ARGS__)
-#define UNICA_LOG_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(Logger::GetCoreLogger(), __VA_ARGS__)
+#define UNICA_LOG_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(Logger::GetCoreLogger(), __VA_ARGS__);throw
 
 enum LogLevel : uint8
 {

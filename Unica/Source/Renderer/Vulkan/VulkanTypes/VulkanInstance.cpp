@@ -40,7 +40,6 @@ void VulkanInstance::Init()
     if (vkCreateInstance(&VulkanCreateInfo, nullptr, &m_VulkanObject) != VK_SUCCESS)
     {
         UNICA_LOG(spdlog::level::critical, "Couldn't create Vulkan instance");
-        return;
     }
     UNICA_LOG(spdlog::level::info, "Vulkan instance created");
 
