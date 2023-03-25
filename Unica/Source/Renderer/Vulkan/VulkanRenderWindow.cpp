@@ -2,63 +2,40 @@
 
 #include "VulkanRenderWindow.h"
 
-#include <tracy/Tracy.hpp>
-
 #include "UnicaInstance.h"
 #include "UnicaMinimal.h"
 
-GlfwRenderWindow::GlfwRenderWindow()
+SdlRenderWindow::SdlRenderWindow()
 {
-    glfwInit();
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
-    m_GlfwWindow = glfwCreateWindow(
-        UnicaSettings::WindowWidth,
-        UnicaSettings::WindowHeight,
-        UnicaSettings::EngineName.c_str(),
-        nullptr, nullptr);
-
-    UNICA_LOG(spdlog::level::info, "Created application window");
-}
-
-void GlfwRenderWindow::Tick()
-{
-    UNICA_PROFILE_FUNCTION
-    WindowCloseRequested();
-    PollEvents();
-}
-
-void GlfwRenderWindow::WindowCloseRequested()
-{
-    UNICA_PROFILE_FUNCTION
-    
-    bool glfwWindowCloseRequest;
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwWindowShouldClose");
-        glfwWindowCloseRequest = glfwWindowShouldClose(m_GlfwWindow);
+        UNICA_LOG(spdlog::level::critical, "Couldn't initialize SDL");
+    }
+
+    m_SdlWindow = SDL_CreateWindow(UnicaSettings::ApplicationName.c_str(), UnicaSettings::WindowWidth, UnicaSettings::WindowHeight, SDL_WINDOW_VULKAN);
+    if (m_SdlWindow == nullptr)
+    {
+        UNICA_LOG(spdlog::level::critical, "Couldn't create an SDL window");
+    }
+}
+
+void SdlRenderWindow::Tick()
+{
+    UNICA_PROFILE_FUNCTION
+    SDL_Event SdlEvent;
+    {
+        UNICA_PROFILE_FUNCTION_NAMED("sdl::SDL_PollEvent");
+        SDL_PollEvent(&SdlEvent);
     }
     
-    if (glfwWindowCloseRequest)
+    if (SdlEvent.type == SDL_EVENT_QUIT)
     {
         UnicaInstance::RequestExit();
     }
 }
 
-void GlfwRenderWindow::PollEvents()
+SdlRenderWindow::~SdlRenderWindow()
 {
-    UNICA_PROFILE_FUNCTION
-    {
-        UNICA_PROFILE_FUNCTION_NAMED("glfw::glfwPollEvents");
-        glfwPollEvents();
-    }
-}
-
-GlfwRenderWindow::~GlfwRenderWindow()
-{
-    glfwDestroyWindow(m_GlfwWindow);
-    glfwTerminate();
-
-    UNICA_LOG(spdlog::level::info, "Destroyed application window");
+    SDL_DestroyWindow(m_SdlWindow);
+    SDL_Quit();
 }

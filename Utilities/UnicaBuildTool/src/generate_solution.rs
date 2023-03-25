@@ -15,7 +15,7 @@ fn get_cmake_path() -> Option<String> {
 }
 
 fn spawn_cmake_process(cmake_path: &str, generator_type: &str, project_path: &PathBuf) -> bool {
-    debug!("Executing CMake: {} -S{} -B{} -G{}", cmake_path, project_path.to_str().unwrap(), project_path.join("Intermediate").to_str().unwrap(), generator_type);
+    info!("Executing CMake: {} -S{} -B{} -G{}", cmake_path, project_path.to_str().unwrap(), project_path.join("Intermediate").to_str().unwrap(), generator_type);
 
     let mut command = Command::new(cmake_path)
         .arg(format!("-S{}", project_path.to_str().unwrap()))
@@ -50,7 +50,13 @@ fn spawn_cmake_process(cmake_path: &str, generator_type: &str, project_path: &Pa
         error!("CMake stderr reader thread failed to join");
     }
 
-    info!("CMake exited with status {:?}", command_exit_status);
+    let exit_status = command_exit_status.unwrap().code().unwrap();
+    if exit_status != 0 {
+        error!("CMake failed with exit code {}", exit_status);
+    } else {
+        info!("CMake completed successfuly");
+    }
+
     return true;
 }
 

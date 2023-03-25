@@ -24,7 +24,7 @@ public:
 	void Tick() override;
 	void Shutdown() override;
 
-	GlfwRenderWindow* GetGlfwRenderWindow() const { return m_GlfwRenderWindow.get(); }
+	SdlRenderWindow* GetSdlRenderWindow() const { return m_SdlRenderWindow.get(); }
 	VulkanInstance* GetVulkanInstance() const { return m_VulkanInstance.get(); }
 
 	bool GetValidationLayersEnabled() const { return m_bValidationLayersEnabled; }
@@ -54,7 +54,7 @@ private:
 
 	void CreateCommandPool();
 
-	std::unique_ptr<GlfwRenderWindow> m_GlfwRenderWindow = std::make_unique<GlfwRenderWindow>();
+	std::unique_ptr<SdlRenderWindow> m_SdlRenderWindow = std::make_unique<SdlRenderWindow>();
 
 	std::unique_ptr<VulkanInstance> m_VulkanInstance = std::make_unique<VulkanInstance>(this);
 	std::unique_ptr<VulkanWindowSurface> m_VulkanWindowSurface = std::make_unique<VulkanWindowSurface>(this);

@@ -18,15 +18,13 @@ set(SPIRV_SKIP_EXECUTABLES ON CACHE BOOL "" FORCE)
 
 add_subdirectory("fmt")
 add_subdirectory("glm")
-add_subdirectory("glfw")
 add_subdirectory("shaderc")
 add_subdirectory("sdl")
 add_subdirectory("spdlog")
 
 set_target_properties(spdlog PROPERTIES FOLDER "Libraries")
 set_target_properties(fmt PROPERTIES FOLDER "Libraries")
-set_target_properties(SDL3-static PROPERTIES FOLDER "Libraries")
-set_target_properties(glfw PROPERTIES FOLDER "Libraries")
+set_target_properties(SDL3-shared PROPERTIES FOLDER "Libraries")
 set_target_properties(add-copyright build-version check-copyright shaderc_combined-pkg-config
     shaderc_static-pkg-config shaderc-pkg-config glslc glslc_exe shaderc testdata
     shaderc_combined_genfile shaderc_shared shaderc_util PROPERTIES FOLDER "Libraries/shaderc")

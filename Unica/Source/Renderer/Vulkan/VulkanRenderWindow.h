@@ -2,22 +2,18 @@
 
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include "SDL3/SDL.h"
 
-class GlfwRenderWindow
+class SdlRenderWindow
 {
 public:
-    GlfwRenderWindow();
-    ~GlfwRenderWindow();
+    SdlRenderWindow();
+    ~SdlRenderWindow();
 
     void Tick();
 
-    GLFWwindow* GetGlfwWindow() const { return m_GlfwWindow; }
+    SDL_Window* GetSdlWindow() const { return m_SdlWindow; }
 
 private:
-    void WindowCloseRequested();
-    void PollEvents();
-    
-    GLFWwindow* m_GlfwWindow;
+    SDL_Window* m_SdlWindow;
 };

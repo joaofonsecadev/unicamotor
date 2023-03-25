@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "UnicaFileUtilities.h"
-#include "GLFW/glfw3.h"
 #include "fmt/format.h"
 #include "shaderc/shaderc.hpp"
 
@@ -33,7 +32,7 @@ void VulkanAPI::Init()
 
 void VulkanAPI::Tick()
 {
-	m_GlfwRenderWindow->Tick();
+	m_SdlRenderWindow->Tick();
 }
 
 VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
@@ -133,7 +132,7 @@ VkExtent2D VulkanAPI::SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCa
 	}
 
 	int32 Width, Height;
-	glfwGetFramebufferSize(m_GlfwRenderWindow->GetGlfwWindow(), &Width, &Height);
+	SDL_GetWindowSizeInPixels(m_SdlRenderWindow->GetSdlWindow(), &Width, &Height);
 
 	VkExtent2D VulkanExtent = { static_cast<uint32>(Width), static_cast<uint32>(Height) };
 	VulkanExtent.width = std::clamp(VulkanExtent.width, SurfaceCapabilities.minImageExtent.width, SurfaceCapabilities.maxImageExtent.width);

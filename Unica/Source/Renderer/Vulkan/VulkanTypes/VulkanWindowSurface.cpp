@@ -2,13 +2,15 @@
 
 #include "VulkanWindowSurface.h"
 
+#include <SDL_vulkan.h>
+
 #include "Renderer/Vulkan/VulkanAPI.h"
 
 void VulkanWindowSurface::Init()
 {
-    if (glfwCreateWindowSurface(m_OwningVulkanAPI->GetVulkanInstance()->GetVulkanObject(), m_OwningVulkanAPI->GetGlfwRenderWindow()->GetGlfwWindow(), nullptr, &m_VulkanObject))
+    if (SDL_Vulkan_CreateSurface(m_OwningVulkanAPI->GetSdlRenderWindow()->GetSdlWindow(), m_OwningVulkanAPI->GetVulkanInstance()->GetVulkanObject(), &m_VulkanObject) == SDL_FALSE)
     {
-        UNICA_LOG(spdlog::level::critical, "Failed to create VulkanWindowSurface");
+        UNICA_LOG(spdlog::level::critical, "Failed to create SDLVulkanWindowSurface");
     }
 }
 

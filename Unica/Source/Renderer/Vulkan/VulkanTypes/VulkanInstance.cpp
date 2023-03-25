@@ -3,6 +3,7 @@
 #include "VulkanInstance.h"
 
 #include <fmt/format.h>
+#include <SDL3/SDL_vulkan.h>
 
 void VulkanInstance::Init()
 {
@@ -25,9 +26,10 @@ void VulkanInstance::Init()
     VulkanCreateInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 #endif // __APPLE__
 
-    uint32 GlfwExtensionCount = 0;
-    const char** GlfwExtensions = glfwGetRequiredInstanceExtensions(&GlfwExtensionCount);
-    std::vector<const char*> RequiredExtensions(GlfwExtensions, GlfwExtensions + GlfwExtensionCount);
+    uint32 SdlExtensionCount = 0;
+    SDL_Vulkan_GetInstanceExtensions(&SdlExtensionCount, nullptr);
+    std::vector<const char*> RequiredExtensions(SdlExtensionCount);
+    SDL_Vulkan_GetInstanceExtensions(&SdlExtensionCount, RequiredExtensions.data());
 
     if (m_OwningVulkanAPI->GetValidationLayersEnabled())
     {
