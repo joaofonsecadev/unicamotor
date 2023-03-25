@@ -4,18 +4,6 @@
 [submodule "Libraries/glm"]
 	path = Libraries/glm
 	url = git@github.com:g-truc/glm.git
-[submodule "Libraries/shaderc"]
-	path = Libraries/shaderc
-	url = https://github.com/google/shaderc
-[submodule "Libraries/glslang"]
-	path = Libraries/glslang
-	url = https://github.com/KhronosGroup/glslang
-[submodule "Libraries/spirv-tools"]
-	path = Libraries/spirv-tools
-	url = https://github.com/KhronosGroup/SPIRV-Tools
-[submodule "Libraries/spirv-headers"]
-	path = Libraries/spirv-headers
-	url = https://github.com/KhronosGroup/SPIRV-headers
 [submodule "Tools/tracy"]
 	path = Tools/tracy
 	url = https://github.com/wolfpld/tracy

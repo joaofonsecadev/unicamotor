@@ -12,6 +12,7 @@
 #include "UnicaFileUtilities.h"
 #include "Log/Logger.h"
 
+/*
 void ShaderUtilities::CompileShaders()
 {
     const std::vector<std::string> ShaderFileExtensionsToCompile = { ".frag", ".vert" };
@@ -53,6 +54,7 @@ void ShaderUtilities::CompileShaders()
     const auto ShaderCompilationTimeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(ShaderCompilationEndTime - ShaderCompilationStartTime);
     UNICA_LOG(spdlog::level::info, fmt::format("Shader compilation completed in {} milliseconds", ShaderCompilationTimeTaken.count()));
 }
+*/
 
 std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
 {
@@ -67,6 +69,7 @@ std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
     return SpvShaderBinary;
 }
 
+/*
 bool ShaderUtilities::WriteCompiledSpirvFile(const std::vector<uint32>& ShaderBinary, const std::string& AbsoluteFileDestination)
 {
     const std::filesystem::path FileDirectory(AbsoluteFileDestination);
@@ -96,3 +99,4 @@ shaderc_shader_kind ShaderUtilities::DeduceShaderKind(const std::filesystem::pat
     return shaderc_glsl_infer_from_source;
     
 }
+*/

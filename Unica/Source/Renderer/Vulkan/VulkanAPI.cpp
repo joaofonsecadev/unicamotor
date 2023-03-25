@@ -268,10 +268,6 @@ void VulkanAPI::CreateRenderPass()
 
 void VulkanAPI::CreateGraphicsPipeline()
 {
-#if !UNICA_SHIPPING
-	ShaderUtilities::CompileShaders();
-#endif
-
 	std::vector<char> VertShaderBinary = ShaderUtilities::LoadShader("Engine:Shaders/shader.vert");
 	std::vector<char> FragShaderBinary = ShaderUtilities::LoadShader("Engine:Shaders/shader.frag");
 
