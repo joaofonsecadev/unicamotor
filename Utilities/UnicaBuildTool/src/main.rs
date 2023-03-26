@@ -21,11 +21,14 @@ struct CliArgs {
     generate_solution: bool,
 
     /// Generate solution files using the specified generator
-    #[arg(long)]
+    #[arg(short = 'G', long)]
     generate_solution_with_gen_type: Option<String>,
 
+    #[arg(short = 's', long)]
+    compile_shaders: bool,
+
     /// Write/update the copyright disclaimer in source files
-    #[arg(long)]
+    #[arg(short, long)]
     write_copyright_disclaimer: bool
 }
 
@@ -61,5 +64,8 @@ fn main() {
     }
     if command_line_args.write_copyright_disclaimer {
         copyright_disclaimer::write_copyright_disclaimer(&global_values);
+    }
+    if command_line_args.compile_shaders {
+        compile_shaders::compile_shaders(&global_values);
     }
 }

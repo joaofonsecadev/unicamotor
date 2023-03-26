@@ -1,7 +1,8 @@
 // 2022-2023 Copyright joaofonseca.dev, All Rights Reserved
 
-use std::path::PathBuf;
+use std::{path::PathBuf};
 use tracing::{error, debug, trace};
+use walkdir::{WalkDir};
 
 pub fn get_project_root_dir() -> PathBuf{
     let executable_path_result = std::env::current_exe();
@@ -32,4 +33,14 @@ pub fn get_project_root_dir() -> PathBuf{
 
     error!("Couldn't find a Unica project root. Is the executable in a subdirectory of it?");
     panic!();
+}
+
+pub fn get_files_in_dir(directories: &[&str]) -> Vec<PathBuf> {
+    let mut files_to_return: Vec<PathBuf> = vec![];
+    for directory in directories {
+        for file_entry in WalkDir::new(directory).into_iter().filter_map(|e| e.ok()) {
+            files_to_return.push(file_entry.into_path());
+        }
+    }
+    return files_to_return;
 }
