@@ -10,6 +10,7 @@ description = "General use build tool for the Unica Engine."
 [dependencies]
 chrono = "0.4.24"
 clap = { version = "4.1.11", features = ["derive"] }
+shaderc = "0.8.2"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.16"
 walkdir = "2.3.3"

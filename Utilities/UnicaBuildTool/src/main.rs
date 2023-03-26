@@ -7,6 +7,7 @@ use tracing_subscriber::FmtSubscriber;
 
 mod copyright_disclaimer;
 mod generate_solution;
+mod compile_shaders;
 mod utils;
 
 #[derive(Parser)]
