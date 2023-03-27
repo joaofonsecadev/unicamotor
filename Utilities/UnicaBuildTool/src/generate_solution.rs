@@ -157,10 +157,34 @@ fn update_cmake_solution_files(path: &Path, source_files: &Vec<String>) {
     info!("Updated CMakeLists.txt file '{}'", cmake_file.to_str().unwrap());
 }
 
+fn get_project_name(unica_root_path: &Path) -> String {
+    let base_engine_file = unica_root_path.join("Unica/Config/BaseEngine.ini");
+    let read_base_config = std::fs::File::open(&base_engine_file);
+    if read_base_config.is_err() {
+        error!("Couldn't open file '{}'", &base_engine_file.to_str().unwrap());
+        return "".to_string();
+    }
+
+    let base_config_lines: Vec<String> = BufReader::new(read_base_config.unwrap())
+        .lines()
+        .map(|l| l.expect("Could not parse line"))
+        .collect();
+
+    for line in base_config_lines {
+        if line.contains("ProjectName=") {
+            return line.replace("ProjectName=", "");
+        }
+    }
+
+    return "".to_string();
+}
+
 fn populate_source_files_list(unica_root_path: &Path) {
-    let unica_source_path = unica_root_path.join("Unica");
-    let project_source_path = unica_root_path.join("UnicaSandbox");
-    let paths_to_process = [unica_source_path, project_source_path];
+    let mut paths_to_process: Vec<PathBuf> = [unica_root_path.join("Unica")].to_vec();
+    let project_name = get_project_name(unica_root_path);
+    if !project_name.is_empty() {
+        paths_to_process.push(unica_root_path.join(project_name))
+    }
     for path_to_process in paths_to_process {
         let solution_files = generate_solution_files_list(&path_to_process);
         update_cmake_solution_files(&path_to_process, &solution_files);
