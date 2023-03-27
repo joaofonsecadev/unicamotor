@@ -13,6 +13,7 @@
 #include "Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h"
+#include "VulkanTypes/VulkanSwapChain.h"
 
 class RenderManager;
 class VulkanInstance;
@@ -27,6 +28,7 @@ public:
 
 	SdlRenderWindow* GetSdlRenderWindow() const { return m_SdlRenderWindow.get(); }
 	VulkanInstance* GetVulkanInstance() const { return m_VulkanInstance.get(); }
+	VulkanWindowSurface* GetVulkanWindowSurface() const { return m_VulkanWindowSurface.get(); }
 	VulkanPhysicalDevice* GetVulkanPhysicalDevice() const { return m_VulkanPhysicalDevice.get(); }
 	VulkanLogicalDevice* GetVulkanLogicalDevice() const { return m_VulkanLogicalDevice.get(); }
 
@@ -38,11 +40,6 @@ public:
 	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 
 private:
-	VkSurfaceFormatKHR SelectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& AvailableSurfaceFormats);
-	VkPresentModeKHR SelectSwapPresentMode(const std::vector<VkPresentModeKHR>& AvailablePresentModes);
-	VkExtent2D SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCapabilities);
-	void CreateSwapChain();
-
 	void CreateImageViews();
 
 	void CreateRenderPass();
@@ -60,13 +57,10 @@ private:
 	std::unique_ptr<VulkanWindowSurface> m_VulkanWindowSurface = std::make_unique<VulkanWindowSurface>(this);
 	std::unique_ptr<VulkanPhysicalDevice> m_VulkanPhysicalDevice = std::make_unique<VulkanPhysicalDevice>(this);
 	std::unique_ptr<VulkanLogicalDevice> m_VulkanLogicalDevice = std::make_unique<VulkanLogicalDevice>(this);
+	std::unique_ptr<VulkanSwapChain> m_VulkanSwapChain = std::make_unique<VulkanSwapChain>(this);
 	
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 	
-	VkSwapchainKHR m_VulkanSwapChain = VK_NULL_HANDLE;
-	VkFormat m_VulkanSwapChainImageFormat;
-	VkExtent2D m_VulkanSwapChainExtent;
-	std::vector<VkImage> m_VulkanSwapChainImages;
 	std::vector<VkImageView> m_VulkanSwapChainImageViews;
 
 	VkRenderPass m_VulkanRenderPass;

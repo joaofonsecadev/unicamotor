@@ -22,7 +22,7 @@ void VulkanAPI::Init()
 	m_VulkanWindowSurface->Init();
 	m_VulkanPhysicalDevice->Init();
 	m_VulkanLogicalDevice->Init();
-	CreateSwapChain();
+	m_VulkanSwapChain->Init();
 	CreateImageViews();
 	CreateRenderPass();
 	CreateGraphicsPipeline();
@@ -97,120 +97,17 @@ VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalD
 	return SwapChainSupportDetails;
 }
 
-VkSurfaceFormatKHR VulkanAPI::SelectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& AvailableSurfaceFormats)
-{
-	for (const VkSurfaceFormatKHR& SurfaceFormat : AvailableSurfaceFormats)
-	{
-		if (SurfaceFormat.format == VK_FORMAT_B8G8R8A8_SRGB && SurfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-		{
-			return SurfaceFormat;
-		}
-	}
-
-	// TODO: Rank surface formats to default to the best possible one
-	return AvailableSurfaceFormats[0];
-}
-
-VkPresentModeKHR VulkanAPI::SelectSwapPresentMode(const std::vector<VkPresentModeKHR>& AvailablePresentModes)
-{
-	for (const VkPresentModeKHR& PresentMode : AvailablePresentModes)
-	{
-		if (PresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-		{
-			return PresentMode;
-		}
-	}
-
-	return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D VulkanAPI::SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCapabilities)
-{
-	if (SurfaceCapabilities.currentExtent.width != std::numeric_limits<uint32>::max())
-	{
-		return SurfaceCapabilities.currentExtent;
-	}
-
-	int32 Width, Height;
-	SDL_GetWindowSizeInPixels(m_SdlRenderWindow->GetSdlWindow(), &Width, &Height);
-
-	VkExtent2D VulkanExtent = { static_cast<uint32>(Width), static_cast<uint32>(Height) };
-	VulkanExtent.width = std::clamp(VulkanExtent.width, SurfaceCapabilities.minImageExtent.width, SurfaceCapabilities.maxImageExtent.width);
-	VulkanExtent.height = std::clamp(VulkanExtent.height, SurfaceCapabilities.minImageExtent.height, SurfaceCapabilities.maxImageExtent.height);
-
-	return VulkanExtent;
-}
-
-void VulkanAPI::CreateSwapChain()
-{
-	const VulkanSwapChainSupportDetails SwapChainSupportDetails = QuerySwapChainSupport(m_VulkanPhysicalDevice->GetVulkanObject());
-	const VkSurfaceFormatKHR SurfaceFormat = SelectSwapSurfaceFormat(SwapChainSupportDetails.SurfaceFormats);
-	const VkPresentModeKHR PresentMode = SelectSwapPresentMode(SwapChainSupportDetails.PresentModes);
-	const VkExtent2D Extent = SelectSwapExtent(SwapChainSupportDetails.SurfaceCapabilities);
-
-	uint32 SwapImageCount = SwapChainSupportDetails.SurfaceCapabilities.minImageCount + 1;
-	if (SwapChainSupportDetails.SurfaceCapabilities.maxImageCount > 0 && SwapImageCount > SwapChainSupportDetails.SurfaceCapabilities.maxImageCount)
-	{
-		SwapImageCount = SwapChainSupportDetails.SurfaceCapabilities.maxImageCount;
-	}
-
-	VkSwapchainCreateInfoKHR SwapChainCreateInfo { };
-	SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	SwapChainCreateInfo.surface = m_VulkanWindowSurface->GetVulkanObject();
-	SwapChainCreateInfo.minImageCount = SwapImageCount;
-	SwapChainCreateInfo.imageFormat = SurfaceFormat.format;
-	SwapChainCreateInfo.imageColorSpace = SurfaceFormat.colorSpace;
-	SwapChainCreateInfo.imageExtent = Extent;
-	SwapChainCreateInfo.imageArrayLayers = 1;
-	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
-	const uint32 QueueFamilyIndicesArray[] = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetPresentImagesFamily().value() };
-
-	if (QueueFamilyIndices.GetGraphicsFamily() != QueueFamilyIndices.GetPresentImagesFamily())
-	{
-		SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-		SwapChainCreateInfo.queueFamilyIndexCount = 2;
-		SwapChainCreateInfo.pQueueFamilyIndices = QueueFamilyIndicesArray;
-	}
-	else
-	{
-		SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		SwapChainCreateInfo.queueFamilyIndexCount = 0;
-		SwapChainCreateInfo.pQueueFamilyIndices = nullptr;
-	}
-
-	SwapChainCreateInfo.preTransform = SwapChainSupportDetails.SurfaceCapabilities.currentTransform;
-	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	SwapChainCreateInfo.presentMode = PresentMode;
-	SwapChainCreateInfo.clipped = VK_TRUE;
-	SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
-
-	if (vkCreateSwapchainKHR(m_VulkanLogicalDevice->GetVulkanObject(), &SwapChainCreateInfo, nullptr, &m_VulkanSwapChain) != VK_SUCCESS)
-	{
-		UNICA_LOG(spdlog::level::critical, "Failed to create VulkanSwapChain");
-		return;
-	}
-
-	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain, &SwapImageCount, nullptr);
-	m_VulkanSwapChainImages.resize(SwapImageCount);
-	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain, &SwapImageCount, m_VulkanSwapChainImages.data());
-
-	m_VulkanSwapChainImageFormat = SurfaceFormat.format;
-	m_VulkanSwapChainExtent = Extent;
-}
-
 void VulkanAPI::CreateImageViews()
 {
 	uint32 SwapChainImageIteration = 0;
-	m_VulkanSwapChainImageViews.resize(m_VulkanSwapChainImages.size());
-	for (const VkImage& SwapChainImage : m_VulkanSwapChainImages)
+	m_VulkanSwapChainImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
+	for (const VkImage& SwapChainImage : m_VulkanSwapChain->GetVulkanSwapChainImages())
 	{
 		VkImageViewCreateInfo ImageViewCreateInfo { };
 		ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		ImageViewCreateInfo.image = SwapChainImage;
 		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		ImageViewCreateInfo.format = m_VulkanSwapChainImageFormat;
+		ImageViewCreateInfo.format = m_VulkanSwapChain->GetVulkanImageFormat();
 
 		ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
 		ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -236,7 +133,7 @@ void VulkanAPI::CreateImageViews()
 void VulkanAPI::CreateRenderPass()
 {
 	VkAttachmentDescription VulkanColorAttachment { };
-	VulkanColorAttachment.format = m_VulkanSwapChainImageFormat;
+	VulkanColorAttachment.format = m_VulkanSwapChain->GetVulkanImageFormat();
 	VulkanColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	VulkanColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	VulkanColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -309,14 +206,14 @@ void VulkanAPI::CreateGraphicsPipeline()
 	VkViewport Viewport{};
 	Viewport.x = 0.0f;
 	Viewport.y = 0.0f;
-	Viewport.width = static_cast<float>(m_VulkanSwapChainExtent.width);
-	Viewport.height = static_cast<float>(m_VulkanSwapChainExtent.height);
+	Viewport.width = static_cast<float>(m_VulkanSwapChain->GetVulkanExtent().width);
+	Viewport.height = static_cast<float>(m_VulkanSwapChain->GetVulkanExtent().height);
 	Viewport.minDepth = 0.0f;
 	Viewport.maxDepth = 1.0f;
 
 	VkRect2D ScissorRectangle{};
 	ScissorRectangle.offset = {0, 0};
-	ScissorRectangle.extent = m_VulkanSwapChainExtent;
+	ScissorRectangle.extent = m_VulkanSwapChain->GetVulkanExtent();
 
 	VkPipelineViewportStateCreateInfo PipelineViewportCreateInfo { };
 	PipelineViewportCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -415,8 +312,8 @@ void VulkanAPI::CreateFramebuffers()
 		FramebufferCreateInfo.renderPass = m_VulkanRenderPass;
 		FramebufferCreateInfo.attachmentCount = 1;
 		FramebufferCreateInfo.pAttachments = ImageViewAttachments;
-		FramebufferCreateInfo.width = m_VulkanSwapChainExtent.width;
-		FramebufferCreateInfo.height = m_VulkanSwapChainExtent.height;
+		FramebufferCreateInfo.width = m_VulkanSwapChain->GetVulkanExtent().width;
+		FramebufferCreateInfo.height = m_VulkanSwapChain->GetVulkanExtent().height;
 		FramebufferCreateInfo.layers = 1;
 
 		if (vkCreateFramebuffer(m_VulkanLogicalDevice->GetVulkanObject(), &FramebufferCreateInfo, nullptr, &m_SwapChainFramebuffers[SwapChainImageViewLoopIndex]) != VK_SUCCESS)
@@ -457,7 +354,7 @@ void VulkanAPI::Shutdown()
 	{
 		vkDestroyImageView(m_VulkanLogicalDevice->GetVulkanObject(), SwapChainImageView, nullptr);
 	}
-	vkDestroySwapchainKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain, nullptr);
+	m_VulkanSwapChain->Destroy();
 	m_VulkanLogicalDevice->Destroy();
 	m_VulkanWindowSurface->Destroy();
 	m_VulkanInstance->Destroy();
