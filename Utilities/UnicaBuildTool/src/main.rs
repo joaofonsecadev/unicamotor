@@ -45,6 +45,7 @@ fn configure_tracing() {
 }
 
 fn main() {
+    let start_time = std::time::Instant::now();
     configure_tracing();
     info!("Version {}", env!("CARGO_PKG_VERSION"));
 
@@ -69,4 +70,5 @@ fn main() {
     if command_line_args.compile_shaders {
         compile_shaders::compile_shaders(&global_values);
     }
+    info!("Finished execution in {:.0?}", start_time.elapsed());
 }
