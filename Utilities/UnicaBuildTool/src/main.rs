@@ -1,16 +1,16 @@
 // 2022-2023 Copyright joaofonseca.dev, All Rights Reserved
 
-use std::path::PathBuf;
-use clap::{Parser};
+use clap::Parser;
+use std::{path::PathBuf, process::Command};
 use tracing::{info, metadata::LevelFilter};
 use tracing_subscriber::FmtSubscriber;
 
 use crate::create_project::create_unica_project;
 
-mod copyright_disclaimer;
-mod generate_solution;
 mod compile_shaders;
+mod copyright_disclaimer;
 mod create_project;
+mod generate_solution;
 mod static_files;
 mod utils;
 
@@ -39,18 +39,25 @@ struct CliArgs {
 
     /// Write/update the copyright disclaimer in source files
     #[arg(short, long)]
-    write_copyright_disclaimer: bool
+    write_copyright_disclaimer: bool,
+
+    /// Clean every file in .gitignore for Unica project
+    #[arg(long)]
+    clean: bool,
 }
 
 pub struct GlobalValues {
-    unica_root_path: PathBuf
+    unica_root_path: PathBuf,
 }
 
 fn configure_tracing() {
-    tracing::subscriber::set_global_default(FmtSubscriber::builder()
-        .with_max_level(LevelFilter::TRACE)
-        .with_target(false)
-        .finish()).expect("Failed tracing subscriber creation");
+    tracing::subscriber::set_global_default(
+        FmtSubscriber::builder()
+            .with_max_level(LevelFilter::TRACE)
+            .with_target(false)
+            .finish(),
+    )
+    .expect("Failed tracing subscriber creation");
 }
 
 fn main() {
@@ -58,23 +65,39 @@ fn main() {
     configure_tracing();
     info!("Version {}", env!("CARGO_PKG_VERSION"));
 
-    let global_values = GlobalValues { unica_root_path: utils::get_project_root_dir() };
-    
+    let global_values = GlobalValues {
+        unica_root_path: utils::get_project_root_dir(),
+    };
+
     let command_line_args = CliArgs::parse();
 
     let mut was_project_created = false;
     if command_line_args.create_unica_project.is_some() {
-        create_unica_project(&command_line_args.create_unica_project.unwrap(), false, &global_values.unica_root_path);
+        create_unica_project(
+            &command_line_args.create_unica_project.unwrap(),
+            false,
+            &global_values.unica_root_path,
+        );
         was_project_created = true;
     } else if command_line_args.create_unica_project_overwrite.is_some() {
-        create_unica_project(&command_line_args.create_unica_project_overwrite.unwrap(), true, &global_values.unica_root_path);
+        create_unica_project(
+            &command_line_args.create_unica_project_overwrite.unwrap(),
+            true,
+            &global_values.unica_root_path,
+        );
         was_project_created = true;
     }
-    
+
     if command_line_args.generate_solution_with_gen_type.is_some() {
-        generate_solution::generate_solution(&command_line_args.generate_solution_with_gen_type.unwrap(), &global_values);
+        generate_solution::generate_solution(
+            &command_line_args.generate_solution_with_gen_type.unwrap(),
+            &global_values,
+        );
     } else if command_line_args.generate_solution || was_project_created {
-        generate_solution::generate_solution(&generate_solution::get_default_cmake_generator(), &global_values);
+        generate_solution::generate_solution(
+            &generate_solution::get_default_cmake_generator(),
+            &global_values,
+        );
     }
 
     if command_line_args.write_copyright_disclaimer {
@@ -83,6 +106,19 @@ fn main() {
 
     if command_line_args.compile_shaders {
         compile_shaders::compile_shaders(&global_values);
+    }
+
+    if command_line_args.clean {
+        let executable_path_result = std::env::current_exe().unwrap();
+
+        let _chdir_result = std::env::set_current_dir(global_values.unica_root_path);
+        let mut _command = Command::new("git")
+            .arg("clean")
+            .arg("-fxd")
+            .status()
+            .unwrap();
+        let _chdir_back_result = std::env::set_current_dir(executable_path_result);
+
     }
 
     info!("Finished execution in {:.0?}", start_time.elapsed());
