@@ -21,7 +21,7 @@ void VulkanAPI::Init()
 	m_VulkanInstance->Init();
 	m_VulkanWindowSurface->Init();
 	m_VulkanPhysicalDevice->Init();
-	CreateVulkanLogicalDevice();
+	m_VulkanLogicalDevice->Init();
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
@@ -186,15 +186,15 @@ void VulkanAPI::CreateSwapChain()
 	SwapChainCreateInfo.clipped = VK_TRUE;
 	SwapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	if (vkCreateSwapchainKHR(m_VulkanLogicalDevice, &SwapChainCreateInfo, nullptr, &m_VulkanSwapChain) != VK_SUCCESS)
+	if (vkCreateSwapchainKHR(m_VulkanLogicalDevice->GetVulkanObject(), &SwapChainCreateInfo, nullptr, &m_VulkanSwapChain) != VK_SUCCESS)
 	{
 		UNICA_LOG(spdlog::level::critical, "Failed to create VulkanSwapChain");
 		return;
 	}
 
-	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, &SwapImageCount, nullptr);
+	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain, &SwapImageCount, nullptr);
 	m_VulkanSwapChainImages.resize(SwapImageCount);
-	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, &SwapImageCount, m_VulkanSwapChainImages.data());
+	vkGetSwapchainImagesKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain, &SwapImageCount, m_VulkanSwapChainImages.data());
 
 	m_VulkanSwapChainImageFormat = SurfaceFormat.format;
 	m_VulkanSwapChainExtent = Extent;
@@ -223,7 +223,7 @@ void VulkanAPI::CreateImageViews()
 		ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 		ImageViewCreateInfo.subresourceRange.layerCount = 1;
 
-		if (vkCreateImageView(m_VulkanLogicalDevice, &ImageViewCreateInfo, nullptr, &m_VulkanSwapChainImageViews[SwapChainImageIteration]) != VK_SUCCESS)
+		if (vkCreateImageView(m_VulkanLogicalDevice->GetVulkanObject(), &ImageViewCreateInfo, nullptr, &m_VulkanSwapChainImageViews[SwapChainImageIteration]) != VK_SUCCESS)
 		{
 			UNICA_LOG(spdlog::level::critical, "Failed to create VulkanImageViews");
 			return;
@@ -260,7 +260,7 @@ void VulkanAPI::CreateRenderPass()
 	VulkanRenderPassCreateInfo.subpassCount = 1;
 	VulkanRenderPassCreateInfo.pSubpasses = &VulkanSubpass;
 
-	if (vkCreateRenderPass(m_VulkanLogicalDevice, &VulkanRenderPassCreateInfo, nullptr, &m_VulkanRenderPass) != VK_SUCCESS)
+	if (vkCreateRenderPass(m_VulkanLogicalDevice->GetVulkanObject(), &VulkanRenderPassCreateInfo, nullptr, &m_VulkanRenderPass) != VK_SUCCESS)
 	{
 		UNICA_LOG(spdlog::level::critical, "Failed to create VulkanRenderPass");
 	}
@@ -357,7 +357,7 @@ void VulkanAPI::CreateGraphicsPipeline()
 	VkPipelineLayoutCreateInfo PipelineLayoutInfo { };
 	PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
-	if (vkCreatePipelineLayout(m_VulkanLogicalDevice, &PipelineLayoutInfo, nullptr, &m_VulkanPipelineLayout) != VK_SUCCESS)
+	if (vkCreatePipelineLayout(m_VulkanLogicalDevice->GetVulkanObject(), &PipelineLayoutInfo, nullptr, &m_VulkanPipelineLayout) != VK_SUCCESS)
 	{
 		UNICA_LOG(spdlog::level::critical, "Failed to create a VulkanPipelineLayout");
 	}
@@ -377,14 +377,14 @@ void VulkanAPI::CreateGraphicsPipeline()
 	GraphicsPipelineCreateInfo.renderPass = m_VulkanRenderPass;
 	GraphicsPipelineCreateInfo.subpass = 0;
 
-	if (vkCreateGraphicsPipelines(m_VulkanLogicalDevice, VK_NULL_HANDLE, 1, &GraphicsPipelineCreateInfo, nullptr, &m_VulkanGraphicsPipeline) != VK_SUCCESS)
+	if (vkCreateGraphicsPipelines(m_VulkanLogicalDevice->GetVulkanObject(), VK_NULL_HANDLE, 1, &GraphicsPipelineCreateInfo, nullptr, &m_VulkanGraphicsPipeline) != VK_SUCCESS)
 	{
 		UNICA_LOG(spdlog::level::critical, "Failed to create the VulkanGraphicsPipeline");
 	}
 
 	// Cleanup shader modules since they've already been created
-	vkDestroyShaderModule(m_VulkanLogicalDevice, VertShaderModule, nullptr);
-	vkDestroyShaderModule(m_VulkanLogicalDevice, FragShaderModule, nullptr);
+	vkDestroyShaderModule(m_VulkanLogicalDevice->GetVulkanObject(), VertShaderModule, nullptr);
+	vkDestroyShaderModule(m_VulkanLogicalDevice->GetVulkanObject(), FragShaderModule, nullptr);
 }
 
 VkShaderModule VulkanAPI::CreateShaderModule(const std::vector<char>& ShaderBinary)
@@ -395,7 +395,7 @@ VkShaderModule VulkanAPI::CreateShaderModule(const std::vector<char>& ShaderBina
 	ShaderModuleCreateInfo.pCode = reinterpret_cast<const uint32*>(ShaderBinary.data());
 
 	VkShaderModule ShaderModule;
-	if (vkCreateShaderModule(m_VulkanLogicalDevice, &ShaderModuleCreateInfo, nullptr, &ShaderModule) != VK_SUCCESS)
+	if (vkCreateShaderModule(m_VulkanLogicalDevice->GetVulkanObject(), &ShaderModuleCreateInfo, nullptr, &ShaderModule) != VK_SUCCESS)
 	{
 		UNICA_LOG(spdlog::level::critical, "Failed to create a VulkanShaderModule");
 	}
@@ -419,7 +419,7 @@ void VulkanAPI::CreateFramebuffers()
 		FramebufferCreateInfo.height = m_VulkanSwapChainExtent.height;
 		FramebufferCreateInfo.layers = 1;
 
-		if (vkCreateFramebuffer(m_VulkanLogicalDevice, &FramebufferCreateInfo, nullptr, &m_SwapChainFramebuffers[SwapChainImageViewLoopIndex]) != VK_SUCCESS)
+		if (vkCreateFramebuffer(m_VulkanLogicalDevice->GetVulkanObject(), &FramebufferCreateInfo, nullptr, &m_SwapChainFramebuffers[SwapChainImageViewLoopIndex]) != VK_SUCCESS)
 		{
 			UNICA_LOG(spdlog::level::critical, "Failed to create a VulkanFramebuffer");
 		}
@@ -437,82 +437,28 @@ void VulkanAPI::CreateCommandPool()
 	CommandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	CommandPoolCreateInfo.queueFamilyIndex = QueueFamilyIndices.GetGraphicsFamily().value();
 
-	if (vkCreateCommandPool(m_VulkanLogicalDevice, &CommandPoolCreateInfo, nullptr, &m_VulkanCommandPool) != VK_SUCCESS)
+	if (vkCreateCommandPool(m_VulkanLogicalDevice->GetVulkanObject(), &CommandPoolCreateInfo, nullptr, &m_VulkanCommandPool) != VK_SUCCESS)
 	{
 		UNICA_LOG(spdlog::level::critical, "Failed to create the VulkanCommandPool");
 	}
 }
 
-void VulkanAPI::CreateVulkanLogicalDevice()
-{
-	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
-	if (!QueueFamilyIndices.WasSet())
-	{
-		UNICA_LOG(spdlog::level::critical, "No support for graphics and image presentation queues");
-		return;
-	}
-
-	std::vector<VkDeviceQueueCreateInfo> QueueCreateInfos;
-	std::set<uint32> UniqueQueueFamilies = { QueueFamilyIndices.GetGraphicsFamily().value(), QueueFamilyIndices.GetPresentImagesFamily().value() };
-	
-	const float QueuePriority = 1.f;
-	for (const uint32 UniqueQueueFamily : UniqueQueueFamilies)
-	{
-		VkDeviceQueueCreateInfo QueueCreateInfo { };
-		QueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		QueueCreateInfo.queueFamilyIndex = UniqueQueueFamily;
-		QueueCreateInfo.queueCount = 1;
-		QueueCreateInfo.pQueuePriorities = &QueuePriority;
-		QueueCreateInfos.push_back(QueueCreateInfo);
-	}
-
-	VkPhysicalDeviceFeatures DeviceFeatures { };
-
-	VkDeviceCreateInfo DeviceCreateInfo { };
-	DeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	DeviceCreateInfo.queueCreateInfoCount = static_cast<uint32>(QueueCreateInfos.size());
-	DeviceCreateInfo.pQueueCreateInfos = QueueCreateInfos.data();
-	DeviceCreateInfo.pEnabledFeatures = &DeviceFeatures;
-
-	DeviceCreateInfo.enabledExtensionCount = static_cast<uint32>(m_RequiredDeviceExtensions.size());
-	DeviceCreateInfo.ppEnabledExtensionNames = m_RequiredDeviceExtensions.data();
-
-	if (m_bValidationLayersEnabled)
-	{
-		DeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_RequestedValidationLayers.size());
-		DeviceCreateInfo.ppEnabledLayerNames = m_RequestedValidationLayers.data();
-	}
-	else
-	{
-		DeviceCreateInfo.enabledLayerCount = 0;
-	}
-
-	if (vkCreateDevice(m_VulkanPhysicalDevice->GetVulkanObject(), &DeviceCreateInfo, nullptr, &m_VulkanLogicalDevice) != VK_SUCCESS)
-	{
-		UNICA_LOG(spdlog::level::critical, "Couldn't create a VulkanLogicalDevice");
-		return;
-	}
-	
-	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetGraphicsFamily().value(), 0, &m_VulkanGraphicsQueue);
-	vkGetDeviceQueue(m_VulkanLogicalDevice, QueueFamilyIndices.GetPresentImagesFamily().value(), 0, &m_VulkanPresentImagesQueue);
-}
-
 void VulkanAPI::Shutdown()
 {
-	vkDestroyCommandPool(m_VulkanLogicalDevice, m_VulkanCommandPool, nullptr);
+	vkDestroyCommandPool(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanCommandPool, nullptr);
 	for (VkFramebuffer_T* SwapChainFramebuffer : m_SwapChainFramebuffers)
 	{
-		vkDestroyFramebuffer(m_VulkanLogicalDevice, SwapChainFramebuffer, nullptr);
+		vkDestroyFramebuffer(m_VulkanLogicalDevice->GetVulkanObject(), SwapChainFramebuffer, nullptr);
 	}
-	vkDestroyPipeline(m_VulkanLogicalDevice, m_VulkanGraphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(m_VulkanLogicalDevice, m_VulkanPipelineLayout, nullptr);
-	vkDestroyRenderPass(m_VulkanLogicalDevice, m_VulkanRenderPass, nullptr);
+	vkDestroyPipeline(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanGraphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanPipelineLayout, nullptr);
+	vkDestroyRenderPass(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanRenderPass, nullptr);
 	for (const VkImageView& SwapChainImageView : m_VulkanSwapChainImageViews)
 	{
-		vkDestroyImageView(m_VulkanLogicalDevice, SwapChainImageView, nullptr);
+		vkDestroyImageView(m_VulkanLogicalDevice->GetVulkanObject(), SwapChainImageView, nullptr);
 	}
-	vkDestroySwapchainKHR(m_VulkanLogicalDevice, m_VulkanSwapChain, nullptr);
-	vkDestroyDevice(m_VulkanLogicalDevice, nullptr);
+	vkDestroySwapchainKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain, nullptr);
+	m_VulkanLogicalDevice->Destroy();
 	m_VulkanWindowSurface->Destroy();
 	m_VulkanInstance->Destroy();
 }

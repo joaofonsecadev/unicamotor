@@ -12,6 +12,7 @@
 #include "Renderer/Vulkan/VulkanTypes/VulkanInstance.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h"
+#include "Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h"
 
 class RenderManager;
 class VulkanInstance;
@@ -26,6 +27,8 @@ public:
 
 	SdlRenderWindow* GetSdlRenderWindow() const { return m_SdlRenderWindow.get(); }
 	VulkanInstance* GetVulkanInstance() const { return m_VulkanInstance.get(); }
+	VulkanPhysicalDevice* GetVulkanPhysicalDevice() const { return m_VulkanPhysicalDevice.get(); }
+	VulkanLogicalDevice* GetVulkanLogicalDevice() const { return m_VulkanLogicalDevice.get(); }
 
 	bool GetValidationLayersEnabled() const { return m_bValidationLayersEnabled; }
 	const std::vector<const char*>& GetRequestedValidationLayers() const { return m_RequestedValidationLayers; }
@@ -35,9 +38,6 @@ public:
 	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 
 private:
-	
-	void CreateVulkanLogicalDevice();
-
 	VkSurfaceFormatKHR SelectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& AvailableSurfaceFormats);
 	VkPresentModeKHR SelectSwapPresentMode(const std::vector<VkPresentModeKHR>& AvailablePresentModes);
 	VkExtent2D SelectSwapExtent(const VkSurfaceCapabilitiesKHR& SurfaceCapabilities);
@@ -59,10 +59,8 @@ private:
 	std::unique_ptr<VulkanInstance> m_VulkanInstance = std::make_unique<VulkanInstance>(this);
 	std::unique_ptr<VulkanWindowSurface> m_VulkanWindowSurface = std::make_unique<VulkanWindowSurface>(this);
 	std::unique_ptr<VulkanPhysicalDevice> m_VulkanPhysicalDevice = std::make_unique<VulkanPhysicalDevice>(this);
-
-	VkQueue m_VulkanGraphicsQueue = VK_NULL_HANDLE;
-	VkQueue m_VulkanPresentImagesQueue = VK_NULL_HANDLE;
-	VkDevice m_VulkanLogicalDevice = VK_NULL_HANDLE;
+	std::unique_ptr<VulkanLogicalDevice> m_VulkanLogicalDevice = std::make_unique<VulkanLogicalDevice>(this);
+	
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 	
 	VkSwapchainKHR m_VulkanSwapChain = VK_NULL_HANDLE;

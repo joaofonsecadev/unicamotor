@@ -2,7 +2,6 @@
 
 #include "RenderManager.h"
 #include "UnicaMinimal.h"
-#include "SDL/SdlAPI.h"
 #include "Vulkan/VulkanAPI.h"
 
 void RenderManager::Init()

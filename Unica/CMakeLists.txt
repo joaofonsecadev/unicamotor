@@ -16,8 +16,6 @@ set(SourceFiles
     Source/Renderer/RenderInterface.h
     Source/Renderer/RenderManager.cpp
     Source/Renderer/RenderManager.h
-    Source/Renderer/SDL/SdlAPI.cpp
-    Source/Renderer/SDL/SdlAPI.h
     Source/Renderer/Vulkan/Shaders/ShaderUtilities.cpp
     Source/Renderer/Vulkan/Shaders/ShaderUtilities.h
     Source/Renderer/Vulkan/VulkanAPI.cpp
@@ -30,6 +28,8 @@ set(SourceFiles
     Source/Renderer/Vulkan/VulkanTypeInterface.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanInstance.cpp
     Source/Renderer/Vulkan/VulkanTypes/VulkanInstance.h
+    Source/Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.cpp
+    Source/Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.cpp
     Source/Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.cpp
