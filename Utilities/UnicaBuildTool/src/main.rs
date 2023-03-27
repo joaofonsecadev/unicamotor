@@ -25,6 +25,7 @@ struct CliArgs {
     #[arg(short = 'G', long)]
     generate_solution_with_gen_type: Option<String>,
 
+    /// Compile GLSL shaders to SPIRV format
     #[arg(short = 's', long)]
     compile_shaders: bool,
 

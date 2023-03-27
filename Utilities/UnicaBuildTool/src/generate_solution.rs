@@ -1,7 +1,7 @@
 use std::{
     env,
     io::{self, BufRead, BufReader},
-    path::{self, Path, PathBuf},
+    path::{Path, PathBuf},
     process::{Command, Stdio},
     thread,
 };
