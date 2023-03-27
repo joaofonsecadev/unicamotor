@@ -115,6 +115,8 @@ fn main() {
         let mut _command = Command::new("git")
             .arg("clean")
             .arg("-fxd")
+            .arg("-e")
+            .arg("unica_build_tool.exe")
             .status()
             .unwrap();
         let _chdir_back_result = std::env::set_current_dir(executable_path_result);
