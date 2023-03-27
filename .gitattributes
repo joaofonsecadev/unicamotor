@@ -1,2 +1,3 @@
 **/Libraries/** linguist-vendored
 CMakeLists.txt filter=gitignore
+BaseEngine.ini filter=gitignore

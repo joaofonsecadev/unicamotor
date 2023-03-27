@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 set(SourceFiles
-    Config/DefaultEngine.ini
+    Config/BaseEngine.ini
     Shaders/shader.frag
     Shaders/shader.vert
     Source/Core/UnicaFileUtilities.cpp
