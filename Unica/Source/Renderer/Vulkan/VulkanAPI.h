@@ -14,6 +14,7 @@
 #include "Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h"
 #include "VulkanTypes/VulkanImageView.h"
+#include "VulkanTypes/VulkanRenderPass.h"
 #include "VulkanTypes/VulkanSwapChain.h"
 
 class RenderManager;
@@ -42,10 +43,8 @@ public:
 	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 
 private:
-	void CreateVulkanImageViews();
-
-	void CreateRenderPass();
-
+	void InitVulkanImageViews();
+	
 	void CreateGraphicsPipeline();
 	VkShaderModule CreateShaderModule(const std::vector<char>& ShaderBinary);
 
@@ -60,13 +59,12 @@ private:
 	std::unique_ptr<VulkanPhysicalDevice> m_VulkanPhysicalDevice = std::make_unique<VulkanPhysicalDevice>(this);
 	std::unique_ptr<VulkanLogicalDevice> m_VulkanLogicalDevice = std::make_unique<VulkanLogicalDevice>(this);
 	std::unique_ptr<VulkanSwapChain> m_VulkanSwapChain = std::make_unique<VulkanSwapChain>(this);
+	std::unique_ptr<VulkanRenderPass> m_VulkanRenderPass = std::make_unique<VulkanRenderPass>(this);
 
 	std::vector<std::unique_ptr<VulkanImageView>> m_VulkanSwapChainImageViews;
 	
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 	
-
-	VkRenderPass m_VulkanRenderPass;
 	VkPipelineLayout m_VulkanPipelineLayout;
 	VkPipeline m_VulkanGraphicsPipeline;
 

@@ -23,8 +23,8 @@ void VulkanAPI::Init()
 	m_VulkanPhysicalDevice->Init();
 	m_VulkanLogicalDevice->Init();
 	m_VulkanSwapChain->Init();
-	CreateVulkanImageViews();
-	CreateRenderPass();
+	InitVulkanImageViews();
+	m_VulkanRenderPass->Init();
 	CreateGraphicsPipeline();
 	CreateFramebuffers();
 	CreateCommandPool();
@@ -97,7 +97,7 @@ VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalD
 	return SwapChainSupportDetails;
 }
 
-void VulkanAPI::CreateVulkanImageViews()
+void VulkanAPI::InitVulkanImageViews()
 {
 	uint32 SwapChainImageIteration = 0;
 	m_VulkanSwapChainImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
@@ -106,39 +106,6 @@ void VulkanAPI::CreateVulkanImageViews()
 		m_VulkanSwapChainImageViews[SwapChainImageIteration] = std::make_unique<VulkanImageView>(this, SwapChainImage);
 		m_VulkanSwapChainImageViews[SwapChainImageIteration]->Init();
 		SwapChainImageIteration++;
-	}
-}
-
-void VulkanAPI::CreateRenderPass()
-{
-	VkAttachmentDescription VulkanColorAttachment { };
-	VulkanColorAttachment.format = m_VulkanSwapChain->GetVulkanImageFormat();
-	VulkanColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	VulkanColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	VulkanColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	VulkanColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	VulkanColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	VulkanColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-	VkAttachmentReference VulkanColorAttachmentRef{};
-	VulkanColorAttachmentRef.attachment = 0;
-	VulkanColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDescription VulkanSubpass{};
-	VulkanSubpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	VulkanSubpass.colorAttachmentCount = 1;
-	VulkanSubpass.pColorAttachments = &VulkanColorAttachmentRef;
-
-	VkRenderPassCreateInfo VulkanRenderPassCreateInfo{};
-	VulkanRenderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	VulkanRenderPassCreateInfo.attachmentCount = 1;
-	VulkanRenderPassCreateInfo.pAttachments = &VulkanColorAttachment;
-	VulkanRenderPassCreateInfo.subpassCount = 1;
-	VulkanRenderPassCreateInfo.pSubpasses = &VulkanSubpass;
-
-	if (vkCreateRenderPass(m_VulkanLogicalDevice->GetVulkanObject(), &VulkanRenderPassCreateInfo, nullptr, &m_VulkanRenderPass) != VK_SUCCESS)
-	{
-		UNICA_LOG(spdlog::level::critical, "Failed to create VulkanRenderPass");
 	}
 }
 
@@ -250,7 +217,7 @@ void VulkanAPI::CreateGraphicsPipeline()
 	GraphicsPipelineCreateInfo.pColorBlendState = &PipelineColorBlend;
 	GraphicsPipelineCreateInfo.pDynamicState = &PipelineDynamicCreateInfo;
 	GraphicsPipelineCreateInfo.layout = m_VulkanPipelineLayout;
-	GraphicsPipelineCreateInfo.renderPass = m_VulkanRenderPass;
+	GraphicsPipelineCreateInfo.renderPass = m_VulkanRenderPass->GetVulkanObject();
 	GraphicsPipelineCreateInfo.subpass = 0;
 
 	if (vkCreateGraphicsPipelines(m_VulkanLogicalDevice->GetVulkanObject(), VK_NULL_HANDLE, 1, &GraphicsPipelineCreateInfo, nullptr, &m_VulkanGraphicsPipeline) != VK_SUCCESS)
@@ -288,7 +255,7 @@ void VulkanAPI::CreateFramebuffers()
 		const VkImageView ImageViewAttachments[] = { SwapChainImageView->GetVulkanObject() };
 		VkFramebufferCreateInfo FramebufferCreateInfo { };
 		FramebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		FramebufferCreateInfo.renderPass = m_VulkanRenderPass;
+		FramebufferCreateInfo.renderPass = m_VulkanRenderPass->GetVulkanObject();
 		FramebufferCreateInfo.attachmentCount = 1;
 		FramebufferCreateInfo.pAttachments = ImageViewAttachments;
 		FramebufferCreateInfo.width = m_VulkanSwapChain->GetVulkanExtent().width;
@@ -328,11 +295,14 @@ void VulkanAPI::Shutdown()
 	}
 	vkDestroyPipeline(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanGraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanPipelineLayout, nullptr);
-	vkDestroyRenderPass(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanRenderPass, nullptr);
+
+	m_VulkanRenderPass->Destroy();
+	
 	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanSwapChainImageViews)
 	{
 		VulkanImageView->Destroy();
 	}
+	
 	m_VulkanSwapChain->Destroy();
 	m_VulkanLogicalDevice->Destroy();
 	m_VulkanWindowSurface->Destroy();
