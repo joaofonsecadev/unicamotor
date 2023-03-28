@@ -100,11 +100,11 @@ VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalD
 void VulkanAPI::InitVulkanImageViews()
 {
 	uint32 SwapChainImageIteration = 0;
-	m_VulkanSwapChainImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
+	m_VulkanImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
 	for (const VkImage& SwapChainImage : m_VulkanSwapChain->GetVulkanSwapChainImages())
 	{
-		m_VulkanSwapChainImageViews[SwapChainImageIteration] = std::make_unique<VulkanImageView>(this, SwapChainImage);
-		m_VulkanSwapChainImageViews[SwapChainImageIteration]->Init();
+		m_VulkanImageViews[SwapChainImageIteration] = std::make_unique<VulkanImageView>(this, SwapChainImage);
+		m_VulkanImageViews[SwapChainImageIteration]->Init();
 		SwapChainImageIteration++;
 	}
 }
@@ -112,24 +112,10 @@ void VulkanAPI::InitVulkanImageViews()
 void VulkanAPI::InitVulkanFramebuffers()
 {
 	uint32 SwapChainImageViewLoopIndex = 0;
-	m_SwapChainFramebuffers.resize(m_VulkanSwapChainImageViews.size());
-	for (const std::unique_ptr<VulkanImageView>& SwapChainImageView : m_VulkanSwapChainImageViews)
+	m_VulkanFramebuffers.resize(m_VulkanImageViews.size());
+	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanImageViews)
 	{
-		const VkImageView ImageViewAttachments[] = { SwapChainImageView->GetVulkanObject() };
-		VkFramebufferCreateInfo FramebufferCreateInfo { };
-		FramebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		FramebufferCreateInfo.renderPass = m_VulkanRenderPass->GetVulkanObject();
-		FramebufferCreateInfo.attachmentCount = 1;
-		FramebufferCreateInfo.pAttachments = ImageViewAttachments;
-		FramebufferCreateInfo.width = m_VulkanSwapChain->GetVulkanExtent().width;
-		FramebufferCreateInfo.height = m_VulkanSwapChain->GetVulkanExtent().height;
-		FramebufferCreateInfo.layers = 1;
-
-		if (vkCreateFramebuffer(m_VulkanLogicalDevice->GetVulkanObject(), &FramebufferCreateInfo, nullptr, &m_SwapChainFramebuffers[SwapChainImageViewLoopIndex]) != VK_SUCCESS)
-		{
-			UNICA_LOG(spdlog::level::critical, "Failed to create a VulkanFramebuffer");
-		}
-		
+		m_VulkanFramebuffers[SwapChainImageViewLoopIndex] = std::make_unique<VulkanFramebuffer>(this, VulkanImageView.get());
 		SwapChainImageViewLoopIndex++;
 	}
 }
@@ -152,15 +138,16 @@ void VulkanAPI::CreateCommandPool()
 void VulkanAPI::Shutdown()
 {
 	vkDestroyCommandPool(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanCommandPool, nullptr);
-	for (VkFramebuffer_T* SwapChainFramebuffer : m_SwapChainFramebuffers)
+	
+	for (const std::unique_ptr<VulkanFramebuffer>& VulkanFramebuffer : m_VulkanFramebuffers)
 	{
-		vkDestroyFramebuffer(m_VulkanLogicalDevice->GetVulkanObject(), SwapChainFramebuffer, nullptr);
+		VulkanFramebuffer->Destroy();
 	}
 	
 	m_VulkanPipeline->Destroy();
 	m_VulkanRenderPass->Destroy();
 	
-	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanSwapChainImageViews)
+	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanImageViews)
 	{
 		VulkanImageView->Destroy();
 	}

@@ -13,6 +13,7 @@
 #include "Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h"
+#include "VulkanTypes/VulkanFramebuffer.h"
 #include "VulkanTypes/VulkanImageView.h"
 #include "VulkanTypes/VulkanPipeline.h"
 #include "VulkanTypes/VulkanRenderPass.h"
@@ -60,11 +61,11 @@ private:
 	std::unique_ptr<VulkanRenderPass> m_VulkanRenderPass = std::make_unique<VulkanRenderPass>(this);
 	std::unique_ptr<VulkanPipeline> m_VulkanPipeline = std::make_unique<VulkanPipeline>(this);
 
-	std::vector<std::unique_ptr<VulkanImageView>> m_VulkanSwapChainImageViews;
+	std::vector<std::unique_ptr<VulkanImageView>> m_VulkanImageViews;
+	std::vector<std::unique_ptr<VulkanFramebuffer>> m_VulkanFramebuffers;
 	
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 
-	std::vector<VkFramebuffer> m_SwapChainFramebuffers;
 
 	VkCommandPool m_VulkanCommandPool;
 
