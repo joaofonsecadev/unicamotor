@@ -34,6 +34,8 @@ set(SourceFiles
     Source/Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.cpp
     Source/Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h
+    Source/Renderer/Vulkan/VulkanTypes/VulkanPipeline.cpp
+    Source/Renderer/Vulkan/VulkanTypes/VulkanPipeline.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanRenderPass.cpp
     Source/Renderer/Vulkan/VulkanTypes/VulkanRenderPass.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanSwapChain.cpp
