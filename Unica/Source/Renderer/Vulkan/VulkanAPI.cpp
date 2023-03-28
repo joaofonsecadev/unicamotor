@@ -23,7 +23,7 @@ void VulkanAPI::Init()
 	m_VulkanPhysicalDevice->Init();
 	m_VulkanLogicalDevice->Init();
 	m_VulkanSwapChain->Init();
-	CreateImageViews();
+	CreateVulkanImageViews();
 	CreateRenderPass();
 	CreateGraphicsPipeline();
 	CreateFramebuffers();
@@ -97,35 +97,14 @@ VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalD
 	return SwapChainSupportDetails;
 }
 
-void VulkanAPI::CreateImageViews()
+void VulkanAPI::CreateVulkanImageViews()
 {
 	uint32 SwapChainImageIteration = 0;
 	m_VulkanSwapChainImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
 	for (const VkImage& SwapChainImage : m_VulkanSwapChain->GetVulkanSwapChainImages())
 	{
-		VkImageViewCreateInfo ImageViewCreateInfo { };
-		ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		ImageViewCreateInfo.image = SwapChainImage;
-		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		ImageViewCreateInfo.format = m_VulkanSwapChain->GetVulkanImageFormat();
-
-		ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-		ImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-		ImageViewCreateInfo.subresourceRange.levelCount = 1;
-		ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-		ImageViewCreateInfo.subresourceRange.layerCount = 1;
-
-		if (vkCreateImageView(m_VulkanLogicalDevice->GetVulkanObject(), &ImageViewCreateInfo, nullptr, &m_VulkanSwapChainImageViews[SwapChainImageIteration]) != VK_SUCCESS)
-		{
-			UNICA_LOG(spdlog::level::critical, "Failed to create VulkanImageViews");
-			return;
-		}
-
+		m_VulkanSwapChainImageViews[SwapChainImageIteration] = std::make_unique<VulkanImageView>(this, SwapChainImage);
+		m_VulkanSwapChainImageViews[SwapChainImageIteration]->Init();
 		SwapChainImageIteration++;
 	}
 }
@@ -304,9 +283,9 @@ void VulkanAPI::CreateFramebuffers()
 {
 	uint32 SwapChainImageViewLoopIndex = 0;
 	m_SwapChainFramebuffers.resize(m_VulkanSwapChainImageViews.size());
-	for (VkImageView_T* SwapChainImageView : m_VulkanSwapChainImageViews)
+	for (const std::unique_ptr<VulkanImageView>& SwapChainImageView : m_VulkanSwapChainImageViews)
 	{
-		const VkImageView ImageViewAttachments[] = { SwapChainImageView };
+		const VkImageView ImageViewAttachments[] = { SwapChainImageView->GetVulkanObject() };
 		VkFramebufferCreateInfo FramebufferCreateInfo { };
 		FramebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		FramebufferCreateInfo.renderPass = m_VulkanRenderPass;
@@ -350,9 +329,9 @@ void VulkanAPI::Shutdown()
 	vkDestroyPipeline(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanGraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanPipelineLayout, nullptr);
 	vkDestroyRenderPass(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanRenderPass, nullptr);
-	for (const VkImageView& SwapChainImageView : m_VulkanSwapChainImageViews)
+	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanSwapChainImageViews)
 	{
-		vkDestroyImageView(m_VulkanLogicalDevice->GetVulkanObject(), SwapChainImageView, nullptr);
+		VulkanImageView->Destroy();
 	}
 	m_VulkanSwapChain->Destroy();
 	m_VulkanLogicalDevice->Destroy();

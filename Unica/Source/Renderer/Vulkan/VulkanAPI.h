@@ -13,6 +13,7 @@
 #include "Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h"
+#include "VulkanTypes/VulkanImageView.h"
 #include "VulkanTypes/VulkanSwapChain.h"
 
 class RenderManager;
@@ -31,6 +32,7 @@ public:
 	VulkanWindowSurface* GetVulkanWindowSurface() const { return m_VulkanWindowSurface.get(); }
 	VulkanPhysicalDevice* GetVulkanPhysicalDevice() const { return m_VulkanPhysicalDevice.get(); }
 	VulkanLogicalDevice* GetVulkanLogicalDevice() const { return m_VulkanLogicalDevice.get(); }
+	VulkanSwapChain* GetVulkanSwapChain() const { return m_VulkanSwapChain.get(); }
 
 	bool GetValidationLayersEnabled() const { return m_bValidationLayersEnabled; }
 	const std::vector<const char*>& GetRequestedValidationLayers() const { return m_RequestedValidationLayers; }
@@ -40,7 +42,7 @@ public:
 	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 
 private:
-	void CreateImageViews();
+	void CreateVulkanImageViews();
 
 	void CreateRenderPass();
 
@@ -58,10 +60,11 @@ private:
 	std::unique_ptr<VulkanPhysicalDevice> m_VulkanPhysicalDevice = std::make_unique<VulkanPhysicalDevice>(this);
 	std::unique_ptr<VulkanLogicalDevice> m_VulkanLogicalDevice = std::make_unique<VulkanLogicalDevice>(this);
 	std::unique_ptr<VulkanSwapChain> m_VulkanSwapChain = std::make_unique<VulkanSwapChain>(this);
+
+	std::vector<std::unique_ptr<VulkanImageView>> m_VulkanSwapChainImageViews;
 	
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
 	
-	std::vector<VkImageView> m_VulkanSwapChainImageViews;
 
 	VkRenderPass m_VulkanRenderPass;
 	VkPipelineLayout m_VulkanPipelineLayout;

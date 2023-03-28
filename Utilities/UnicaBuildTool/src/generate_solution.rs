@@ -172,7 +172,7 @@ fn get_project_name(unica_root_path: &Path) -> String {
 
     for line in base_config_lines {
         if line.contains("ProjectName=") {
-            return line.replace("ProjectName=", "");
+            return line.replace("ProjectName=", "").replace("#gitignore", "");
         }
     }
 
