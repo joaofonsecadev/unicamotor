@@ -5,7 +5,7 @@
 class VulkanFramebuffer : public VulkanTypeInterface<VkFramebuffer>
 {
 public:
-    VulkanFramebuffer(VulkanAPI* OwningVulkanAPI, VulkanImageView* VulkanImageView) : VulkanTypeInterface(OwningVulkanAPI), m_VulkanImageView(VulkanImageView) { }
+    VulkanFramebuffer(VulkanInterface* OwningVulkanAPI, VulkanImageView* VulkanImageView) : VulkanTypeInterface(OwningVulkanAPI), m_VulkanImageView(VulkanImageView) { }
     
     void Init() override;
     void Destroy() override;

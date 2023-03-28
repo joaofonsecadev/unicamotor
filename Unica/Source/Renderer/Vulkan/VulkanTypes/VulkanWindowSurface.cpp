@@ -4,7 +4,7 @@
 
 #include <SDL_vulkan.h>
 
-#include "Renderer/Vulkan/VulkanAPI.h"
+#include "Renderer/Vulkan/VulkanInterface.h"
 
 void VulkanWindowSurface::Init()
 {

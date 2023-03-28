@@ -23,7 +23,7 @@ class RenderManager;
 class VulkanInstance;
 class VulkanQueueFamilyIndices;
 
-class VulkanAPI : public RenderInterface
+class VulkanInterface : public RenderInterface
 {
 public:
 	void Init() override;

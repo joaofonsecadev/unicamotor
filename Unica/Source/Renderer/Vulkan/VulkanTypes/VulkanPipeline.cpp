@@ -1,6 +1,6 @@
 ﻿#include "VulkanPipeline.h"
 
-#include "Renderer/Vulkan/VulkanAPI.h"
+#include "Renderer/Vulkan/VulkanInterface.h"
 #include "Renderer/Vulkan/Shaders/ShaderUtilities.h"
 
 void VulkanPipeline::Init()

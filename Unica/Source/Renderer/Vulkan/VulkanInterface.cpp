@@ -1,6 +1,6 @@
 // 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-#include "VulkanAPI.h"
+#include "VulkanInterface.h"
 
 #include <algorithm>
 #include <map>
@@ -16,7 +16,7 @@
 #include "Renderer/RenderManager.h"
 #include "Shaders/ShaderUtilities.h"
 
-void VulkanAPI::Init()
+void VulkanInterface::Init()
 {
 	m_VulkanInstance->Init();
 	m_VulkanWindowSurface->Init();
@@ -30,12 +30,12 @@ void VulkanAPI::Init()
 	CreateCommandPool();
 }
 
-void VulkanAPI::Tick()
+void VulkanInterface::Tick()
 {
 	m_SdlRenderWindow->Tick();
 }
 
-VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
+VulkanQueueFamilyIndices VulkanInterface::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
 {
 	VulkanQueueFamilyIndices QueueFamilyIndices;
 
@@ -72,7 +72,7 @@ VulkanQueueFamilyIndices VulkanAPI::GetDeviceQueueFamilies(const VkPhysicalDevic
 	return QueueFamilyIndices;
 }
 
-VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice)
+VulkanSwapChainSupportDetails VulkanInterface::QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice)
 {
 	VulkanSwapChainSupportDetails SwapChainSupportDetails;
 
@@ -97,7 +97,7 @@ VulkanSwapChainSupportDetails VulkanAPI::QuerySwapChainSupport(const VkPhysicalD
 	return SwapChainSupportDetails;
 }
 
-void VulkanAPI::InitVulkanImageViews()
+void VulkanInterface::InitVulkanImageViews()
 {
 	uint32 SwapChainImageIteration = 0;
 	m_VulkanImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
@@ -109,7 +109,7 @@ void VulkanAPI::InitVulkanImageViews()
 	}
 }
 
-void VulkanAPI::InitVulkanFramebuffers()
+void VulkanInterface::InitVulkanFramebuffers()
 {
 	uint32 SwapChainImageViewLoopIndex = 0;
 	m_VulkanFramebuffers.resize(m_VulkanImageViews.size());
@@ -120,7 +120,7 @@ void VulkanAPI::InitVulkanFramebuffers()
 	}
 }
 
-void VulkanAPI::CreateCommandPool()
+void VulkanInterface::CreateCommandPool()
 {
 	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
 
@@ -135,7 +135,7 @@ void VulkanAPI::CreateCommandPool()
 	}
 }
 
-void VulkanAPI::Shutdown()
+void VulkanInterface::Shutdown()
 {
 	vkDestroyCommandPool(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanCommandPool, nullptr);
 	

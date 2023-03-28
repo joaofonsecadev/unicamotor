@@ -6,7 +6,7 @@
 #include <set>
 
 #include "UnicaMinimal.h"
-#include "Renderer/Vulkan/VulkanAPI.h"
+#include "Renderer/Vulkan/VulkanInterface.h"
 #include "Renderer/Vulkan/VulkanQueueFamilyIndices.h"
 
 void VulkanPhysicalDevice::Init()

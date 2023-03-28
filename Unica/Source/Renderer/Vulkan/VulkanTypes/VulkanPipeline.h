@@ -6,7 +6,7 @@
 class VulkanPipeline : public VulkanTypeInterface<VkPipeline>
 {
 public:
-    VulkanPipeline(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
+    VulkanPipeline(VulkanInterface* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override;

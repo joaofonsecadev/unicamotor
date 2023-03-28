@@ -2,11 +2,11 @@
 
 #include "RenderManager.h"
 #include "UnicaMinimal.h"
-#include "Vulkan/VulkanAPI.h"
+#include "Vulkan/VulkanInterface.h"
 
 void RenderManager::Init()
 {
-    m_RenderInterface = std::make_unique_for_overwrite<VulkanAPI>();
+    m_RenderInterface = std::make_unique_for_overwrite<VulkanInterface>();
     m_RenderInterface->Init();
 }
 

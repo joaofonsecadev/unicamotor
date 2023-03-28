@@ -7,7 +7,7 @@
 class VulkanWindowSurface : public VulkanTypeInterface<VkSurfaceKHR>
 {
 public:
-    VulkanWindowSurface(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
+    VulkanWindowSurface(VulkanInterface* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override;

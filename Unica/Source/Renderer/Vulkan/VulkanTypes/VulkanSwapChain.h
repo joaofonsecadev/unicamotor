@@ -7,7 +7,7 @@
 class VulkanSwapChain : public VulkanTypeInterface<VkSwapchainKHR>
 {
 public:
-    VulkanSwapChain(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
+    VulkanSwapChain(VulkanInterface* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override;

@@ -5,7 +5,7 @@
 class VulkanLogicalDevice : public VulkanTypeInterface<VkDevice>
 {
 public:
-    VulkanLogicalDevice(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
+    VulkanLogicalDevice(VulkanInterface* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override;

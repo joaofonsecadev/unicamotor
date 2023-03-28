@@ -4,13 +4,13 @@
 
 #include <vector>
 
-#include "Renderer/Vulkan/VulkanAPI.h"
+#include "Renderer/Vulkan/VulkanInterface.h"
 #include "Renderer/Vulkan/VulkanTypeInterface.h"
 
 class VulkanInstance : public VulkanTypeInterface<VkInstance>
 {
 public:
-    VulkanInstance(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
+    VulkanInstance(VulkanInterface* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override;

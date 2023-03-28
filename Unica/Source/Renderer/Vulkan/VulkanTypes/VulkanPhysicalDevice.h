@@ -8,7 +8,7 @@
 class VulkanPhysicalDevice : public VulkanTypeInterface<VkPhysicalDevice>
 {
 public:
-    VulkanPhysicalDevice(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
+    VulkanPhysicalDevice(VulkanInterface* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override { }

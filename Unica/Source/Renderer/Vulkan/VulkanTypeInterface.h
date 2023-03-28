@@ -4,13 +4,13 @@
 
 #include "vulkan/vulkan_core.h"
 
-class VulkanAPI;
+class VulkanInterface;
 
 template <typename T>
 class VulkanTypeInterface
 {
 public:
-    VulkanTypeInterface(VulkanAPI* OwningVulkanAPI) : m_OwningVulkanAPI(OwningVulkanAPI) { }
+    VulkanTypeInterface(VulkanInterface* OwningVulkanAPI) : m_OwningVulkanAPI(OwningVulkanAPI) { }
     virtual void Init() = 0;
     virtual void Destroy() = 0;
     virtual ~VulkanTypeInterface() = default;
@@ -18,5 +18,5 @@ public:
     virtual T GetVulkanObject() { return m_VulkanObject; }
     
     T m_VulkanObject = VK_NULL_HANDLE;
-    VulkanAPI* m_OwningVulkanAPI = nullptr;
+    VulkanInterface* m_OwningVulkanAPI = nullptr;
 };

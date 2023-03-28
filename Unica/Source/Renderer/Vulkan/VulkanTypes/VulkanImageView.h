@@ -5,7 +5,7 @@
 class VulkanImageView : public VulkanTypeInterface<VkImageView>
 {
 public:
-    VulkanImageView(VulkanAPI* OwningVulkanAPI, VkImage VulkanSwapChainImage) : VulkanTypeInterface(OwningVulkanAPI), m_VulkanSwapChainImage(VulkanSwapChainImage) { }
+    VulkanImageView(VulkanInterface* OwningVulkanAPI, VkImage VulkanSwapChainImage) : VulkanTypeInterface(OwningVulkanAPI), m_VulkanSwapChainImage(VulkanSwapChainImage) { }
     
     void Init() override;
     void Destroy() override;

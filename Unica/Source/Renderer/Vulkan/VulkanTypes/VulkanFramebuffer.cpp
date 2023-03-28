@@ -1,6 +1,6 @@
 ﻿#include "VulkanFramebuffer.h"
 
-#include "Renderer/Vulkan/VulkanAPI.h"
+#include "Renderer/Vulkan/VulkanInterface.h"
 
 void VulkanFramebuffer::Init()
 {

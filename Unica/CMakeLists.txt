@@ -18,8 +18,8 @@ set(SourceFiles
     Source/Renderer/RenderManager.h
     Source/Renderer/Vulkan/Shaders/ShaderUtilities.cpp
     Source/Renderer/Vulkan/Shaders/ShaderUtilities.h
-    Source/Renderer/Vulkan/VulkanAPI.cpp
-    Source/Renderer/Vulkan/VulkanAPI.h
+    Source/Renderer/Vulkan/VulkanInterface.cpp
+    Source/Renderer/Vulkan/VulkanInterface.h
     Source/Renderer/Vulkan/VulkanQueueFamilyIndices.cpp
     Source/Renderer/Vulkan/VulkanQueueFamilyIndices.h
     Source/Renderer/Vulkan/VulkanRenderWindow.cpp

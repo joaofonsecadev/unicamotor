@@ -4,7 +4,7 @@
 class VulkanRenderPass : public VulkanTypeInterface<VkRenderPass>
 {
 public:
-    VulkanRenderPass(VulkanAPI* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
+    VulkanRenderPass(VulkanInterface* OwningVulkanAPI) : VulkanTypeInterface(OwningVulkanAPI) { }
     
     void Init() override;
     void Destroy() override;
