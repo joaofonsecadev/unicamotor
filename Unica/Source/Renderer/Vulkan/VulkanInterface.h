@@ -13,6 +13,7 @@
 #include "Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanLogicalDevice.h"
+#include "VulkanTypes/VulkanCommandPool.h"
 #include "VulkanTypes/VulkanFramebuffer.h"
 #include "VulkanTypes/VulkanImageView.h"
 #include "VulkanTypes/VulkanPipeline.h"
@@ -49,8 +50,6 @@ private:
 	void InitVulkanImageViews();
 	void InitVulkanFramebuffers();
 
-	void CreateCommandPool();
-
 	std::unique_ptr<SdlRenderWindow> m_SdlRenderWindow = std::make_unique<SdlRenderWindow>();
 
 	std::unique_ptr<VulkanInstance> m_VulkanInstance = std::make_unique<VulkanInstance>(this);
@@ -60,15 +59,13 @@ private:
 	std::unique_ptr<VulkanSwapChain> m_VulkanSwapChain = std::make_unique<VulkanSwapChain>(this);
 	std::unique_ptr<VulkanRenderPass> m_VulkanRenderPass = std::make_unique<VulkanRenderPass>(this);
 	std::unique_ptr<VulkanPipeline> m_VulkanPipeline = std::make_unique<VulkanPipeline>(this);
+	std::unique_ptr<VulkanCommandPool> m_VulkanCommandPool = std::make_unique<VulkanCommandPool>(this);
 
 	std::vector<std::unique_ptr<VulkanImageView>> m_VulkanImageViews;
 	std::vector<std::unique_ptr<VulkanFramebuffer>> m_VulkanFramebuffers;
 	
     VkDebugUtilsMessengerEXT m_VulkanDebugMessenger = VK_NULL_HANDLE;
-
-
-	VkCommandPool m_VulkanCommandPool;
-
+	
 	const std::vector<const char*> m_RequiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	const std::vector<const char*> m_RequestedValidationLayers = { "VK_LAYER_KHRONOS_validation" };
 

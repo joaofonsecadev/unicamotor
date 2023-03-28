@@ -27,12 +27,35 @@ void VulkanInterface::Init()
 	m_VulkanRenderPass->Init();
 	m_VulkanPipeline->Init();
 	InitVulkanFramebuffers();
-	CreateCommandPool();
+	m_VulkanCommandPool->Init();
 }
 
 void VulkanInterface::Tick()
 {
 	m_SdlRenderWindow->Tick();
+}
+
+void VulkanInterface::InitVulkanImageViews()
+{
+	uint32 SwapChainImageIteration = 0;
+	m_VulkanImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
+	for (const VkImage& SwapChainImage : m_VulkanSwapChain->GetVulkanSwapChainImages())
+	{
+		m_VulkanImageViews[SwapChainImageIteration] = std::make_unique<VulkanImageView>(this, SwapChainImage);
+		m_VulkanImageViews[SwapChainImageIteration]->Init();
+		SwapChainImageIteration++;
+	}
+}
+
+void VulkanInterface::InitVulkanFramebuffers()
+{
+	uint32 SwapChainImageViewLoopIndex = 0;
+	m_VulkanFramebuffers.resize(m_VulkanImageViews.size());
+	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanImageViews)
+	{
+		m_VulkanFramebuffers[SwapChainImageViewLoopIndex] = std::make_unique<VulkanFramebuffer>(this, VulkanImageView.get());
+		SwapChainImageViewLoopIndex++;
+	}
 }
 
 VulkanQueueFamilyIndices VulkanInterface::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
@@ -97,47 +120,9 @@ VulkanSwapChainSupportDetails VulkanInterface::QuerySwapChainSupport(const VkPhy
 	return SwapChainSupportDetails;
 }
 
-void VulkanInterface::InitVulkanImageViews()
-{
-	uint32 SwapChainImageIteration = 0;
-	m_VulkanImageViews.resize(m_VulkanSwapChain->GetVulkanSwapChainImages().size());
-	for (const VkImage& SwapChainImage : m_VulkanSwapChain->GetVulkanSwapChainImages())
-	{
-		m_VulkanImageViews[SwapChainImageIteration] = std::make_unique<VulkanImageView>(this, SwapChainImage);
-		m_VulkanImageViews[SwapChainImageIteration]->Init();
-		SwapChainImageIteration++;
-	}
-}
-
-void VulkanInterface::InitVulkanFramebuffers()
-{
-	uint32 SwapChainImageViewLoopIndex = 0;
-	m_VulkanFramebuffers.resize(m_VulkanImageViews.size());
-	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanImageViews)
-	{
-		m_VulkanFramebuffers[SwapChainImageViewLoopIndex] = std::make_unique<VulkanFramebuffer>(this, VulkanImageView.get());
-		SwapChainImageViewLoopIndex++;
-	}
-}
-
-void VulkanInterface::CreateCommandPool()
-{
-	VulkanQueueFamilyIndices QueueFamilyIndices = GetDeviceQueueFamilies(m_VulkanPhysicalDevice->GetVulkanObject());
-
-	VkCommandPoolCreateInfo CommandPoolCreateInfo { };
-	CommandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	CommandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	CommandPoolCreateInfo.queueFamilyIndex = QueueFamilyIndices.GetGraphicsFamily().value();
-
-	if (vkCreateCommandPool(m_VulkanLogicalDevice->GetVulkanObject(), &CommandPoolCreateInfo, nullptr, &m_VulkanCommandPool) != VK_SUCCESS)
-	{
-		UNICA_LOG(spdlog::level::critical, "Failed to create the VulkanCommandPool");
-	}
-}
-
 void VulkanInterface::Shutdown()
 {
-	vkDestroyCommandPool(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanCommandPool, nullptr);
+	m_VulkanCommandPool->Destroy();
 	
 	for (const std::unique_ptr<VulkanFramebuffer>& VulkanFramebuffer : m_VulkanFramebuffers)
 	{

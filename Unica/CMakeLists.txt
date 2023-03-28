@@ -26,6 +26,8 @@ set(SourceFiles
     Source/Renderer/Vulkan/VulkanRenderWindow.h
     Source/Renderer/Vulkan/VulkanSwapChainSupportDetails.h
     Source/Renderer/Vulkan/VulkanTypeInterface.h
+    Source/Renderer/Vulkan/VulkanTypes/VulkanCommandPool.cpp
+    Source/Renderer/Vulkan/VulkanTypes/VulkanCommandPool.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanFramebuffer.cpp
     Source/Renderer/Vulkan/VulkanTypes/VulkanFramebuffer.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanImageView.cpp
