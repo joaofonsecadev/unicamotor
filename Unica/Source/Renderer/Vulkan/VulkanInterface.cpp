@@ -28,11 +28,22 @@ void VulkanInterface::Init()
 	m_VulkanPipeline->Init();
 	InitVulkanFramebuffers();
 	m_VulkanCommandPool->Init();
+	m_VulkanCommandBuffer->Init();
+	InitSyncObjects();
 }
 
 void VulkanInterface::Tick()
 {
+	UNICA_PROFILE_FUNCTION
 	m_SdlRenderWindow->Tick();
+	DrawFrame();
+}
+
+void VulkanInterface::DrawFrame()
+{
+	UNICA_PROFILE_FUNCTION
+	
+	//vkWaitForFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &FenceInFlight, VK_TRUE, UINT64_MAX);
 }
 
 void VulkanInterface::InitVulkanImageViews()
@@ -55,6 +66,24 @@ void VulkanInterface::InitVulkanFramebuffers()
 	{
 		m_VulkanFramebuffers[SwapChainImageViewLoopIndex] = std::make_unique<VulkanFramebuffer>(this, VulkanImageView.get());
 		SwapChainImageViewLoopIndex++;
+	}
+}
+
+void VulkanInterface::InitSyncObjects()
+{
+	VkSemaphoreCreateInfo SemaphoreInfo { };
+	SemaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	VkFenceCreateInfo FenceInfo { };
+	FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+
+	const bool bSemaphoreImageAvailabeCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &SemaphoreImageAvailable) != VK_SUCCESS;
+	const bool bSemaphoreRenderFinishedCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &SemaphoreRenderFinished) != VK_SUCCESS;
+	const bool bFenceInFlightCreated = vkCreateFence(m_VulkanLogicalDevice->GetVulkanObject(), &FenceInfo, nullptr, &FenceInFlight) != VK_SUCCESS;
+
+	if (bSemaphoreImageAvailabeCreated || bSemaphoreRenderFinishedCreated || bFenceInFlightCreated)
+	{
+		UNICA_LOG_CRITICAL("Failed to create Vulkan sync objects");
 	}
 }
 
@@ -120,8 +149,16 @@ VulkanSwapChainSupportDetails VulkanInterface::QuerySwapChainSupport(const VkPhy
 	return SwapChainSupportDetails;
 }
 
+void VulkanInterface::DestroySyncObjects()
+{
+	vkDestroySemaphore(m_VulkanLogicalDevice->GetVulkanObject(), SemaphoreImageAvailable, nullptr);
+	vkDestroySemaphore(m_VulkanLogicalDevice->GetVulkanObject(), SemaphoreRenderFinished, nullptr);
+	vkDestroyFence(m_VulkanLogicalDevice->GetVulkanObject(), FenceInFlight, nullptr);
+}
+
 void VulkanInterface::Shutdown()
 {
+	DestroySyncObjects();
 	m_VulkanCommandPool->Destroy();
 	
 	for (const std::unique_ptr<VulkanFramebuffer>& VulkanFramebuffer : m_VulkanFramebuffers)
