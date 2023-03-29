@@ -22,12 +22,22 @@ void VulkanRenderPass::Init()
     VulkanSubpass.colorAttachmentCount = 1;
     VulkanSubpass.pColorAttachments = &VulkanColorAttachmentRef;
 
+    VkSubpassDependency VulkanSubpassDependency{};
+    VulkanSubpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    VulkanSubpassDependency.dstSubpass = 0;
+    VulkanSubpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VulkanSubpassDependency.srcAccessMask = 0;
+    VulkanSubpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VulkanSubpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
     VkRenderPassCreateInfo VulkanRenderPassCreateInfo { };
     VulkanRenderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     VulkanRenderPassCreateInfo.attachmentCount = 1;
     VulkanRenderPassCreateInfo.pAttachments = &VulkanColorAttachment;
     VulkanRenderPassCreateInfo.subpassCount = 1;
     VulkanRenderPassCreateInfo.pSubpasses = &VulkanSubpass;
+    VulkanRenderPassCreateInfo.dependencyCount = 1;
+    VulkanRenderPassCreateInfo.pDependencies = &VulkanSubpassDependency;    
 
     if (vkCreateRenderPass(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), &VulkanRenderPassCreateInfo, nullptr, &m_VulkanObject) != VK_SUCCESS)
     {

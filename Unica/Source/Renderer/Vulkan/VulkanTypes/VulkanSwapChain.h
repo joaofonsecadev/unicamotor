@@ -2,6 +2,7 @@
 
 #include <vector>
 
+
 #include "Renderer/Vulkan/VulkanTypeInterface.h"
 
 class VulkanSwapChain : public VulkanTypeInterface<VkSwapchainKHR>

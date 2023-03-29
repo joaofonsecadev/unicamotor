@@ -12,5 +12,7 @@ public:
     void Init() override;
     void Destroy() override { }
         
-    void Record(uint32 VulkanImageViewIndex);
+    void Record(uint32 VulkanImageIndex);
+
+    VkCommandBuffer* GetCommandBufferObject() { return &m_VulkanObject; }
 };

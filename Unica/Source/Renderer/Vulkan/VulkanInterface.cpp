@@ -42,8 +42,59 @@ void VulkanInterface::Tick()
 void VulkanInterface::DrawFrame()
 {
 	UNICA_PROFILE_FUNCTION
+	{
+		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkWaitForFences");
+		vkWaitForFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &FenceInFlight, VK_TRUE, UINT64_MAX);
+	}
+	{
+		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkResetFences");
+		vkResetFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &FenceInFlight);
+	}
+	uint32 VulkanImageIndex;
+	{
+		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkAcquireNextImageKHR");
+		vkAcquireNextImageKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain->GetVulkanObject(), UINT64_MAX, SemaphoreImageAvailable, VK_NULL_HANDLE, &VulkanImageIndex);
+	}
+	{
+		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkResetCommandBuffer");
+		vkResetCommandBuffer(m_VulkanCommandBuffer->GetVulkanObject(), 0);
+	}
+	m_VulkanCommandBuffer->Record(VulkanImageIndex);
+
+	const VkSemaphore WaitSemaphores[] = { SemaphoreImageAvailable };
+	const VkSemaphore SignalSemaphores[] = { SemaphoreRenderFinished };
+	const VkPipelineStageFlags WaitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	
-	//vkWaitForFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &FenceInFlight, VK_TRUE, UINT64_MAX);
+	VkSubmitInfo SubmitInfo { };
+	SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;	
+	SubmitInfo.waitSemaphoreCount = 1;
+	SubmitInfo.pWaitSemaphores = WaitSemaphores;
+	SubmitInfo.pWaitDstStageMask = WaitStages;
+	SubmitInfo.commandBufferCount = 1;
+	SubmitInfo.pCommandBuffers = m_VulkanCommandBuffer->GetCommandBufferObject();
+	SubmitInfo.signalSemaphoreCount = 1;
+	SubmitInfo.pSignalSemaphores = SignalSemaphores;
+	{
+		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkQueueSubmit");
+		if (vkQueueSubmit(m_VulkanLogicalDevice->GetVulkanGraphicsQueue(), 1, &SubmitInfo, FenceInFlight) != VK_SUCCESS)
+		{
+			UNICA_LOG_CRITICAL("Failed to submit draw command buffer!");
+		}
+	}
+
+	VkPresentInfoKHR VulkanPresentInfo{};
+	VulkanPresentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	VulkanPresentInfo.waitSemaphoreCount = 1;
+	VulkanPresentInfo.pWaitSemaphores = SignalSemaphores;
+
+	const VkSwapchainKHR VulkanSwapChains[] = { m_VulkanSwapChain->GetVulkanObject() };
+	VulkanPresentInfo.swapchainCount = 1;
+	VulkanPresentInfo.pSwapchains = VulkanSwapChains;
+	VulkanPresentInfo.pImageIndices = &VulkanImageIndex;
+	{
+		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkQueuePresentKHR");
+		vkQueuePresentKHR(m_VulkanLogicalDevice->GetVulkanPresentImagesQueue(), &VulkanPresentInfo);
+	}
 }
 
 void VulkanInterface::InitVulkanImageViews()
@@ -65,6 +116,7 @@ void VulkanInterface::InitVulkanFramebuffers()
 	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanImageViews)
 	{
 		m_VulkanFramebuffers[SwapChainImageViewLoopIndex] = std::make_unique<VulkanFramebuffer>(this, VulkanImageView.get());
+		m_VulkanFramebuffers[SwapChainImageViewLoopIndex]->Init();
 		SwapChainImageViewLoopIndex++;
 	}
 }
@@ -76,12 +128,13 @@ void VulkanInterface::InitSyncObjects()
 
 	VkFenceCreateInfo FenceInfo { };
 	FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	const bool bSemaphoreImageAvailabeCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &SemaphoreImageAvailable) != VK_SUCCESS;
+	const bool bSemaphoreImageAvailableCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &SemaphoreImageAvailable) != VK_SUCCESS;
 	const bool bSemaphoreRenderFinishedCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &SemaphoreRenderFinished) != VK_SUCCESS;
 	const bool bFenceInFlightCreated = vkCreateFence(m_VulkanLogicalDevice->GetVulkanObject(), &FenceInfo, nullptr, &FenceInFlight) != VK_SUCCESS;
 
-	if (bSemaphoreImageAvailabeCreated || bSemaphoreRenderFinishedCreated || bFenceInFlightCreated)
+	if (bSemaphoreImageAvailableCreated || bSemaphoreRenderFinishedCreated || bFenceInFlightCreated)
 	{
 		UNICA_LOG_CRITICAL("Failed to create Vulkan sync objects");
 	}

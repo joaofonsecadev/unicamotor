@@ -16,8 +16,10 @@ void VulkanCommandBuffer::Init()
     }
 }
 
-void VulkanCommandBuffer::Record(uint32 VulkanImageViewIndex)
+void VulkanCommandBuffer::Record(uint32 VulkanImageIndex)
 {
+    UNICA_PROFILE_FUNCTION
+    
     VkCommandBufferBeginInfo CommandBufferBeginInfo { };
     CommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -29,7 +31,7 @@ void VulkanCommandBuffer::Record(uint32 VulkanImageViewIndex)
     VkRenderPassBeginInfo RenderPassBeginInfo { };
     RenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     RenderPassBeginInfo.renderPass = m_OwningVulkanAPI->GetVulkanRenderPass()->GetVulkanObject();
-    RenderPassBeginInfo.framebuffer = m_OwningVulkanAPI->GetVulkanFramebuffers().at(VulkanImageViewIndex)->GetVulkanObject();
+    RenderPassBeginInfo.framebuffer = m_OwningVulkanAPI->GetVulkanFramebuffers().at(VulkanImageIndex)->GetVulkanObject();
     RenderPassBeginInfo.renderArea.offset = {0, 0};
     RenderPassBeginInfo.renderArea.extent = m_OwningVulkanAPI->GetVulkanSwapChain()->GetVulkanExtent();
 
