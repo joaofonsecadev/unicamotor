@@ -1,4 +1,4 @@
-﻿#include "VulkanCommandBuffer.h"
+#include "VulkanCommandBuffer.h"
 
 #include "Renderer/Vulkan/VulkanInterface.h"
 
@@ -35,7 +35,7 @@ void VulkanCommandBuffer::Record(uint32 VulkanImageIndex)
     RenderPassBeginInfo.renderArea.offset = {0, 0};
     RenderPassBeginInfo.renderArea.extent = m_OwningVulkanAPI->GetVulkanSwapChain()->GetVulkanExtent();
 
-    const VkClearValue ClearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+    const VkClearValue ClearColor = {{{0.01f, 0.01f, 0.01f, 1.0f}}};
     
     RenderPassBeginInfo.clearValueCount = 1;
     RenderPassBeginInfo.pClearValues = &ClearColor;

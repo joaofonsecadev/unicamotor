@@ -6,6 +6,7 @@
 
 #include "RenderInterface.h"
 #include "Subsystem/SubsystemBase.h"
+#include "Renderer/Vulkan/VulkanInterface.h"
 
 class RenderManager final : public SubsystemBase
 {
@@ -15,5 +16,5 @@ private:
     void Shutdown() override;
     bool ShouldTick() override { return true; }
 
-    std::unique_ptr<RenderInterface> m_RenderInterface;
+    std::unique_ptr<RenderInterface> m_RenderInterface = std::make_unique<VulkanInterface>();
 };

@@ -6,7 +6,6 @@
 
 void RenderManager::Init()
 {
-    m_RenderInterface = std::make_unique_for_overwrite<VulkanInterface>();
     m_RenderInterface->Init();
 }
 
