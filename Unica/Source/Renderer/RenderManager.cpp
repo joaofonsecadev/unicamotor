@@ -1,16 +1,22 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "RenderManager.h"
-
-#include <tracy/Tracy.hpp>
+#include "UnicaMinimal.h"
+#include "Vulkan/VulkanInterface.h"
 
 void RenderManager::Init()
 {
-    m_RenderWindow = std::make_unique<RenderWindow>();
-    m_RenderInterface = std::make_unique<VulkanAPI>(this);
+    m_RenderInterface = std::make_unique_for_overwrite<VulkanInterface>();
+    m_RenderInterface->Init();
 }
 
 void RenderManager::Tick()
 {
-    m_RenderWindow->Tick();
+    UNICA_PROFILE_FUNCTION
+    m_RenderInterface->Tick();
+}
+
+void RenderManager::Shutdown()
+{
+    m_RenderInterface->Shutdown();
 }

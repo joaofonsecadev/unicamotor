@@ -1,3 +1,5 @@
+// 2022-2023 Copyright joaofonseca.dev, All Rights Reserved
+
 #version 450
 
 layout(location = 0) out vec3 fragColor;

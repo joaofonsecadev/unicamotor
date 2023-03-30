@@ -1,4 +1,6 @@
-﻿#pragma once
+// 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
+
+#pragma once
 
 #include <string>
 #include <vector>

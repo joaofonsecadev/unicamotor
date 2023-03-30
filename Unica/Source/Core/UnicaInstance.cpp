@@ -1,4 +1,4 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include "UnicaInstance.h"
 
@@ -14,17 +14,22 @@ std::filesystem::path UnicaInstance::m_ProjectRootDirectory;
 
 void UnicaInstance::Init()
 {
+    Logger::Init();
+    
     m_SubsystemManager = std::make_unique<SubsystemManager>();
     m_SubsystemManager->Init();
 }
 
 void UnicaInstance::TickLogic()
 {
+    UNICA_PROFILE_FUNCTION
 	m_SubsystemManager->TickSubsystems();
 }
 
 void UnicaInstance::Tick()
 {
+    UNICA_PROFILE_FUNCTION
+    
     if (UnicaSettings::FrameTimeLimit <= 0)
     {
         TickLogic();

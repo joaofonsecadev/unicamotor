@@ -1,5 +1,5 @@
 **/Libraries/** linguist-vendored
-
 CMakeLists.txt filter=gitignore
+BaseEngine.ini filter=gitignore
 # git config filter.gitignore.clean "sed '/#gitignore$/d'"
 # git config filter.gitignore.smudge cat

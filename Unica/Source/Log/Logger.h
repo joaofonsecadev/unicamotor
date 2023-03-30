@@ -1,12 +1,21 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #pragma once
 
 #include <string>
 
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#include <spdlog/spdlog.h>
+
 #include "UnicaMinimal.h"
 
-#define UNICA_LOG(...) Logger::Log(__VA_ARGS__)
+#define UNICA_LOG(LogLevel, ...) SPDLOG_LOGGER_CALL(Logger::GetCoreLogger(), LogLevel, __VA_ARGS__);if(LogLevel==spdlog::level::critical)throw
+#define UNICA_LOG_TRACE(...) SPDLOG_LOGGER_TRACE(Logger::GetCoreLogger(), __VA_ARGS__)
+#define UNICA_LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(Logger::GetCoreLogger(), __VA_ARGS__)
+#define UNICA_LOG_INFO(...) SPDLOG_LOGGER_INFO(Logger::GetCoreLogger(), __VA_ARGS__)
+#define UNICA_LOG_WARN(...) SPDLOG_LOGGER_WARN(Logger::GetCoreLogger(), __VA_ARGS__)
+#define UNICA_LOG_ERROR(...) SPDLOG_LOGGER_ERROR(Logger::GetCoreLogger(), __VA_ARGS__)
+#define UNICA_LOG_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(Logger::GetCoreLogger(), __VA_ARGS__);throw
 
 enum LogLevel : uint8
 {
@@ -19,8 +28,8 @@ enum LogLevel : uint8
 class Logger
 {
 public:
-    static void Log(LogLevel LogLevel, const std::string& LogCategory, const std::string& LogText);
-
+    static void Init();
+    static std::shared_ptr<spdlog::logger> GetCoreLogger() { return m_CoreLogger; }
 private:
-    static std::string GetLogTimestamp();
+    static std::shared_ptr<spdlog::logger> m_CoreLogger;
 };

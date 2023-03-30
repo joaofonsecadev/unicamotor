@@ -1,11 +1,9 @@
-// 2021-2022 Copyright joaofonseca.dev, All Rights Reserved.
+// 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
 #include <iostream>
 
+#include "UnicaMinimal.h"
 #include "UnicaInstance.h"
-#include "Subsystem/SubsystemManager.h"
-
-#include "tracy/Tracy.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -17,6 +15,7 @@ int main(int argc, char* argv[])
     while (!UnicaInstance::HasRequestedExit())
     {
         EngineInstance->Tick();
+        UNICA_PROFILE_FRAME("EngineLoop");
     }
 
     EngineInstance->Shutdown();
