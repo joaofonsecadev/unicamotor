@@ -4,8 +4,8 @@
 [submodule "Libraries/glm"]
 	path = Libraries/glm
 	url = git@github.com:g-truc/glm.git
-[submodule "Tools/tracy"]
-	path = Tools/tracy
+[submodule "Libraries/tracy"]
+	path = Libraries/tracy
 	url = https://github.com/wolfpld/tracy
 [submodule "Libraries/sdl"]
 	path = Libraries/sdl

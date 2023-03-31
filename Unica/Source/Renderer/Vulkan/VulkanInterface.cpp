@@ -13,7 +13,6 @@
 
 #include "UnicaMinimal.h"
 #include "VulkanQueueFamilyIndices.h"
-#include "Renderer/RenderManager.h"
 #include "Shaders/ShaderUtilities.h"
 
 void VulkanInterface::Init()
