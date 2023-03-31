@@ -48,6 +48,7 @@ public:
 	const std::vector<const char*>& GetRequestedValidationLayers() const { return m_RequestedValidationLayers; }
 	const std::vector<const char*>& GetRequiredDeviceExtensions() const { return m_RequiredDeviceExtensions; }
 
+	uint8 GetMaxFramesInFlight() const { return m_MaxFramesInFlight; }
 	VulkanQueueFamilyIndices GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice);
 	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 
@@ -75,12 +76,15 @@ private:
 	std::vector<std::unique_ptr<VulkanImageView>> m_VulkanImageViews;
 	std::vector<std::unique_ptr<VulkanFramebuffer>> m_VulkanFramebuffers;
 
-	VkSemaphore SemaphoreImageAvailable = VK_NULL_HANDLE;
-	VkSemaphore SemaphoreRenderFinished = VK_NULL_HANDLE;
-	VkFence FenceInFlight = VK_NULL_HANDLE;
+	std::vector<VkSemaphore> m_SemaphoresImageAvailable;
+	std::vector<VkSemaphore> m_SemaphoresRenderFinished;
+	std::vector<VkFence> m_FencesInFlight;
 	
 	const std::vector<const char*> m_RequiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	const std::vector<const char*> m_RequestedValidationLayers = { "VK_LAYER_KHRONOS_validation" };
+
+	const uint8 m_MaxFramesInFlight = 2;
+	uint8 m_CurrentFrameIndex = 0;
 
 private:
 #if UNICA_SHIPPING

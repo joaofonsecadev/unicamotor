@@ -50,26 +50,26 @@ void VulkanInterface::DrawFrame()
 	UNICA_PROFILE_FUNCTION
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkWaitForFences");
-		vkWaitForFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &FenceInFlight, VK_TRUE, UINT64_MAX);
+		vkWaitForFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &m_FencesInFlight[m_CurrentFrameIndex], VK_TRUE, UINT64_MAX);
 	}
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkResetFences");
-		vkResetFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &FenceInFlight);
+		vkResetFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &m_FencesInFlight[m_CurrentFrameIndex]);
 	}
 	uint32 VulkanImageIndex;
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkAcquireNextImageKHR");
-		vkAcquireNextImageKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain->GetVulkanObject(), UINT64_MAX, SemaphoreImageAvailable, VK_NULL_HANDLE, &VulkanImageIndex);
+		vkAcquireNextImageKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain->GetVulkanObject(), UINT64_MAX, m_SemaphoresImageAvailable[m_CurrentFrameIndex], VK_NULL_HANDLE, &VulkanImageIndex);
 	}
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkResetCommandBuffer");
-		vkResetCommandBuffer(m_VulkanCommandBuffer->GetVulkanObject(), 0);
+		vkResetCommandBuffer(m_VulkanCommandBuffer->GetVulkanCommandBuffersVector()[m_CurrentFrameIndex], 0);
 	}
-	m_VulkanCommandBuffer->Record(VulkanImageIndex);
+	m_VulkanCommandBuffer->Record(m_CurrentFrameIndex, VulkanImageIndex);
 
-	const VkSemaphore WaitSemaphores[] = { SemaphoreImageAvailable };
-	const VkSemaphore SignalSemaphores[] = { SemaphoreRenderFinished };
-	const VkPipelineStageFlags WaitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	const VkSemaphore WaitSemaphores[] = { m_SemaphoresImageAvailable[m_CurrentFrameIndex] };
+	const VkSemaphore SignalSemaphores[] = { m_SemaphoresRenderFinished[m_CurrentFrameIndex] };
+	constexpr VkPipelineStageFlags WaitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	
 	VkSubmitInfo SubmitInfo { };
 	SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;	
@@ -77,12 +77,12 @@ void VulkanInterface::DrawFrame()
 	SubmitInfo.pWaitSemaphores = WaitSemaphores;
 	SubmitInfo.pWaitDstStageMask = WaitStages;
 	SubmitInfo.commandBufferCount = 1;
-	SubmitInfo.pCommandBuffers = m_VulkanCommandBuffer->GetCommandBufferObject();
+	SubmitInfo.pCommandBuffers = &m_VulkanCommandBuffer->GetVulkanCommandBuffersVector()[m_CurrentFrameIndex];
 	SubmitInfo.signalSemaphoreCount = 1;
 	SubmitInfo.pSignalSemaphores = SignalSemaphores;
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkQueueSubmit");
-		if (vkQueueSubmit(m_VulkanLogicalDevice->GetVulkanGraphicsQueue(), 1, &SubmitInfo, FenceInFlight) != VK_SUCCESS)
+		if (vkQueueSubmit(m_VulkanLogicalDevice->GetVulkanGraphicsQueue(), 1, &SubmitInfo, m_FencesInFlight[m_CurrentFrameIndex]) != VK_SUCCESS)
 		{
 			UNICA_LOG_CRITICAL("Failed to submit draw command buffer!");
 		}
@@ -101,6 +101,8 @@ void VulkanInterface::DrawFrame()
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkQueuePresentKHR");
 		vkQueuePresentKHR(m_VulkanLogicalDevice->GetVulkanPresentImagesQueue(), &VulkanPresentInfo);
 	}
+
+	m_CurrentFrameIndex = (m_CurrentFrameIndex + 1) % m_MaxFramesInFlight;
 }
 
 void VulkanInterface::InitVulkanImageViews()
@@ -129,6 +131,10 @@ void VulkanInterface::InitVulkanFramebuffers()
 
 void VulkanInterface::InitSyncObjects()
 {
+	m_SemaphoresImageAvailable.resize(m_MaxFramesInFlight);
+	m_SemaphoresRenderFinished.resize(m_MaxFramesInFlight);
+	m_FencesInFlight.resize(m_MaxFramesInFlight);
+	
 	VkSemaphoreCreateInfo SemaphoreInfo { };
 	SemaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -136,13 +142,16 @@ void VulkanInterface::InitSyncObjects()
 	FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	const bool bSemaphoreImageAvailableCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &SemaphoreImageAvailable) != VK_SUCCESS;
-	const bool bSemaphoreRenderFinishedCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &SemaphoreRenderFinished) != VK_SUCCESS;
-	const bool bFenceInFlightCreated = vkCreateFence(m_VulkanLogicalDevice->GetVulkanObject(), &FenceInfo, nullptr, &FenceInFlight) != VK_SUCCESS;
-
-	if (bSemaphoreImageAvailableCreated || bSemaphoreRenderFinishedCreated || bFenceInFlightCreated)
+	for (uint8 FrameIndex = 0; FrameIndex < m_MaxFramesInFlight; FrameIndex++)
 	{
-		UNICA_LOG_CRITICAL("Failed to create Vulkan sync objects");
+		const bool bSemaphoreImageAvailableCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &m_SemaphoresImageAvailable[FrameIndex]) != VK_SUCCESS;
+		const bool bSemaphoreRenderFinishedCreated = vkCreateSemaphore(m_VulkanLogicalDevice->GetVulkanObject(), &SemaphoreInfo, nullptr, &m_SemaphoresRenderFinished[FrameIndex]) != VK_SUCCESS;
+		const bool bFenceInFlightCreated = vkCreateFence(m_VulkanLogicalDevice->GetVulkanObject(), &FenceInfo, nullptr, &m_FencesInFlight[FrameIndex]) != VK_SUCCESS;
+
+		if (bSemaphoreImageAvailableCreated || bSemaphoreRenderFinishedCreated || bFenceInFlightCreated)
+		{
+			UNICA_LOG_CRITICAL("Failed to create Vulkan sync objects for frame {}", FrameIndex);
+		}
 	}
 }
 
@@ -210,9 +219,12 @@ VulkanSwapChainSupportDetails VulkanInterface::QuerySwapChainSupport(const VkPhy
 
 void VulkanInterface::DestroySyncObjects()
 {
-	vkDestroySemaphore(m_VulkanLogicalDevice->GetVulkanObject(), SemaphoreImageAvailable, nullptr);
-	vkDestroySemaphore(m_VulkanLogicalDevice->GetVulkanObject(), SemaphoreRenderFinished, nullptr);
-	vkDestroyFence(m_VulkanLogicalDevice->GetVulkanObject(), FenceInFlight, nullptr);
+	for (uint8 FrameIndex = 0; FrameIndex < m_MaxFramesInFlight; FrameIndex++)
+	{
+		vkDestroySemaphore(m_VulkanLogicalDevice->GetVulkanObject(), m_SemaphoresImageAvailable[FrameIndex], nullptr);
+		vkDestroySemaphore(m_VulkanLogicalDevice->GetVulkanObject(), m_SemaphoresRenderFinished[FrameIndex], nullptr);
+		vkDestroyFence(m_VulkanLogicalDevice->GetVulkanObject(), m_FencesInFlight[FrameIndex], nullptr);
+	}
 }
 
 void VulkanInterface::Shutdown()

@@ -11,8 +11,13 @@ public:
 
     void Init() override;
     void Destroy() override { }
+
+    std::vector<VkCommandBuffer>& GetVulkanCommandBuffersVector() { return m_VulkanCommandBuffers; }
         
-    void Record(uint32 VulkanImageIndex);
+    void Record(uint8 VulkanCommandBufferIndex, uint32 VulkanImageIndex);
 
     VkCommandBuffer* GetCommandBufferObject() { return &m_VulkanObject; }
+
+private:
+    std::vector<VkCommandBuffer> m_VulkanCommandBuffers;
 };

@@ -5,26 +5,28 @@
 
 void VulkanCommandBuffer::Init()
 {
+    m_VulkanCommandBuffers.resize(m_OwningVulkanAPI->GetMaxFramesInFlight());
+    
     VkCommandBufferAllocateInfo CommandBufferAllocateInfo{};
     CommandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     CommandBufferAllocateInfo.commandPool = m_OwningVulkanAPI->GetVulkanCommandPool()->GetVulkanObject();
     CommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    CommandBufferAllocateInfo.commandBufferCount = 1;
+    CommandBufferAllocateInfo.commandBufferCount = static_cast<uint32>(m_VulkanCommandBuffers.size());
 
-    if (vkAllocateCommandBuffers(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), &CommandBufferAllocateInfo, &m_VulkanObject) != VK_SUCCESS)
+    if (vkAllocateCommandBuffers(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), &CommandBufferAllocateInfo, m_VulkanCommandBuffers.data()) != VK_SUCCESS)
     {
         UNICA_LOG_CRITICAL("Failed to allocate VulkanCommandBuffers");
     }
 }
 
-void VulkanCommandBuffer::Record(uint32 VulkanImageIndex)
+void VulkanCommandBuffer::Record(uint8 VulkanCommandBufferIndex, uint32 VulkanImageIndex)
 {
     UNICA_PROFILE_FUNCTION
     
     VkCommandBufferBeginInfo CommandBufferBeginInfo { };
     CommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    if (vkBeginCommandBuffer(m_VulkanObject, &CommandBufferBeginInfo) != VK_SUCCESS)
+    if (vkBeginCommandBuffer(m_VulkanCommandBuffers[VulkanCommandBufferIndex], &CommandBufferBeginInfo) != VK_SUCCESS)
     {
         UNICA_LOG_CRITICAL("Failed to begin recording command buffer");
     }
@@ -36,13 +38,13 @@ void VulkanCommandBuffer::Record(uint32 VulkanImageIndex)
     RenderPassBeginInfo.renderArea.offset = {0, 0};
     RenderPassBeginInfo.renderArea.extent = m_OwningVulkanAPI->GetVulkanSwapChain()->GetVulkanExtent();
 
-    const VkClearValue ClearColor = {{{0.01f, 0.01f, 0.01f, 1.0f}}};
+    constexpr VkClearValue ClearColor = {{{0.01f, 0.01f, 0.01f, 1.0f}}};
     
     RenderPassBeginInfo.clearValueCount = 1;
     RenderPassBeginInfo.pClearValues = &ClearColor;
 
-    vkCmdBeginRenderPass(m_VulkanObject, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(m_VulkanObject, VK_PIPELINE_BIND_POINT_GRAPHICS, m_OwningVulkanAPI->GetVulkanPipeline()->GetVulkanObject());
+    vkCmdBeginRenderPass(m_VulkanCommandBuffers[VulkanCommandBufferIndex], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(m_VulkanCommandBuffers[VulkanCommandBufferIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_OwningVulkanAPI->GetVulkanPipeline()->GetVulkanObject());
 
     VkViewport Viewport { };
     Viewport .x = 0.0f;
@@ -51,16 +53,16 @@ void VulkanCommandBuffer::Record(uint32 VulkanImageIndex)
     Viewport .height = static_cast<float>(m_OwningVulkanAPI->GetVulkanSwapChain()->GetVulkanExtent().height);
     Viewport .minDepth = 0.0f;
     Viewport .maxDepth = 1.0f;
-    vkCmdSetViewport(m_VulkanObject, 0, 1, &Viewport );
+    vkCmdSetViewport(m_VulkanCommandBuffers[VulkanCommandBufferIndex], 0, 1, &Viewport );
 
     VkRect2D Scissor{};
     Scissor.offset = {0, 0};
     Scissor.extent = m_OwningVulkanAPI->GetVulkanSwapChain()->GetVulkanExtent();
-    vkCmdSetScissor(m_VulkanObject, 0, 1, &Scissor);
+    vkCmdSetScissor(m_VulkanCommandBuffers[VulkanCommandBufferIndex], 0, 1, &Scissor);
 
-    vkCmdDraw(m_VulkanObject, 3, 1, 0, 0);
-    vkCmdEndRenderPass(m_VulkanObject);
-    if (vkEndCommandBuffer(m_VulkanObject) != VK_SUCCESS)
+    vkCmdDraw(m_VulkanCommandBuffers[VulkanCommandBufferIndex], 3, 1, 0, 0);
+    vkCmdEndRenderPass(m_VulkanCommandBuffers[VulkanCommandBufferIndex]);
+    if (vkEndCommandBuffer(m_VulkanCommandBuffers[VulkanCommandBufferIndex]) != VK_SUCCESS)
     {
         UNICA_LOG_CRITICAL("Failed to record command buffer!");
     }
