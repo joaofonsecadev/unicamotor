@@ -4,6 +4,8 @@
 
 #include "UnicaInstance.h"
 #include "UnicaMinimal.h"
+#include "Log/Logger.h"
+#include "UnicaSettings.h"
 
 SdlRenderWindow::SdlRenderWindow()
 {

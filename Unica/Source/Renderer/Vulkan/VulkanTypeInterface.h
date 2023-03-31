@@ -17,6 +17,6 @@ public:
     
     virtual T GetVulkanObject() { return m_VulkanObject; }
     
-    T m_VulkanObject = VK_NULL_HANDLE;
+    T m_VulkanObject = nullptr;
     VulkanInterface* m_OwningVulkanAPI = nullptr;
 };

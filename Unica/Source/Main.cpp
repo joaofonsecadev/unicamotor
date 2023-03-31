@@ -1,7 +1,5 @@
 // 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-#include <iostream>
-
 #include "UnicaMinimal.h"
 #include "UnicaInstance.h"
 

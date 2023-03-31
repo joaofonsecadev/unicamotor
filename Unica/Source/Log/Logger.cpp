@@ -2,13 +2,8 @@
 
 #include "Logger.h"
 
-#include <chrono>
 #include <memory>
 
-#include <fmt/color.h>
-#include <fmt/chrono.h>
-
-#include "UnicaInstance.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 std::shared_ptr<spdlog::logger> Logger::m_CoreLogger;

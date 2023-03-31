@@ -11,4 +11,6 @@ public:
     virtual ~SubsystemBase() = default;
 
     virtual bool ShouldTick() { return false; }
+
+    virtual SubsystemBase* Get() { return this; }
 };

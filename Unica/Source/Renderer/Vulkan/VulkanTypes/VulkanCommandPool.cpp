@@ -1,5 +1,6 @@
 ﻿#include "VulkanCommandPool.h"
 
+#include "Log/Logger.h"
 #include "Renderer/Vulkan/VulkanInterface.h"
 #include "Renderer/Vulkan/VulkanQueueFamilyIndices.h"
 

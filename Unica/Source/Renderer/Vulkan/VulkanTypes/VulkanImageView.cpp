@@ -1,5 +1,6 @@
 ﻿#include "VulkanImageView.h"
 
+#include "Log/Logger.h"
 #include "Renderer/Vulkan/VulkanInterface.h"
 
 void VulkanImageView::Init()

@@ -2,11 +2,8 @@
 
 #pragma once
 
-#include <memory>
-
-#include "RenderInterface.h"
 #include "Subsystem/SubsystemBase.h"
-#include "Renderer/Vulkan/VulkanInterface.h"
+#include "Vulkan/VulkanInterface.h"
 
 class RenderManager final : public SubsystemBase
 {

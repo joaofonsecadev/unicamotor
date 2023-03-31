@@ -56,6 +56,10 @@ set(SourceFiles
 )
 add_executable("Unica" ${SourceFiles})
 
+if(MSVC)
+  target_compile_options(Unica PUBLIC "/MP")
+endif()
+
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})
     get_filename_component(SourcePath ${SourceFile} PATH)

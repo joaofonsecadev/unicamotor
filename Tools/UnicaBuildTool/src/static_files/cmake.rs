@@ -17,6 +17,10 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
     source_group(${GroupPath} FILES ${SourceFile})
 endforeach()
 
+if(MSVC)
+  target_compile_options(CUSTOM_PROJECT_NAME_GOES_HERE PUBLIC "/MP")
+endif()
+
 target_include_directories("CUSTOM_PROJECT_NAME_GOES_HERE" PUBLIC
     Source/
 )"#.replace("CUSTOM_PROJECT_NAME_GOES_HERE", &project_name).to_string();

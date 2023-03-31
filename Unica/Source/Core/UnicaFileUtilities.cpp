@@ -7,8 +7,6 @@
 #endif
 #include <fstream>
 
-#include <fmt/format.h>
-
 #include "UnicaMinimal.h"
 #include "UnicaInstance.h"
 
@@ -65,8 +63,7 @@ std::vector<std::filesystem::path> UnicaFileUtilities::GetFilesInPathWithExtensi
 
     if (!std::filesystem::is_directory(PathToSearch))
     {
-        const std::string ErrorMessage = fmt::format("Path '{}' is not valid", PathToSearch.string());
-        UNICA_LOG(spdlog::level::err, ErrorMessage);
+        UNICA_LOG(spdlog::level::err, "Path '{}' is not valid", PathToSearch.string());
         return FinalFilesVector;
     }
     
@@ -104,7 +101,7 @@ std::vector<char> UnicaFileUtilities::ReadFileAsBinary(const std::string& FileLo
 
     if (!FileAsBinary.is_open())
     {
-        UNICA_LOG(spdlog::level::err, fmt::format("Can't open file '{}'", FileDirectory.string()));
+        UNICA_LOG(spdlog::level::err, "Can't open file '{}'", FileDirectory.string());
         return { };
     }
 
@@ -125,7 +122,7 @@ std::string UnicaFileUtilities::ReadFileAsString(const std::string& FileLocation
     std::ifstream FileAsString(FileLocation);
     if (!FileAsString.is_open())
     {
-        UNICA_LOG(spdlog::level::err, fmt::format("Can't open file '{}'", FileDirectory.string()));
+        UNICA_LOG(spdlog::level::err, "Can't open file '{}'", FileDirectory.string());
         return "";
     }
 
@@ -148,7 +145,7 @@ bool UnicaFileUtilities::WriteFile(const std::vector<char>& FileSource, const st
 
     if (!OutputFile)
     {
-        UNICA_LOG(spdlog::level::err, fmt::format("Can't open file '{}' for writting", FileDirectory.string()));
+        UNICA_LOG(spdlog::level::err, "Can't open file '{}' for writting", FileDirectory.string());
         return false;
     }
 

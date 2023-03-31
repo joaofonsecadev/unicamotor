@@ -1,5 +1,6 @@
 ﻿#include "VulkanPipeline.h"
 
+#include "Log/Logger.h"
 #include "Renderer/Vulkan/VulkanInterface.h"
 #include "Renderer/Vulkan/Shaders/ShaderUtilities.h"
 

@@ -5,6 +5,9 @@
 #include <fmt/format.h>
 #include <SDL3/SDL_vulkan.h>
 
+#include "Core/UnicaSettings.h"
+#include "Log/Logger.h"
+
 void VulkanInstance::Init()
 {
     VkApplicationInfo VulkanAppInfo{ };

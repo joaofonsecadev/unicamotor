@@ -8,10 +8,12 @@
 #include <vector>
 
 #include "UnicaFileUtilities.h"
+#include "UnicaInstance.h"
 #include "fmt/format.h"
 #include "shaderc/shaderc.hpp"
 
 #include "UnicaMinimal.h"
+#include "Log/Logger.h"
 #include "VulkanQueueFamilyIndices.h"
 #include "Shaders/ShaderUtilities.h"
 

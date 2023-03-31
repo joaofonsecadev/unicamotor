@@ -1,5 +1,6 @@
 ﻿#include "VulkanRenderPass.h"
 
+#include "Log/Logger.h"
 #include "Renderer/Vulkan/VulkanInterface.h"
 
 void VulkanRenderPass::Init()

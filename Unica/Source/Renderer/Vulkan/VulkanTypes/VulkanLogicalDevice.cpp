@@ -2,6 +2,7 @@
 
 #include <set>
 
+#include "Log/Logger.h"
 #include "Renderer/Vulkan/VulkanQueueFamilyIndices.h"
 #include "Renderer/Vulkan/VulkanInterface.h"
 
