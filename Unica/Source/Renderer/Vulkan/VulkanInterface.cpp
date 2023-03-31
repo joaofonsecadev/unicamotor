@@ -38,6 +38,11 @@ void VulkanInterface::Tick()
 	UNICA_PROFILE_FUNCTION
 	m_SdlRenderWindow->Tick();
 	DrawFrame();
+
+	if (UnicaInstance::HasRequestedExit())
+	{
+		vkDeviceWaitIdle(m_VulkanLogicalDevice->GetVulkanObject());
+	}
 }
 
 void VulkanInterface::DrawFrame()
