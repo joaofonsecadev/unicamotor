@@ -11,8 +11,6 @@ std::filesystem::path UnicaInstance::m_ProjectRootDirectory;
 
 void UnicaInstance::Init()
 {
-    Logger::Init();
-    
     m_SubsystemManager = std::make_unique<SubsystemManager>();
     m_SubsystemManager->Init();
 }
@@ -55,9 +53,29 @@ void UnicaInstance::Tick()
 void UnicaInstance::SetProjectRootDirectory(char* SystemStyledExecutableDirectory)
 {
     const std::filesystem::path ExecutablePath(SystemStyledExecutableDirectory);
+    std::filesystem::path PathBeingValidated = ExecutablePath;
 
-    // TODO: This is only valid for development. Must adapt for the packaging system
-    m_ProjectRootDirectory = ExecutablePath.parent_path().parent_path().parent_path();
+    while (true)
+    {
+        if (ExecutablePath == ExecutablePath.root_path())
+        {
+            UNICA_LOG_CRITICAL("Can't find a valid project root directory. Is the project binary in the correct directory?");
+        }
+
+        std::filesystem::path BaseEnginePath = PathBeingValidated;
+        BaseEnginePath.append("Unica/Config/BaseEngine.ini").make_preferred();
+        if (!exists(BaseEnginePath))
+        {
+            UNICA_LOG_TRACE("Path '{}' is not a valid project root path", PathBeingValidated.string());
+            PathBeingValidated = PathBeingValidated.parent_path();
+            BaseEnginePath = PathBeingValidated;
+            continue;
+        }
+
+        break;
+    }
+
+    m_ProjectRootDirectory = PathBeingValidated;
 }
 
 void UnicaInstance::Shutdown()

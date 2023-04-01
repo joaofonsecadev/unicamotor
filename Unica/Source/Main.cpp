@@ -6,7 +6,8 @@
 int main(int argc, char* argv[])
 {
     const std::unique_ptr<UnicaInstance> EngineInstance(new class UnicaInstance);
-    
+
+    Logger::Init();
     EngineInstance->SetProjectRootDirectory(/* SystemStyledExecutableDirectory */ argv[0]);
     EngineInstance->Init();
 
