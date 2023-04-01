@@ -112,6 +112,7 @@ fn generate_solution_files_list(path: &Path) -> Vec<String> {
         files_to_return.push(found_source_file_string);
     }
 
+    files_to_return.sort();
     return files_to_return;
 }
 
