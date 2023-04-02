@@ -80,7 +80,12 @@ private:
 	std::vector<VkSemaphore> m_SemaphoresRenderFinished;
 	std::vector<VkFence> m_FencesInFlight;
 	
-	const std::vector<const char*> m_RequiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+	const std::vector<const char*> m_RequiredDeviceExtensions = {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+#ifdef __APPLE__
+            "VK_KHR_portability_subset",
+#endif
+    };
 	const std::vector<const char*> m_RequestedValidationLayers = { "VK_LAYER_KHRONOS_validation" };
 
 	const uint8 m_MaxFramesInFlight = 2;
