@@ -72,6 +72,7 @@ void UnicaInstance::SetProjectRootDirectory(char* SystemStyledExecutableDirector
             continue;
         }
 
+        UNICA_LOG_DEBUG("Found a valid Unica path at '{}'", PathBeingValidated.string());
         break;
     }
 
