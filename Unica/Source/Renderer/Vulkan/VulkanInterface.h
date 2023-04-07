@@ -44,6 +44,8 @@ public:
 	
 	std::vector<std::unique_ptr<VulkanFramebuffer>>& GetVulkanFramebuffers() { return m_VulkanFramebuffers; }
 
+	void RecreateSwapChainObjects();
+
 	bool GetValidationLayersEnabled() const { return m_bValidationLayersEnabled; }
 	const std::vector<const char*>& GetRequestedValidationLayers() const { return m_RequestedValidationLayers; }
 	const std::vector<const char*>& GetRequiredDeviceExtensions() const { return m_RequiredDeviceExtensions; }
@@ -58,8 +60,9 @@ private:
 	void InitVulkanImageViews();
 	void InitVulkanFramebuffers();
 	void InitSyncObjects();
-
+	
 	void DestroySyncObjects();
+	void DestroySwapChainObjects();
 
 	std::unique_ptr<SdlRenderWindow> m_SdlRenderWindow = std::make_unique<SdlRenderWindow>();
 

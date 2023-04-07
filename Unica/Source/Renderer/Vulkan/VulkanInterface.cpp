@@ -52,14 +52,22 @@ void VulkanInterface::DrawFrame()
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkWaitForFences");
 		vkWaitForFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &m_FencesInFlight[m_CurrentFrameIndex], VK_TRUE, UINT64_MAX);
 	}
-	{
-		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkResetFences");
-		vkResetFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &m_FencesInFlight[m_CurrentFrameIndex]);
-	}
 	uint32 VulkanImageIndex;
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkAcquireNextImageKHR");
-		vkAcquireNextImageKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain->GetVulkanObject(), UINT64_MAX, m_SemaphoresImageAvailable[m_CurrentFrameIndex], VK_NULL_HANDLE, &VulkanImageIndex);
+		const VkResult AcquireNextImageResult = vkAcquireNextImageKHR(m_VulkanLogicalDevice->GetVulkanObject(), m_VulkanSwapChain->GetVulkanObject(), UINT64_MAX, m_SemaphoresImageAvailable[m_CurrentFrameIndex], VK_NULL_HANDLE, &VulkanImageIndex);
+		if (AcquireNextImageResult == VK_ERROR_OUT_OF_DATE_KHR)
+		{
+			RecreateSwapChainObjects();
+		}
+		else if (AcquireNextImageResult != VK_SUCCESS && AcquireNextImageResult != VK_SUBOPTIMAL_KHR)
+		{
+			UNICA_LOG_CRITICAL("Couldn't acquire a valid swap chain image");
+		}
+	}
+	{
+		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkResetFences");
+		vkResetFences(m_VulkanLogicalDevice->GetVulkanObject(), 1, &m_FencesInFlight[m_CurrentFrameIndex]);
 	}
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkResetCommandBuffer");
@@ -99,7 +107,17 @@ void VulkanInterface::DrawFrame()
 	VulkanPresentInfo.pImageIndices = &VulkanImageIndex;
 	{
 		UNICA_PROFILE_FUNCTION_NAMED("vulkan::vkQueuePresentKHR");
-		vkQueuePresentKHR(m_VulkanLogicalDevice->GetVulkanPresentImagesQueue(), &VulkanPresentInfo);
+		const VkResult QueuePresentResult = vkQueuePresentKHR(m_VulkanLogicalDevice->GetVulkanPresentImagesQueue(), &VulkanPresentInfo);
+
+		if (QueuePresentResult == VK_ERROR_OUT_OF_DATE_KHR || QueuePresentResult == VK_SUBOPTIMAL_KHR || m_SdlRenderWindow->GetWindowResized())
+		{
+			m_SdlRenderWindow->SetWindowResized(false);
+			RecreateSwapChainObjects();
+		}
+		else if (QueuePresentResult != VK_SUCCESS)
+		{
+			UNICA_LOG_CRITICAL("Couldn't present a valid swap chain image");
+		}
 	}
 
 	m_CurrentFrameIndex = (m_CurrentFrameIndex + 1) % m_MaxFramesInFlight;
@@ -153,6 +171,15 @@ void VulkanInterface::InitSyncObjects()
 			UNICA_LOG_CRITICAL("Failed to create Vulkan sync objects for frame {}", FrameIndex);
 		}
 	}
+}
+
+void VulkanInterface::RecreateSwapChainObjects()
+{
+	vkDeviceWaitIdle(m_VulkanLogicalDevice->m_VulkanObject);
+	DestroySwapChainObjects();
+	m_VulkanSwapChain->Init();
+	InitVulkanImageViews();
+	InitVulkanFramebuffers();
 }
 
 VulkanQueueFamilyIndices VulkanInterface::GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice)
@@ -227,18 +254,12 @@ void VulkanInterface::DestroySyncObjects()
 	}
 }
 
-void VulkanInterface::Shutdown()
+void VulkanInterface::DestroySwapChainObjects()
 {
-	DestroySyncObjects();
-	m_VulkanCommandPool->Destroy();
-	
 	for (const std::unique_ptr<VulkanFramebuffer>& VulkanFramebuffer : m_VulkanFramebuffers)
 	{
 		VulkanFramebuffer->Destroy();
 	}
-	
-	m_VulkanPipeline->Destroy();
-	m_VulkanRenderPass->Destroy();
 	
 	for (const std::unique_ptr<VulkanImageView>& VulkanImageView : m_VulkanImageViews)
 	{
@@ -246,6 +267,15 @@ void VulkanInterface::Shutdown()
 	}
 	
 	m_VulkanSwapChain->Destroy();
+}
+
+void VulkanInterface::Shutdown()
+{
+	DestroySwapChainObjects();
+	DestroySyncObjects();
+	m_VulkanCommandPool->Destroy();	
+	m_VulkanPipeline->Destroy();
+	m_VulkanRenderPass->Destroy();	
 	m_VulkanLogicalDevice->Destroy();
 	m_VulkanWindowSurface->Destroy();
 	m_VulkanInstance->Destroy();
