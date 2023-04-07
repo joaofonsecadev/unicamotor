@@ -4,6 +4,7 @@
 
 #include <filesystem>
 
+#include "UnicaMinimal.h"
 #include "Subsystem/SubsystemManager.h"
 
 class UnicaInstance
@@ -21,6 +22,8 @@ public:
 
 private:
     void TickLogic();
+
+    void Sleep(const uint64 NextFrameTimeTargetCount);
     
     std::unique_ptr<SubsystemManager> m_SubsystemManager;
     

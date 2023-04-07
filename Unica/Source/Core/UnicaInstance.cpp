@@ -47,7 +47,13 @@ void UnicaInstance::Tick()
     }
     
 	TimeManager::SetFrameSleepDuration(static_cast<float>(SleepDuration.count()) / 1'000'000);
-    while (std::chrono::steady_clock::now() < NextFrameTimeTarget);
+    Sleep(NextFrameTimeTarget.time_since_epoch().count());
+}
+
+void UnicaInstance::Sleep(const uint64 NextFrameTimeTargetCount)
+{
+    UNICA_PROFILE_FUNCTION
+    while (std::chrono::steady_clock::now().time_since_epoch().count() < NextFrameTimeTargetCount);
 }
 
 void UnicaInstance::SetProjectRootDirectory(char* SystemStyledExecutableDirectory)

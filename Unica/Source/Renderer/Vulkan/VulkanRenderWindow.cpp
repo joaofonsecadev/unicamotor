@@ -50,7 +50,10 @@ void SdlRenderWindow::HandleSdlEvent(const SDL_Event& Event)
         while (m_bWindowIsMinimized)
         {
             SDL_Event WaitEvent;
-            SDL_WaitEvent(&WaitEvent);
+            {
+                UNICA_PROFILE_FUNCTION_NAMED("sdl::SDL_WaitEvent");
+                SDL_WaitEvent(&WaitEvent);
+            }
             if (WaitEvent.type == SDL_EVENT_WINDOW_RESTORED)
             {
                 UNICA_LOG_TRACE("Window has been restored");

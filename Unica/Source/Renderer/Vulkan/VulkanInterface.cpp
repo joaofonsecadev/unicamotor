@@ -175,6 +175,8 @@ void VulkanInterface::InitSyncObjects()
 
 void VulkanInterface::RecreateSwapChainObjects()
 {
+    UNICA_PROFILE_FUNCTION
+
 	vkDeviceWaitIdle(m_VulkanLogicalDevice->m_VulkanObject);
 	DestroySwapChainObjects();
 	m_VulkanSwapChain->Init();
