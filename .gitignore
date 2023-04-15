@@ -12,6 +12,8 @@ Intermediate/
 **.xcodeproj
 .cache
 
+compile_commands.json
+
 Unica/Shaders/**/*.preprocessed
 Unica/Shaders/**/*.spv
 

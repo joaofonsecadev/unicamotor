@@ -9,7 +9,7 @@
 class TimeManager final : public SubsystemBase
 {
 public:
-    static float GetDeltaTimeSeconds() { return m_DeltaTimeMillis / 1000; }
+    static float GetDeltaTimeSeconds() { return m_DeltaTimeMillis / 100; }
     static float GetDeltaTimeMillis() { return m_DeltaTimeMillis; }
 
     static void SetFrameWorkDuration(const float FrameWorkDuration) { m_FrameWorkDuration = FrameWorkDuration; }

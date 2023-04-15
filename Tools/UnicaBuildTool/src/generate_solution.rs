@@ -23,12 +23,39 @@ fn get_cmake_path() -> Option<String> {
     return Some(cmake_path.unwrap().to_str().unwrap().to_string());
 }
 
-fn spawn_cmake_process(cmake_path: &str, generator_type: &str, project_path: &PathBuf) -> bool {
+fn create_compile_commands(global_values: &GlobalValues) {
+    debug!("Attempting to create compile_commands.json, using either Ninja or Make");
+
+    let ninja = which::which("ninja");
+    let make = which::which("make");
+    let generator_type: &str;
+
+    if !ninja.is_err() {
+        generator_type = "Ninja";
+    }
+    else if !make.is_err() {
+        generator_type = "Unix Makefiles";
+    }
+    else {
+        warn!("Can't create compile_commands.json, is Ninja or Make available?");
+        return;
+    }
+
+    spawn_cmake_process(get_cmake_path().unwrap().as_str(), generator_type, "Intermediate/CompileCommands", &global_values.unica_root_path);
+
+    let rename_result = std::fs::rename(global_values.unica_root_path.join("Intermediate/CompileCommands/compile_commands.json"), global_values.unica_root_path.join("compile_commands.json"));
+    if rename_result.is_err() {
+        warn!("Couldn't move the compile_commands.json file from Intermediate/CompileCommands to the project root");
+    }
+    info!("Successfuly created compile_commands.json and moved it to the project root");
+}
+
+fn spawn_cmake_process(cmake_path: &str, generator_type: &str, dest_path: &str, project_path: &PathBuf) -> bool {
     info!(
-        "Executing CMake: {} -S{} -B{} -G{}",
+        "Executing CMake: {} -S{} -B{} -G{} -DCMAKE_EXPORT_COMPILE_COMMANDS=1",
         cmake_path,
         project_path.to_str().unwrap(),
-        project_path.join("Intermediate").to_str().unwrap(),
+        project_path.join(dest_path).to_str().unwrap(),
         generator_type
     );
 
@@ -36,9 +63,10 @@ fn spawn_cmake_process(cmake_path: &str, generator_type: &str, project_path: &Pa
         .arg(format!("-S{}", project_path.to_str().unwrap()))
         .arg(format!(
             "-B{}",
-            project_path.join("Intermediate").to_str().unwrap()
+            project_path.join(dest_path).to_str().unwrap()
         ))
         .arg(format!("-G{}", generator_type))
+        .arg("-DCMAKE_EXPORT_COMPILE_COMMANDS=1")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -221,9 +249,12 @@ pub fn generate_solution(generator_type: &str, global_values: &GlobalValues) -> 
     if !spawn_cmake_process(
         cmake_path.unwrap().as_str(),
         generator_type,
+        "Intermediate",
         &global_values.unica_root_path,
     ) {
         error!("CMake error while generating solution files");
         return;
     }
+
+    create_compile_commands(global_values);
 }
