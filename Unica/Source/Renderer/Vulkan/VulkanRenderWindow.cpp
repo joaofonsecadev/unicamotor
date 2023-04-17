@@ -41,11 +41,13 @@ void SdlRenderWindow::HandleSdlEvent(const SDL_Event& Event)
     switch (Event.type)
     {
     case SDL_EVENT_WINDOW_RESIZED:
-        UNICA_LOG_TRACE("Window has been resized to {}x{}", Event.window.data1, Event.window.data2);
+    {
+        UNICA_LOG_DEBUG("Window has been resized to {}x{}", Event.window.data1, Event.window.data2);
         m_bWindowResized = true;
         break;
+    }    
     case SDL_EVENT_WINDOW_MINIMIZED:
-        UNICA_LOG_TRACE("Window has been minimized");
+        UNICA_LOG_DEBUG("Window has been minimized");
         m_bWindowIsMinimized = true;
         while (m_bWindowIsMinimized)
         {
@@ -63,6 +65,7 @@ void SdlRenderWindow::HandleSdlEvent(const SDL_Event& Event)
         
         break;
     case SDL_EVENT_QUIT:
+        UNICA_LOG_DEBUG("Window's close button (X) was pressed");
         UnicaInstance::RequestExit();
         break;
     default:

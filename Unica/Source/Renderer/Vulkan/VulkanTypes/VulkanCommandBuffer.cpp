@@ -17,6 +17,8 @@ void VulkanCommandBuffer::Init()
     {
         UNICA_LOG_CRITICAL("Failed to allocate VulkanCommandBuffers");
     }
+
+    UNICA_LOG_TRACE("VulkanCommandBuffer created");
 }
 
 void VulkanCommandBuffer::Record(uint8 VulkanCommandBufferIndex, uint32 VulkanImageIndex)

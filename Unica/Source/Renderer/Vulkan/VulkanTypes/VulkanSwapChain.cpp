@@ -62,6 +62,8 @@ void VulkanSwapChain::Init()
 
 	m_VulkanSwapChainImageFormat = SurfaceFormat.format;
 	m_VulkanSwapChainExtent = Extent;
+
+	UNICA_LOG_TRACE("VulkanSwapChain created");
 }
 
 VkSurfaceFormatKHR VulkanSwapChain::SelectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& AvailableSurfaceFormats)
@@ -110,5 +112,6 @@ VkExtent2D VulkanSwapChain::SelectSwapExtent(const VkSurfaceCapabilitiesKHR& Sur
 
 void VulkanSwapChain::Destroy()
 {
+	UNICA_LOG_TRACE("Destroying VulkanSwapChain");
 	vkDestroySwapchainKHR(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), m_VulkanObject, nullptr);
 }

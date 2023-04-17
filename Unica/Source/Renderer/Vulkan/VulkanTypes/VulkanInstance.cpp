@@ -46,7 +46,7 @@ void VulkanInstance::Init()
     {
         UNICA_LOG(spdlog::level::critical, "Couldn't create Vulkan instance");
     }
-    UNICA_LOG(spdlog::level::info, "Vulkan instance created");
+    UNICA_LOG(spdlog::level::trace, "VulkanInstance created");
 
     CreateVulkanDebugMessenger();
 }
@@ -198,6 +198,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanInstance::VulkanDebugCallback(VkDebugUtilsM
 
 void VulkanInstance::Destroy()
 {
+    UNICA_LOG_TRACE("Destroying VulkanInstance");
     if (m_OwningVulkanAPI->GetValidationLayersEnabled())
     {
         DestroyVulkanDebugUtilsMessengerEXT(m_VulkanObject, m_VulkanDebugMessenger, nullptr);

@@ -56,9 +56,12 @@ void VulkanLogicalDevice::Init()
 	
 	vkGetDeviceQueue(m_VulkanObject, QueueFamilyIndices.GetGraphicsFamily().value(), 0, &m_VulkanGraphicsQueue);
 	vkGetDeviceQueue(m_VulkanObject, QueueFamilyIndices.GetPresentImagesFamily().value(), 0, &m_VulkanPresentImagesQueue);
+
+	UNICA_LOG_TRACE("VulkanLogicalDevice created");
 }
 
 void VulkanLogicalDevice::Destroy()
 {
+	UNICA_LOG_TRACE("Destroying VulkanLogicalDevice");
     vkDestroyDevice(m_VulkanObject, nullptr);
 }

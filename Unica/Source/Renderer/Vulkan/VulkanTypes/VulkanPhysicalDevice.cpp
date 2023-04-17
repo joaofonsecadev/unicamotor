@@ -39,6 +39,10 @@ void VulkanPhysicalDevice::Init()
         UNICA_LOG(spdlog::level::critical, "No suitable GPU found");
         return;
     }
+    
+    VkPhysicalDeviceProperties VulkanPhysicalDeviceProperties;
+    vkGetPhysicalDeviceProperties(m_VulkanObject, &VulkanPhysicalDeviceProperties);
+    UNICA_LOG_DEBUG("Selected VulkanPhysicalDevice '{}'", VulkanPhysicalDeviceProperties.deviceName);
 }
 
 uint32 VulkanPhysicalDevice::RateVulkanPhysicalDevice(const VkPhysicalDevice& VulkanPhysicalDevice) const

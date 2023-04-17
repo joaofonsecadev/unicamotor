@@ -17,9 +17,12 @@ void VulkanCommandPool::Init()
     {
         UNICA_LOG(spdlog::level::critical, "Failed to create the VulkanCommandPool");
     }
+
+    UNICA_LOG_TRACE("VulkanCommandPool created");
 }
 
 void VulkanCommandPool::Destroy()
 {
+    UNICA_LOG_TRACE("Destroying VulkanCommandPool");
     vkDestroyCommandPool(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), m_VulkanObject, nullptr);
 }

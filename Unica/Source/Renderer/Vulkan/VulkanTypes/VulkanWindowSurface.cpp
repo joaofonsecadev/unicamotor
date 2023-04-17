@@ -13,9 +13,11 @@ void VulkanWindowSurface::Init()
     {
         UNICA_LOG(spdlog::level::critical, "Failed to create SDLVulkanWindowSurface");
     }
+    UNICA_LOG_TRACE("VulkanWindowSurface created");
 }
 
 void VulkanWindowSurface::Destroy()
 {
+    UNICA_LOG_TRACE("Destroying VulkanWindowSurface");
     vkDestroySurfaceKHR(m_OwningVulkanAPI->GetVulkanInstance()->GetVulkanObject(), m_VulkanObject, nullptr);
 }

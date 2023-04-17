@@ -44,9 +44,12 @@ void VulkanRenderPass::Init()
     {
         UNICA_LOG(spdlog::level::critical, "Failed to create VulkanRenderPass");
     }
+
+    UNICA_LOG_TRACE("VulkanRenderPass created");
 }
 
 void VulkanRenderPass::Destroy()
 {
+    UNICA_LOG_TRACE("Destroying VulkanRenderPass");
     vkDestroyRenderPass(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), m_VulkanObject, nullptr);
 }

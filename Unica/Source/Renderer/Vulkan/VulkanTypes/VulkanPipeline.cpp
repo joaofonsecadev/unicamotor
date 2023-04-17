@@ -123,6 +123,8 @@ void VulkanPipeline::Init()
 	// Cleanup shader modules since they've already been created
 	vkDestroyShaderModule(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), VertShaderModule, nullptr);
 	vkDestroyShaderModule(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), FragShaderModule, nullptr);
+
+	UNICA_LOG_TRACE("VulkanPipeline created");
 }
 
 VkShaderModule VulkanPipeline::CreateShaderModule(const std::vector<char>& ShaderBinary)
@@ -143,6 +145,7 @@ VkShaderModule VulkanPipeline::CreateShaderModule(const std::vector<char>& Shade
 
 void VulkanPipeline::Destroy()
 {
+	UNICA_LOG_TRACE("Destroying VulkanPipeline");
 	vkDestroyPipeline(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), m_VulkanObject, nullptr);
 	vkDestroyPipelineLayout(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), m_VulkanPipelineLayout, nullptr);
 }

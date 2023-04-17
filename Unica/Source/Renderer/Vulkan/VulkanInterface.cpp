@@ -31,6 +31,8 @@ void VulkanInterface::Init()
 	m_VulkanCommandPool->Init();
 	m_VulkanCommandBuffer->Init();
 	InitSyncObjects();
+
+	UNICA_LOG_INFO("VulkanInterface created successfuly");
 }
 
 void VulkanInterface::Tick()
@@ -133,6 +135,7 @@ void VulkanInterface::InitVulkanImageViews()
 		m_VulkanImageViews[SwapChainImageIteration]->Init();
 		SwapChainImageIteration++;
 	}
+	UNICA_LOG_TRACE("VulkanImageViews created");
 }
 
 void VulkanInterface::InitVulkanFramebuffers()
@@ -145,6 +148,8 @@ void VulkanInterface::InitVulkanFramebuffers()
 		m_VulkanFramebuffers[SwapChainImageViewLoopIndex]->Init();
 		SwapChainImageViewLoopIndex++;
 	}
+
+	UNICA_LOG_TRACE("VulkanFramebuffers created");
 }
 
 void VulkanInterface::InitSyncObjects()
@@ -177,6 +182,7 @@ void VulkanInterface::RecreateSwapChainObjects()
 {
     UNICA_PROFILE_FUNCTION
 
+	UNICA_LOG_TRACE("Recreating SwapChainObjects");
 	vkDeviceWaitIdle(m_VulkanLogicalDevice->m_VulkanObject);
 	DestroySwapChainObjects();
 	m_VulkanSwapChain->Init();
@@ -248,6 +254,7 @@ VulkanSwapChainSupportDetails VulkanInterface::QuerySwapChainSupport(const VkPhy
 
 void VulkanInterface::DestroySyncObjects()
 {
+	UNICA_LOG_TRACE("Destroying SyncObjects");
 	for (uint8 FrameIndex = 0; FrameIndex < m_MaxFramesInFlight; FrameIndex++)
 	{
 		vkDestroySemaphore(m_VulkanLogicalDevice->GetVulkanObject(), m_SemaphoresImageAvailable[FrameIndex], nullptr);
@@ -258,6 +265,7 @@ void VulkanInterface::DestroySyncObjects()
 
 void VulkanInterface::DestroySwapChainObjects()
 {
+	UNICA_LOG_TRACE("Destroying SwapChainObjects");
 	for (const std::unique_ptr<VulkanFramebuffer>& VulkanFramebuffer : m_VulkanFramebuffers)
 	{
 		VulkanFramebuffer->Destroy();
@@ -281,4 +289,6 @@ void VulkanInterface::Shutdown()
 	m_VulkanLogicalDevice->Destroy();
 	m_VulkanWindowSurface->Destroy();
 	m_VulkanInstance->Destroy();
+
+	UNICA_LOG_INFO("VulkanInterface has been destroyed");
 }
