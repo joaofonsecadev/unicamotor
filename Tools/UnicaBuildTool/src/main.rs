@@ -13,6 +13,7 @@ mod create_project;
 mod generate_solution;
 mod static_files;
 mod utils;
+mod build;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -24,6 +25,10 @@ struct CliArgs {
     /// Create a new Unica project with a given name
     #[arg(short = 'C', long, value_name = "PROJECT_NAME")]
     create_unica_project_overwrite: Option<String>,
+
+    /// Build the project using Ninja
+    #[arg(short, long)]
+    build: bool,
 
     /// Generate OS appropriate solution files
     #[arg(short, long)]
@@ -106,6 +111,10 @@ fn main() {
 
     if command_line_args.compile_shaders {
         compile_shaders::compile_shaders(&global_values);
+    }
+    
+    if command_line_args.build {
+        build::build(&global_values);
     }
 
     if command_line_args.clean {

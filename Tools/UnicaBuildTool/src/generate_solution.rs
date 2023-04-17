@@ -24,33 +24,29 @@ fn get_cmake_path() -> Option<String> {
 }
 
 fn create_compile_commands(global_values: &GlobalValues) {
-    debug!("Attempting to create compile_commands.json, using either Ninja or Make");
+    debug!("Attempting to create compile_commands.json, using Ninja");
 
     let ninja = which::which("ninja");
-    let make = which::which("make");
     let generator_type: &str;
 
     if !ninja.is_err() {
         generator_type = "Ninja";
     }
-    else if !make.is_err() {
-        generator_type = "Unix Makefiles";
-    }
     else {
-        warn!("Can't create compile_commands.json, is Ninja or Make available?");
+        warn!("Can't create compile_commands.json, is Ninja available?");
         return;
     }
 
-    spawn_cmake_process(get_cmake_path().unwrap().as_str(), generator_type, "Intermediate/CompileCommands", &global_values.unica_root_path);
+    spawn_cmake_process(get_cmake_path().unwrap().as_str(), generator_type, "Intermediate/Ninja", &global_values.unica_root_path);
 
-    let rename_result = std::fs::rename(global_values.unica_root_path.join("Intermediate/CompileCommands/compile_commands.json"), global_values.unica_root_path.join("compile_commands.json"));
+    let rename_result = std::fs::rename(global_values.unica_root_path.join("Intermediate/Ninja/compile_commands.json"), global_values.unica_root_path.join("compile_commands.json"));
     if rename_result.is_err() {
-        warn!("Couldn't move the compile_commands.json file from Intermediate/CompileCommands to the project root");
+        warn!("Couldn't move the compile_commands.json file from Intermediate/Ninja to the project root");
     }
     info!("Successfuly created compile_commands.json and moved it to the project root");
 }
 
-fn spawn_cmake_process(cmake_path: &str, generator_type: &str, dest_path: &str, project_path: &PathBuf) -> bool {
+pub fn spawn_cmake_process(cmake_path: &str, generator_type: &str, dest_path: &str, project_path: &PathBuf) -> bool {
     info!(
         "Executing CMake: {} -S{} -B{} -G{} -DCMAKE_EXPORT_COMPILE_COMMANDS=1",
         cmake_path,
