@@ -30,7 +30,7 @@ fn create_compile_commands(global_values: &GlobalValues) {
     let generator_type: &str;
 
     if !ninja.is_err() {
-        generator_type = "Ninja";
+        generator_type = "Ninja Multi-Config";
     }
     else {
         warn!("Can't create compile_commands.json, is Ninja available?");
