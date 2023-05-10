@@ -21,6 +21,8 @@ SdlRenderWindow::SdlRenderWindow()
     }
 
     SDL_SetWindowMinimumSize(m_SdlWindow, 260, 144);
+
+    UNICA_LOG_TRACE("SDL window created");
 }
 
 void SdlRenderWindow::Tick()
@@ -75,6 +77,7 @@ void SdlRenderWindow::HandleSdlEvent(const SDL_Event& Event)
 
 SdlRenderWindow::~SdlRenderWindow()
 {
+    UNICA_LOG_TRACE("Destroying SDL window");
     SDL_DestroyWindow(m_SdlWindow);
     SDL_Quit();
 }

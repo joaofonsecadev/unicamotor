@@ -61,6 +61,7 @@ void VulkanInterface::DrawFrame()
 		if (AcquireNextImageResult == VK_ERROR_OUT_OF_DATE_KHR)
 		{
 			RecreateSwapChainObjects();
+			return;
 		}
 		else if (AcquireNextImageResult != VK_SUCCESS && AcquireNextImageResult != VK_SUBOPTIMAL_KHR)
 		{
