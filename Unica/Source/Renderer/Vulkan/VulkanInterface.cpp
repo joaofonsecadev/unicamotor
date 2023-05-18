@@ -29,6 +29,7 @@ void VulkanInterface::Init()
 	m_VulkanPipeline->Init();
 	InitVulkanFramebuffers();
 	m_VulkanCommandPool->Init();
+	m_VulkanVertexBuffer->Init();
 	m_VulkanCommandBuffer->Init();
 	InitSyncObjects();
 
@@ -283,6 +284,7 @@ void VulkanInterface::DestroySwapChainObjects()
 void VulkanInterface::Shutdown()
 {
 	DestroySwapChainObjects();
+	m_VulkanVertexBuffer->Destroy();
 	DestroySyncObjects();
 	m_VulkanCommandPool->Destroy();	
 	m_VulkanPipeline->Destroy();

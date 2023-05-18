@@ -62,7 +62,11 @@ void VulkanCommandBuffer::Record(uint8 VulkanCommandBufferIndex, uint32 VulkanIm
     Scissor.extent = m_OwningVulkanAPI->GetVulkanSwapChain()->GetVulkanExtent();
     vkCmdSetScissor(m_VulkanCommandBuffers[VulkanCommandBufferIndex], 0, 1, &Scissor);
 
-    vkCmdDraw(m_VulkanCommandBuffers[VulkanCommandBufferIndex], 3, 1, 0, 0);
+    VkBuffer VulkanVertexBuffers[] = { m_OwningVulkanAPI->GetVulkanVertexBuffer()->m_VulkanObject };
+    VkDeviceSize DeviceOffsets[] = { 0 };
+    vkCmdBindVertexBuffers(m_VulkanCommandBuffers[VulkanCommandBufferIndex], 0, 1, VulkanVertexBuffers, DeviceOffsets);
+
+    vkCmdDraw(m_VulkanCommandBuffers[VulkanCommandBufferIndex], static_cast<uint32>(m_OwningVulkanAPI->GetHardcodedVertices().size()), 1, 0, 0);
     vkCmdEndRenderPass(m_VulkanCommandBuffers[VulkanCommandBufferIndex]);
     if (vkEndCommandBuffer(m_VulkanCommandBuffers[VulkanCommandBufferIndex]) != VK_SUCCESS)
     {

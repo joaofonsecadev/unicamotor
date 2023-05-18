@@ -46,8 +46,12 @@ set(SourceFiles
     Source/Renderer/Vulkan/VulkanTypes/VulkanRenderPass.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanSwapChain.cpp
     Source/Renderer/Vulkan/VulkanTypes/VulkanSwapChain.h
+    Source/Renderer/Vulkan/VulkanTypes/VulkanVertexBuffer.cpp
+    Source/Renderer/Vulkan/VulkanTypes/VulkanVertexBuffer.h
     Source/Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.cpp
     Source/Renderer/Vulkan/VulkanTypes/VulkanWindowSurface.h
+    Source/Renderer/Vulkan/VulkanVertex.cpp
+    Source/Renderer/Vulkan/VulkanVertex.h
     Source/Subsystem/SubsystemBase.h
     Source/Subsystem/SubsystemManager.cpp
     Source/Subsystem/SubsystemManager.h

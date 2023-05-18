@@ -8,6 +8,7 @@
 #include "UnicaMinimal.h"
 #include "VulkanRenderWindow.h"
 #include "VulkanSwapChainSupportDetails.h"
+#include "VulkanVertex.h"
 #include "Renderer/RenderInterface.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanInstance.h"
 #include "Renderer/Vulkan/VulkanTypes/VulkanPhysicalDevice.h"
@@ -20,6 +21,7 @@
 #include "VulkanTypes/VulkanPipeline.h"
 #include "VulkanTypes/VulkanRenderPass.h"
 #include "VulkanTypes/VulkanSwapChain.h"
+#include "VulkanTypes/VulkanVertexBuffer.h"
 
 class RenderManager;
 class VulkanInstance;
@@ -41,6 +43,7 @@ public:
 	VulkanRenderPass* GetVulkanRenderPass() const { return m_VulkanRenderPass.get(); }
 	VulkanPipeline* GetVulkanPipeline() const { return m_VulkanPipeline.get(); }
 	VulkanCommandPool* GetVulkanCommandPool() const { return m_VulkanCommandPool.get(); }
+	VulkanVertexBuffer* GetVulkanVertexBuffer() const { return m_VulkanVertexBuffer.get(); }
 	
 	std::vector<std::unique_ptr<VulkanFramebuffer>>& GetVulkanFramebuffers() { return m_VulkanFramebuffers; }
 
@@ -53,6 +56,8 @@ public:
 	uint8 GetMaxFramesInFlight() const { return m_MaxFramesInFlight; }
 	VulkanQueueFamilyIndices GetDeviceQueueFamilies(const VkPhysicalDevice& VulkanPhysicalDevice);
 	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
+
+	const std::vector<VulkanVertex>& GetHardcodedVertices() const { return m_HardcodedVertices; }
 
 private:
 	void DrawFrame();
@@ -75,6 +80,7 @@ private:
 	std::unique_ptr<VulkanPipeline> m_VulkanPipeline = std::make_unique<VulkanPipeline>(this);
 	std::unique_ptr<VulkanCommandPool> m_VulkanCommandPool = std::make_unique<VulkanCommandPool>(this);
 	std::unique_ptr<VulkanCommandBuffer> m_VulkanCommandBuffer = std::make_unique<VulkanCommandBuffer>(this);
+	std::unique_ptr<VulkanVertexBuffer> m_VulkanVertexBuffer = std::make_unique<VulkanVertexBuffer>(this);
 
 	std::vector<std::unique_ptr<VulkanImageView>> m_VulkanImageViews;
 	std::vector<std::unique_ptr<VulkanFramebuffer>> m_VulkanFramebuffers;
@@ -93,6 +99,12 @@ private:
 
 	const uint8 m_MaxFramesInFlight = 2;
 	uint8 m_CurrentFrameIndex = 0;
+
+	const std::vector<VulkanVertex> m_HardcodedVertices = {
+		{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
+		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+	};
 
 private:
 #if UNICA_SHIPPING

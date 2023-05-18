@@ -2,6 +2,7 @@
 
 #include "Log/Logger.h"
 #include "Renderer/Vulkan/VulkanInterface.h"
+#include "Renderer/Vulkan/VulkanVertex.h"
 #include "Renderer/Vulkan/Shaders/ShaderUtilities.h"
 
 void VulkanPipeline::Init()
@@ -32,12 +33,15 @@ void VulkanPipeline::Init()
 	PipelineDynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(PipelineDynamicStates.size());
 	PipelineDynamicCreateInfo.pDynamicStates = PipelineDynamicStates.data();
 
+	const VkVertexInputBindingDescription VertexBindingDescription = VulkanVertex::GetBindingDescription();
+	const std::array<VkVertexInputAttributeDescription, 2> VertexAttributeDescriptions = VulkanVertex::GetAttributeDescriptions();
+
 	VkPipelineVertexInputStateCreateInfo PipelineVertexInputCreateInfo { };
 	PipelineVertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	PipelineVertexInputCreateInfo.vertexBindingDescriptionCount = 0;
-	PipelineVertexInputCreateInfo.pVertexBindingDescriptions = nullptr;
-	PipelineVertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
-	PipelineVertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;
+	PipelineVertexInputCreateInfo.vertexBindingDescriptionCount = 1;
+	PipelineVertexInputCreateInfo.pVertexBindingDescriptions = &VertexBindingDescription;
+	PipelineVertexInputCreateInfo.vertexAttributeDescriptionCount = VertexAttributeDescriptions.size();
+	PipelineVertexInputCreateInfo.pVertexAttributeDescriptions = VertexAttributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo PipelineInputAssemblyCreateInfo{};
 	PipelineInputAssemblyCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
