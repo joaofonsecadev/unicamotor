@@ -57,4 +57,5 @@ uint32 VulkanVertexBuffer::FindGpuMemoryType(uint32 TypeFilter, VkMemoryProperty
 void VulkanVertexBuffer::Destroy()
 {
     vkDestroyBuffer(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), m_VulkanObject, nullptr);
+    vkFreeMemory(m_OwningVulkanAPI->GetVulkanLogicalDevice()->GetVulkanObject(), m_VulkanDeviceMemory, nullptr);
 }
