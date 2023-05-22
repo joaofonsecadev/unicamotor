@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Managed/ManagedInterface.h"
 #include "Subsystem/SubsystemBase.h"
 #include "Vulkan/VulkanInterface.h"
 
@@ -13,5 +14,5 @@ private:
     void Shutdown() override;
     bool ShouldTick() override { return true; }
 
-    std::unique_ptr<RenderInterface> m_RenderInterface = std::make_unique<VulkanInterface>();
+    std::unique_ptr<RenderInterface> m_RenderInterface = std::make_unique<ManagedInterface>();
 };

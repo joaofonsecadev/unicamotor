@@ -4,11 +4,11 @@
 
 #include "SDL3/SDL.h"
 
-class SdlRenderWindow
+class RenderWindow
 {
 public:
-    SdlRenderWindow();
-    ~SdlRenderWindow();
+    RenderWindow();
+    ~RenderWindow();
 
     void Tick();
 
@@ -21,8 +21,8 @@ public:
     void SetWindowResized(const bool Value) { m_bWindowResized = Value; }
 
 private:
+    SDL_Window* m_SdlWindow = nullptr;
     
-    SDL_Window* m_SdlWindow;
     bool m_bWindowResized = false;
     bool m_bWindowIsMinimized = false;
 };

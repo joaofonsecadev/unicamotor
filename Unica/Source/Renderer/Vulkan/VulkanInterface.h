@@ -6,7 +6,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "UnicaMinimal.h"
-#include "VulkanRenderWindow.h"
+#include "Renderer/RenderWindow.h"
 #include "VulkanSwapChainSupportDetails.h"
 #include "VulkanVertex.h"
 #include "Renderer/RenderInterface.h"
@@ -34,7 +34,7 @@ public:
 	void Tick() override;
 	void Shutdown() override;
 
-	SdlRenderWindow* GetSdlRenderWindow() const { return m_SdlRenderWindow.get(); }
+	RenderWindow* GetSdlRenderWindow() const { return m_SdlRenderWindow.get(); }
 	VulkanInstance* GetVulkanInstance() const { return m_VulkanInstance.get(); }
 	VulkanWindowSurface* GetVulkanWindowSurface() const { return m_VulkanWindowSurface.get(); }
 	VulkanPhysicalDevice* GetVulkanPhysicalDevice() const { return m_VulkanPhysicalDevice.get(); }
@@ -69,7 +69,7 @@ private:
 	void DestroySyncObjects();
 	void DestroySwapChainObjects();
 
-	std::unique_ptr<SdlRenderWindow> m_SdlRenderWindow = std::make_unique<SdlRenderWindow>();
+	std::unique_ptr<RenderWindow> m_SdlRenderWindow = std::make_unique<RenderWindow>();
 
 	std::unique_ptr<VulkanInstance> m_VulkanInstance = std::make_unique<VulkanInstance>(this);
 	std::unique_ptr<VulkanWindowSurface> m_VulkanWindowSurface = std::make_unique<VulkanWindowSurface>(this);

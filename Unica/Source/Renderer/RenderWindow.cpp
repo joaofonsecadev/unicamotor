@@ -1,13 +1,13 @@
 // 2022-2023 Copyright joaofonseca.dev, All Rights Reserved.
 
-#include "VulkanRenderWindow.h"
+#include "RenderWindow.h"
 
 #include "UnicaInstance.h"
 #include "UnicaMinimal.h"
 #include "Log/Logger.h"
 #include "UnicaSettings.h"
 
-SdlRenderWindow::SdlRenderWindow()
+RenderWindow::RenderWindow()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -25,7 +25,7 @@ SdlRenderWindow::SdlRenderWindow()
     UNICA_LOG_TRACE("SDL window created");
 }
 
-void SdlRenderWindow::Tick()
+void RenderWindow::Tick()
 {
     UNICA_PROFILE_FUNCTION
     SDL_Event SdlEvent;
@@ -37,7 +37,7 @@ void SdlRenderWindow::Tick()
     HandleSdlEvent(SdlEvent);
 }
 
-void SdlRenderWindow::HandleSdlEvent(const SDL_Event& Event)
+void RenderWindow::HandleSdlEvent(const SDL_Event& Event)
 {
     UNICA_PROFILE_FUNCTION
     switch (Event.type)
@@ -75,7 +75,7 @@ void SdlRenderWindow::HandleSdlEvent(const SDL_Event& Event)
     }
 }
 
-SdlRenderWindow::~SdlRenderWindow()
+RenderWindow::~RenderWindow()
 {
     UNICA_LOG_TRACE("Destroying SDL window");
     SDL_DestroyWindow(m_SdlWindow);
