@@ -1,6 +1,6 @@
 ﻿#include "VulkanSwapChain.h"
 
-#include "Log/Logger.h"
+#include "Logging/Logger.h"
 #include "Renderer/Vulkan/VulkanInterface.h"
 #include "Renderer/Vulkan/VulkanSwapChainSupportDetails.h"
 #include "Renderer/Vulkan/VulkanQueueFamilyIndices.h"

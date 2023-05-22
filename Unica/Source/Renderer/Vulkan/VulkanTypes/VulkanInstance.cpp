@@ -6,7 +6,7 @@
 #include <SDL3/SDL_vulkan.h>
 
 #include "Core/UnicaSettings.h"
-#include "Log/Logger.h"
+#include "Logging/Logger.h"
 
 void VulkanInstance::Init()
 {

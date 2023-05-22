@@ -4,7 +4,7 @@
 
 #include <tracy/Tracy.hpp>
 
-#include "Log/Logger.h"
+#include "Logging/Logger.h"
 
 typedef int8_t int8;
 typedef int16_t int16;

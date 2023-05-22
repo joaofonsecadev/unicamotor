@@ -10,8 +10,8 @@ set(SourceFiles
     Source/Core/UnicaInstance.h
     Source/Core/UnicaMinimal.h
     Source/Core/UnicaSettings.h
-    Source/Log/Logger.cpp
-    Source/Log/Logger.h
+    Source/Logging/Logger.cpp
+    Source/Logging/Logger.h
     Source/Main.cpp
     Source/Renderer/Managed/ManagedInterface.cpp
     Source/Renderer/Managed/ManagedInterface.h

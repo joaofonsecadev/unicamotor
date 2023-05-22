@@ -14,5 +14,5 @@ private:
     void Shutdown() override;
     bool ShouldTick() override { return true; }
 
-    std::unique_ptr<RenderInterface> m_RenderInterface = std::make_unique<ManagedInterface>();
+    std::unique_ptr<RenderInterface> m_RenderInterface = std::make_unique<VulkanInterface>();
 };

@@ -13,7 +13,6 @@
 #include "shaderc/shaderc.hpp"
 
 #include "UnicaMinimal.h"
-#include "Log/Logger.h"
 #include "VulkanQueueFamilyIndices.h"
 #include "Shaders/ShaderUtilities.h"
 

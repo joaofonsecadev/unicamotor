@@ -10,7 +10,7 @@
 #include <shaderc/shaderc.hpp>
 
 #include "UnicaFileUtilities.h"
-#include "Log/Logger.h"
+#include "Logging/Logger.h"
 
 std::vector<char> ShaderUtilities::LoadShader(const std::string& FileLocation)
 {
