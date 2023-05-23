@@ -294,3 +294,5 @@ void VulkanInterface::Shutdown()
 
 	UNICA_LOG_INFO("VulkanInterface has been destroyed");
 }
+
+

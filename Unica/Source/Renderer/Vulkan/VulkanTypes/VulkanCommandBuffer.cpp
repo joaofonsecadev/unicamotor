@@ -65,8 +65,9 @@ void VulkanCommandBuffer::Record(uint8 VulkanCommandBufferIndex, uint32 VulkanIm
     VkBuffer VulkanVertexBuffers[] = { m_OwningVulkanAPI->GetVulkanVertexBuffer()->m_VulkanObject };
     VkDeviceSize DeviceOffsets[] = { 0 };
     vkCmdBindVertexBuffers(m_VulkanCommandBuffers[VulkanCommandBufferIndex], 0, 1, VulkanVertexBuffers, DeviceOffsets);
+    vkCmdBindIndexBuffer(m_VulkanCommandBuffers[VulkanCommandBufferIndex], m_OwningVulkanAPI->GetVulkanVertexBuffer()->GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16);
 
-    vkCmdDraw(m_VulkanCommandBuffers[VulkanCommandBufferIndex], static_cast<uint32>(m_OwningVulkanAPI->GetHardcodedVertices().size()), 1, 0, 0);
+    vkCmdDrawIndexed(m_VulkanCommandBuffers[VulkanCommandBufferIndex], static_cast<uint32>(m_OwningVulkanAPI->GetHardcodedIndices().size()), 1, 0, 0, 0);
     vkCmdEndRenderPass(m_VulkanCommandBuffers[VulkanCommandBufferIndex]);
     if (vkEndCommandBuffer(m_VulkanCommandBuffers[VulkanCommandBufferIndex]) != VK_SUCCESS)
     {

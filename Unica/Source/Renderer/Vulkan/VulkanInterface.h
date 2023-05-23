@@ -58,6 +58,8 @@ public:
 	VulkanSwapChainSupportDetails QuerySwapChainSupport(const VkPhysicalDevice& VulkanPhysicalDevice);
 
 	const std::vector<VulkanVertex>& GetHardcodedVertices() const { return m_HardcodedVertices; }
+	const std::vector<uint16>& GetHardcodedIndices() const { return m_HardcodedIndices; }
+
 
 private:
 	void DrawFrame();
@@ -101,9 +103,14 @@ private:
 	uint8 m_CurrentFrameIndex = 0;
 
 	const std::vector<VulkanVertex> m_HardcodedVertices = {
-		{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	};
+
+	const std::vector<uint16> m_HardcodedIndices = {
+		0, 1, 2, 2, 3, 0
 	};
 
 private:
