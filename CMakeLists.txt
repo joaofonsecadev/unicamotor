@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 project(unicamotor LANGUAGES CXX)
 set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 set(CMAKE_CXX_STANDARD          20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,11 +14,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # Project source files
 set(SourceFiles
-    src/main.cpp
+        src/main.cpp
+        src/core/unicamotor.cpp
+        src/core/unicamotor.h
+        src/core/version.h
+        src/subsystem/subsystem.h
+        src/core/arguments.cpp
+        src/core/arguments.h
 )
 
+add_subdirectory(external EXCLUDE_FROM_ALL)
+
 add_executable(unicamotor ${SourceFiles})
-target_include_directories(unicamotor PUBLIC src)
+target_include_directories(unicamotor PRIVATE src)
+target_link_libraries(unicamotor PRIVATE spdlog::spdlog Tracy::TracyClient)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})
