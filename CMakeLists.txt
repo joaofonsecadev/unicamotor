@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 3.21)
+
+project(unicamotor LANGUAGES CXX)
+set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
+
+set(CMAKE_CXX_STANDARD          20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS        OFF)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+# Project source files
+set(SourceFiles
+    src/main.cpp
+)
+
+add_executable(unicamotor ${SourceFiles})
+target_include_directories(unicamotor PUBLIC src)
+
+# Create file structure in IDE
+foreach(SourceFile IN ITEMS ${SourceFiles})
+    get_filename_component(SourcePath ${SourceFile} PATH)
+    string(REPLACE ${CMAKE_SOURCE_DIR} "" GroupPath ${SourcePath})
+    string(REPLACE "/" "\\" GroupPath ${GroupPath})
+    source_group(${GroupPath} FILES ${SourceFile})
+endforeach()
+
