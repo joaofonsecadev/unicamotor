@@ -1,3 +1,5 @@
+#include "tracy/Tracy.hpp"
+
 #include "spdlog/spdlog.h"
 #include "spdlog/async.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -24,6 +26,7 @@ void DefaultCommandLineParsing(int argc, char* argv[])
     CommandLineParser& command_line_parser = CommandLineParser::Get();
     command_line_parser.SetArgumentInput(argc, argv);
     command_line_parser.AddArgumentToParse({ "-n", "--network-mode" });
+    command_line_parser.AddArgumentToParse({ "-t", "--target-frame-time-ms" });
 
     command_line_parser.Parse();
 
@@ -58,9 +61,10 @@ int main(int argc, char* argv[])
     }
 
     Unicamotor engine(network_mode);
-    while (!engine.HasExitBeenRequested())
+    while (!Unicamotor::HasExitBeenRequested())
     {
         engine.Tick();
+        FrameMarkNamed("EngineLoop");
     }
 
     return 0;

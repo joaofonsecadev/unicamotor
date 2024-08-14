@@ -21,6 +21,8 @@ set(SourceFiles
         src/subsystem/subsystem.h
         src/core/arguments.cpp
         src/core/arguments.h
+        src/timer/timer_subsystem.cpp
+        src/timer/timer_subsystem.h
 )
 
 add_subdirectory(external EXCLUDE_FROM_ALL)

@@ -2,6 +2,12 @@
 
 #include <utility>
 #include <vector>
+#include <unordered_map>
+#include <memory>
+
+#include "subsystem/subsystem.h"
+
+class TimerSubsystem;
 
 enum UnicamotorNetworkMode : uint8_t
 {
@@ -13,16 +19,22 @@ enum UnicamotorNetworkMode : uint8_t
 class Unicamotor
 {
 public:
-    Unicamotor() = default;
-    Unicamotor(const UnicamotorNetworkMode network_mode) : m_network_mode(network_mode) { }
+    Unicamotor();
+    explicit Unicamotor(const UnicamotorNetworkMode network_mode) : Unicamotor() { m_network_mode = network_mode; }
 
     void Tick();
 
     static void RequestExit() { m_requested_exit = true; }
-    bool HasExitBeenRequested() { return m_requested_exit; }
+    static bool HasExitBeenRequested() { return m_requested_exit; }
 
 private:
+    void InitializeSubsystems();
+
     UnicamotorNetworkMode m_network_mode = UnicamotorNetworkMode::Standalone;
+    std::unordered_map<std::string, Subsystem*> m_subsystems_map;
+    std::vector<std::unique_ptr<Subsystem>> m_subsystems_vector;
+
+    TimerSubsystem* m_timer_subsystem = nullptr;
 
     static bool m_requested_exit;
 };
