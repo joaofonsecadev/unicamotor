@@ -1,4 +1,5 @@
 #include "arguments.h"
+#include "spdlog/spdlog-inl.h"
 
 void CommandLineParser::SetArgumentInput(int argc, char* argv[])
 {
@@ -60,7 +61,7 @@ void CommandLineParser::Parse()
     }
 }
 
-std::string* CommandLineParser::GetArgumentValue(std::string& argument_long_name)
+std::string* CommandLineParser::GetArgumentValue(const std::string& argument_long_name)
 {
     auto found_short_argument = m_short_arguments.find(argument_long_name);
     if (found_short_argument != m_short_arguments.end())
@@ -86,4 +87,29 @@ void CommandLineParser::AddArgumentToParse(CommandLineArgument argument)
             m_long_arguments.insert(std::pair<std::string, CommandLineArgument>(argument.long_name, argument));
 
     m_short_arguments.insert(std::pair<std::string, CommandLineArgument*>(argument.short_name, &inserted_value.first->second));
+}
+
+UnicamotorNetworkMode CommandLineParser::ResolveServerArgument(std::string* server_argument)
+{
+    if (server_argument == nullptr)
+    {
+        SPDLOG_ERROR("Provided server argument is nullptr, defaulting to Standalone network mode");
+        return Standalone;
+    }
+
+    if (*server_argument == "server")
+    {
+        return Server;
+    }
+    else if (*server_argument == "standalone")
+    {
+        return Standalone;
+    }
+    else if (*server_argument == "client")
+    {
+        return Client;
+    }
+
+    SPDLOG_WARN("Failed to resolve '{}' to a valid network mode, defaulting to Standalone", *server_argument);
+    return Standalone;
 }

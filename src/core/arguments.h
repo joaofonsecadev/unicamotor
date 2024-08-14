@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include <unordered_map>
+#include "unicamotor.h"
 
 struct CommandLineArgument
 {
@@ -27,8 +28,10 @@ public:
     }
 
     void Parse();
-    std::string* GetArgumentValue(std::string& argument_long_name);
+    std::string* GetArgumentValue(const std::string& argument_long_name);
     void AddArgumentToParse(CommandLineArgument argument);
+
+    static UnicamotorNetworkMode ResolveServerArgument(std::string* server_argument);
 
 private:
     std::vector<std::string> m_argument_input;

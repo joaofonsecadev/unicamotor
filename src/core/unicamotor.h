@@ -10,19 +10,20 @@ enum UnicamotorNetworkMode : uint8_t
     Server,
 };
 
-struct UnicamotorConfig
-{
-
-    std::vector<std::string> command_line_arguments;
-};
-
 class Unicamotor
 {
 public:
     Unicamotor() = default;
-    Unicamotor(UnicamotorConfig config) : m_unicamotor_config(std::move(config)) { }
+    Unicamotor(const UnicamotorNetworkMode network_mode) : m_network_mode(network_mode) { }
+
+    void Tick();
+
+    static void RequestExit() { m_requested_exit = true; }
+    bool HasExitBeenRequested() { return m_requested_exit; }
 
 private:
-    UnicamotorConfig m_unicamotor_config;
+    UnicamotorNetworkMode m_network_mode = UnicamotorNetworkMode::Standalone;
+
+    static bool m_requested_exit;
 };
 
