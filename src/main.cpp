@@ -9,6 +9,19 @@
 #include "core/unicamotor.h"
 #include "core/version.h"
 
+void* operator new(std::size_t size)
+{
+    void* pointer = malloc(size);
+    TracyAlloc(pointer, size);
+    return pointer;
+}
+
+void operator delete(void* ptr) noexcept
+{
+    TracyFree(ptr);
+    free(ptr);
+}
+
 void CreateLogger()
 {
     spdlog::init_thread_pool(8192, 1);
