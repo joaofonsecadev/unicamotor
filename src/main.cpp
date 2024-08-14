@@ -26,6 +26,20 @@ void DefaultCommandLineParsing(int argc, char* argv[])
     command_line_parser.AddArgumentToParse({ "-n", "--network-mode" });
 
     command_line_parser.Parse();
+
+    if (argc <= 1)
+    {
+        return;
+    }
+
+    std::string all_arguments;
+    for (int i = 1; i < argc; ++i)
+    {
+        all_arguments.append(argv[i]);
+        all_arguments.append(" ");
+    }
+
+    SPDLOG_INFO("Commandline arguments: {}", all_arguments);
 }
 
 int main(int argc, char* argv[])
