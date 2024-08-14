@@ -1,6 +1,7 @@
 #include <tracy/Tracy.hpp>
 #include "unicamotor.h"
 #include "timer/timer_subsystem.h"
+#include "spdlog/spdlog.h"
 
 bool Unicamotor::m_requested_exit = false;
 
@@ -38,6 +39,14 @@ void Unicamotor::InitializeSubsystems()
 
     for (std::unique_ptr<Subsystem>& subsystem : m_subsystems_vector)
     {
+        SPDLOG_INFO("Initializing {}", subsystem->GetSubsystemName());
+
+        if (!subsystem->Init())
+        {
+            SPDLOG_ERROR("Failed to initialize {}", subsystem->GetSubsystemName());
+            continue;
+        }
+
         m_subsystems_map.insert(std::pair<std::string, Subsystem*>(subsystem->GetSubsystemName(), subsystem.get()));
     }
 }

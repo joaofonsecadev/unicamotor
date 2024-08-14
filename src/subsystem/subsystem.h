@@ -14,6 +14,7 @@ public:
     virtual bool ShouldTick() = 0;
     virtual std::string GetSubsystemName() = 0;
 
+    virtual bool Init() { return true; }
     virtual void Tick() { }
 
 private:
