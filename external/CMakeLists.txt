@@ -14,3 +14,6 @@ target_compile_options(TracyClient PRIVATE "-w")
 set_target_properties(TracyClient PROPERTIES FOLDER external)
 
 add_subdirectory(glfw)
+
+add_library(glad glad/src/glad.c)
+target_include_directories(glad PUBLIC glad/include)

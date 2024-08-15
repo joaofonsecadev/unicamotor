@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(unicamotor LANGUAGES CXX)
+project(unicamotor LANGUAGES CXX C)
 set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
@@ -32,7 +32,7 @@ add_subdirectory(external EXCLUDE_FROM_ALL)
 
 add_executable(unicamotor ${SourceFiles})
 target_include_directories(unicamotor PRIVATE src)
-target_link_libraries(unicamotor PRIVATE spdlog::spdlog Tracy::TracyClient glfw)
+target_link_libraries(unicamotor PRIVATE spdlog::spdlog Tracy::TracyClient glfw glad)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})
