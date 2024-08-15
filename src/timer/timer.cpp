@@ -1,5 +1,5 @@
 #include <tracy/Tracy.hpp>
-#include "timer_subsystem.h"
+#include "timer.h"
 #include "core/arguments.h"
 #include "spdlog/spdlog.h"
 

@@ -12,3 +12,5 @@ option(TRACY_ONLY_LOCALHOST "" ON)
 add_subdirectory(tracy)
 target_compile_options(TracyClient PRIVATE "-w")
 set_target_properties(TracyClient PROPERTIES FOLDER external)
+
+add_subdirectory(glfw)

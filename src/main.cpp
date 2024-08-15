@@ -40,6 +40,7 @@ void DefaultCommandLineParsing(int argc, char* argv[])
     command_line_parser.SetArgumentInput(argc, argv);
     command_line_parser.AddArgumentToParse({ "-n", "--network-mode" });
     command_line_parser.AddArgumentToParse({ "-t", "--target-frame-time-ms" });
+    command_line_parser.AddArgumentToParse({ "-r", "--renderer-graphics-api" });
 
     command_line_parser.Parse();
 

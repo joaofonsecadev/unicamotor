@@ -21,15 +21,18 @@ set(SourceFiles
         src/subsystem/subsystem.h
         src/core/arguments.cpp
         src/core/arguments.h
-        src/timer/timer_subsystem.cpp
-        src/timer/timer_subsystem.h
+        src/timer/timer.cpp
+        src/timer/timer.h
+        src/renderer/renderer.h
+        src/renderer/opengl/opengl.cpp
+        src/renderer/opengl/opengl.h
 )
 
 add_subdirectory(external EXCLUDE_FROM_ALL)
 
 add_executable(unicamotor ${SourceFiles})
 target_include_directories(unicamotor PRIVATE src)
-target_link_libraries(unicamotor PRIVATE spdlog::spdlog Tracy::TracyClient)
+target_link_libraries(unicamotor PRIVATE spdlog::spdlog Tracy::TracyClient glfw)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})
