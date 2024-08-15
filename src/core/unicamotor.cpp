@@ -60,21 +60,21 @@ void Unicamotor::ResolveGraphicsApi(std::vector<std::unique_ptr<Subsystem>>& sub
     std::string* graphics_api = CommandLineParser::Get().GetArgumentValue("--renderer-graphics-api");
     if (graphics_api == nullptr || graphics_api->empty())
     {
-        m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
         SPDLOG_INFO("Using the default graphics API: OpenGL");
+        m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
         return;
     }
 
     if (*graphics_api == "opengl")
     {
-        m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
         SPDLOG_INFO("Selected graphics API: OpenGL");
+        m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
         return;
     }
     else
     {
-        m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
         SPDLOG_INFO("Failed to resolve graphics api argument '{}', defaulting to OpenGL", *graphics_api);
+        m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
         return;
     }
 }
