@@ -14,6 +14,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # Project source files
 set(SourceFiles
+        content/shaders/main.vert
         src/main.cpp
         src/core/unicamotor.cpp
         src/core/unicamotor.h
@@ -28,6 +29,9 @@ set(SourceFiles
         src/renderer/opengl/opengl.h
         src/renderer/vulkan/vulkan.cpp
         src/renderer/vulkan/vulkan.h
+        src/core/directories.cpp
+        src/core/directories.h
+
 )
 
 add_subdirectory(external EXCLUDE_FROM_ALL)

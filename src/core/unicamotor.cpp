@@ -40,7 +40,7 @@ void Unicamotor::InitializeSubsystems()
     m_subsystems_vector.push_back(std::make_unique<TimerSubsystem>(this));
     m_timer_subsystem = static_cast<TimerSubsystem*>(m_subsystems_vector.at(0).get());
 
-    ResolveGraphicsApi(m_subsystems_vector);
+    ResolveGraphicsApi();
 
     for (std::unique_ptr<Subsystem>& subsystem : m_subsystems_vector)
     {
@@ -56,7 +56,7 @@ void Unicamotor::InitializeSubsystems()
     }
 }
 
-void Unicamotor::ResolveGraphicsApi(std::vector<std::unique_ptr<Subsystem>>& subsystems)
+void Unicamotor::ResolveGraphicsApi()
 {
     std::string* graphics_api = CommandLineParser::Get().GetArgumentValue("--renderer-graphics-api");
     if (graphics_api == nullptr || graphics_api->empty())

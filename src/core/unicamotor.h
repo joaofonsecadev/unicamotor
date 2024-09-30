@@ -29,7 +29,7 @@ public:
 
 private:
     void InitializeSubsystems();
-    void ResolveGraphicsApi(std::vector<std::unique_ptr<Subsystem>>& subsystems);
+    void ResolveGraphicsApi();
 
     UnicamotorNetworkMode m_network_mode = UnicamotorNetworkMode::Standalone;
     std::unordered_map<std::string, Subsystem*> m_subsystems_map;

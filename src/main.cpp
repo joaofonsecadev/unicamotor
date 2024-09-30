@@ -8,6 +8,7 @@
 #include "core/arguments.h"
 #include "core/unicamotor.h"
 #include "core/version.h"
+#include "core/directories.h"
 
 void* operator new(std::size_t size)
 {
@@ -64,6 +65,7 @@ int main(int argc, char* argv[])
     CreateLogger();
     SPDLOG_INFO("Starting Unicamotor - v{}", VERSION_STRING);
 
+    DirectoriesHelper::CalculateBaseDirectories(argv[0]);
     DefaultCommandLineParsing(argc, argv);
 
     CommandLineParser& command_line_parser = CommandLineParser::Get();
