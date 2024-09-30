@@ -26,6 +26,8 @@ set(SourceFiles
         src/renderer/renderer.h
         src/renderer/opengl/opengl.cpp
         src/renderer/opengl/opengl.h
+        src/renderer/vulkan/vulkan.cpp
+        src/renderer/vulkan/vulkan.h
 )
 
 add_subdirectory(external EXCLUDE_FROM_ALL)

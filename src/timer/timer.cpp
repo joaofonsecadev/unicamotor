@@ -54,6 +54,5 @@ void TimerSubsystem::MarkEndWork()
 void TimerSubsystem::PossibleSleep()
 {
     ZoneScoped;
-    const std::chrono::nanoseconds time_to_sleep = m_target_frame_time - m_current_frame_work_time;
     while (std::chrono::steady_clock::now() - m_current_frame_start_work_time < m_target_frame_time) { }
 }

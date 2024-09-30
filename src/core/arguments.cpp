@@ -1,5 +1,5 @@
 #include "arguments.h"
-#include "spdlog/spdlog-inl.h"
+#include "spdlog/spdlog.h"
 
 void CommandLineParser::SetArgumentInput(int argc, char* argv[])
 {

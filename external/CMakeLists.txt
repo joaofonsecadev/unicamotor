@@ -15,5 +15,5 @@ set_target_properties(TracyClient PROPERTIES FOLDER external)
 
 add_subdirectory(glfw)
 
-add_library(glad glad/src/glad.c)
+add_library(glad STATIC glad/src/glad.c)
 target_include_directories(glad PUBLIC glad/include)

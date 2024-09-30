@@ -2,8 +2,9 @@
 #include "unicamotor.h"
 #include "timer/timer.h"
 #include "spdlog/spdlog.h"
-#include "renderer/opengl/opengl.h"
 #include "arguments.h"
+#include "renderer/opengl/opengl.h"
+#include "renderer/vulkan/vulkan.h"
 
 bool Unicamotor::m_requested_exit = false;
 
@@ -69,6 +70,12 @@ void Unicamotor::ResolveGraphicsApi(std::vector<std::unique_ptr<Subsystem>>& sub
     {
         SPDLOG_INFO("Selected graphics API: OpenGL");
         m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
+        return;
+    }
+    if (*graphics_api == "vulkan")
+    {
+        SPDLOG_INFO("Selected graphics API: Vulkan");
+        m_subsystems_vector.push_back(std::make_unique<RendererVulkan>(this));
         return;
     }
     else

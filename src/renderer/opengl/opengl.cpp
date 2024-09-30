@@ -23,7 +23,6 @@ RendererOpengl::RendererOpengl(Unicamotor* engine) : RendererSubsystem(engine)
     {
         SPDLOG_CRITICAL("OpenGL failed critically when creating window");
         Unicamotor::RequestExit();
-        glfwTerminate();
         return;
     }
 
