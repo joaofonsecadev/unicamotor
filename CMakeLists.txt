@@ -15,6 +15,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 # Project source files
 set(SourceFiles
         content/shaders/main.vert
+        content/shaders/main.frag
         src/main.cpp
         src/core/unicamotor.cpp
         src/core/unicamotor.h
