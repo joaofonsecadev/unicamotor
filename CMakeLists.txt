@@ -32,6 +32,8 @@ set(SourceFiles
         src/renderer/vulkan/vulkan.h
         src/core/directories.cpp
         src/core/directories.h
+        src/game/gameinstance.cpp
+        src/game/gameinstance.h
 
 )
 
