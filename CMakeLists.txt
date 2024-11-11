@@ -1,16 +1,19 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(unicamotor LANGUAGES CXX C)
-set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+if (PROJECT_IS_TOP_LEVEL)
+    set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
+    option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
-set(CMAKE_CXX_STANDARD          20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS        OFF)
+    set(CMAKE_CXX_STANDARD          20)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS        OFF)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+endif()
 
 # Project source files
 set(SourceFiles
@@ -34,14 +37,13 @@ set(SourceFiles
         src/core/directories.h
         src/game/gameinstance.cpp
         src/game/gameinstance.h
-
 )
 
 add_subdirectory(external EXCLUDE_FROM_ALL)
 
 add_executable(unicamotor ${SourceFiles})
-target_include_directories(unicamotor PRIVATE src)
-target_link_libraries(unicamotor PRIVATE spdlog::spdlog Tracy::TracyClient glfw glad)
+target_include_directories(unicamotor PUBLIC src)
+target_link_libraries(unicamotor PUBLIC spdlog::spdlog Tracy::TracyClient glfw glad)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})
@@ -50,4 +52,3 @@ foreach(SourceFile IN ITEMS ${SourceFiles})
     string(REPLACE "/" "\\" GroupPath ${GroupPath})
     source_group(${GroupPath} FILES ${SourceFile})
 endforeach()
-

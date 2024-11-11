@@ -23,7 +23,19 @@ void DirectoriesHelper::CalculateBaseDirectories(char* system_arg_zero)
         }
 
         std::filesystem::path possible_engine_root_path = path_being_validated;
+        std::filesystem::path possible_engine_with_game_root_path = path_being_validated;
+
         possible_engine_root_path.append("config/default.ini");
+        possible_engine_with_game_root_path.append("engine/config/default.ini");
+
+        if (std::filesystem::exists(possible_engine_with_game_root_path))
+        {
+            path_being_validated.append("engine");
+
+            SPDLOG_INFO("Engine root path found at {}", path_being_validated.string());
+            break;
+        }
+
         if (!std::filesystem::exists(possible_engine_root_path))
         {
             path_being_validated = path_being_validated.parent_path();

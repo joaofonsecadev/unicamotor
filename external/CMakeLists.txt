@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 add_subdirectory(spdlog)
 set_target_properties(spdlog PROPERTIES FOLDER external)
@@ -10,7 +10,7 @@ option(TRACY_ON_DEMAND "" ON)
 option(TRACY_CALLSTACK "" ON)
 option(TRACY_ONLY_LOCALHOST "" ON)
 add_subdirectory(tracy)
-target_compile_options(TracyClient PRIVATE "-w")
+target_compile_options(TracyClient PUBLIC "-w")
 set_target_properties(TracyClient PROPERTIES FOLDER external)
 
 add_subdirectory(glfw)
