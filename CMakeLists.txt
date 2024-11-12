@@ -35,8 +35,12 @@ set(SourceFiles
         src/renderer/vulkan/vulkan.h
         src/core/directories.cpp
         src/core/directories.h
+        src/game/gamesubsystem.cpp
+        src/game/gamesubsystem.h
         src/game/gameinstance.cpp
         src/game/gameinstance.h
+        src/demo/demogame.cpp
+        src/demo/demogame.h
 )
 
 add_subdirectory(external EXCLUDE_FROM_ALL)

@@ -5,6 +5,7 @@
 #include "arguments.h"
 #include "renderer/opengl/opengl.h"
 #include "renderer/vulkan/vulkan.h"
+#include "game/gamesubsystem.h"
 
 bool Unicamotor::m_requested_exit = false;
 
@@ -39,6 +40,8 @@ void Unicamotor::InitializeSubsystems()
 
     m_subsystems_vector.push_back(std::make_unique<TimerSubsystem>(this));
     m_timer_subsystem = static_cast<TimerSubsystem*>(m_subsystems_vector.at(0).get());
+
+    m_subsystems_vector.push_back(std::make_unique<GameSubsystem>(this));
 
     ResolveGraphicsApi();
 

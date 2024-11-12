@@ -1,14 +1,11 @@
-#pragma once
+#include "gamesubsystem.h"
 
-#include <memory>
-#include "subsystem/subsystem.h"
-
-class GameInstance : public Subsystem
+class GameInstance
 {
 public:
-    GameInstance();
-    ~GameInstance() override = default;
+    GameInstance() = default;
+    explicit GameInstance(GameSubsystem* owner) : m_owner(owner) { }
 
-    bool ShouldTick() override { return true; }
-    std::string GetSubsystemName() override { return "GameInstance"; }
+private:
+    GameSubsystem* m_owner = nullptr;
 };
