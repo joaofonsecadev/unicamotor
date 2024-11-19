@@ -25,8 +25,8 @@ void DirectoriesHelper::CalculateBaseDirectories(char* system_arg_zero)
         std::filesystem::path possible_engine_root_path = path_being_validated;
         std::filesystem::path possible_engine_with_game_root_path = path_being_validated;
 
-        possible_engine_root_path.append("config/default.ini");
-        possible_engine_with_game_root_path.append("engine/config/default.ini");
+        possible_engine_root_path.append("config/defaultengine.toml");
+        possible_engine_with_game_root_path.append("engine/config/defaultengine.toml");
 
         if (std::filesystem::exists(possible_engine_with_game_root_path))
         {

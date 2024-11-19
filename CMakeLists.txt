@@ -46,8 +46,8 @@ set(SourceFiles
 add_subdirectory(external EXCLUDE_FROM_ALL)
 
 add_executable(unicamotor ${SourceFiles})
-target_include_directories(unicamotor PUBLIC src)
-target_link_libraries(unicamotor PUBLIC spdlog::spdlog Tracy::TracyClient glfw glad)
+target_include_directories(unicamotor PUBLIC src ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(unicamotor PUBLIC spdlog::spdlog Tracy::TracyClient glfw glad ${Vulkan_LIBRARIES} VulkanMemoryAllocator vk-bootstrap tomlplusplus::tomlplusplus)
 
 # Create file structure in IDE
 foreach(SourceFile IN ITEMS ${SourceFiles})

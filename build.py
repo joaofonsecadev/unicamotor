@@ -9,5 +9,5 @@ if __name__ == "__main__":
         raise Exception("NINJA is not available")
 
     script_directory = os.path.dirname(os.path.abspath(__file__))
-    project_root_path_detector = os.path.join(script_directory, "config", "default.ini")
+    project_root_path_detector = os.path.join(script_directory, "config", "default.tomltoml")
     print(project_root_path_detector)

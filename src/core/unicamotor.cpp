@@ -54,7 +54,7 @@ void Unicamotor::InitializeSubsystems()
             SPDLOG_ERROR("Failed to initialize {}", subsystem->GetSubsystemName());
             continue;
         }
-
+        
         m_subsystems_map.insert(std::pair<std::string, Subsystem*>(subsystem->GetSubsystemName(), subsystem.get()));
     }
 }
@@ -64,8 +64,8 @@ void Unicamotor::ResolveGraphicsApi()
     std::string* graphics_api = CommandLineParser::Get().GetArgumentValue("--renderer-graphics-api");
     if (graphics_api == nullptr || graphics_api->empty())
     {
-        SPDLOG_INFO("Using the default graphics API: OpenGL");
-        m_subsystems_vector.push_back(std::make_unique<RendererOpengl>(this));
+        SPDLOG_INFO("Using the default graphics API: Vulkan");
+        m_subsystems_vector.push_back(std::make_unique<RendererVulkan>(this));
         return;
     }
 

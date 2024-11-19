@@ -9,6 +9,8 @@
 #include "core/directories.h"
 #include "tracy/Tracy.hpp"
 
+#include "toml++/toml.hpp"
+
 RendererOpengl::RendererOpengl(Unicamotor* engine) : RendererSubsystem(engine)
 {
     glfwInit();
