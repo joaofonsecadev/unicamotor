@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.21)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
-find_package(Vulkan REQUIRED)
 add_subdirectory(vk-bootstrap)
 add_subdirectory(VulkanMemoryAllocator)
 

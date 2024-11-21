@@ -43,6 +43,7 @@ set(SourceFiles
         src/demo/demogame.h
 )
 
+find_package(Vulkan REQUIRED)
 add_subdirectory(external EXCLUDE_FROM_ALL)
 
 add_executable(unicamotor ${SourceFiles})
