@@ -11,7 +11,6 @@
 #include "core/unicamotor.h"
 #include "core/directories.h"
 
-
 RendererVulkan::RendererVulkan(Unicamotor* engine) : RendererSubsystem(engine)
 {
 
@@ -64,7 +63,7 @@ bool RendererVulkan::CreateVulkanInstance()
     vkb::InstanceBuilder vulkan_builder;
     vkb::Result<vkb::Instance> vulkan_instance_build_result = vulkan_builder
         .request_validation_layers(engine_config["GRAPHICS"]["VULKAN_VALIDATION_LAYERS_ENABLED"].value_or(false))
-        .use_default_debug_messenger()
+        .set_debug_callback(VulkanDebugMessenger)
         .require_api_version(VK_API_VERSION_1_3)
         .build();
 
@@ -162,4 +161,29 @@ RendererVulkan::~RendererVulkan()
 
     glfwDestroyWindow(m_glfw_window);
     glfwTerminate();
+}
+
+VKAPI_ATTR VkBool32 VKAPI_CALL RendererVulkan::VulkanDebugMessenger(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void*)
+{
+    const std::string message_formatted = std::format("Vulkan - {} - {}", vkb::to_string_message_type(messageType), pCallbackData->pMessage);
+    switch (messageSeverity)
+    {
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+        SPDLOG_DEBUG(message_formatted);
+        break;
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+        SPDLOG_ERROR(message_formatted);
+        break;
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+        SPDLOG_WARN(message_formatted);
+        break;
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+        SPDLOG_INFO(message_formatted);
+        break;
+    default:
+        SPDLOG_INFO(message_formatted);
+        break;
+    }
+
+    return VK_FALSE;
 }

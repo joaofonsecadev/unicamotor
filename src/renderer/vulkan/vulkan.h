@@ -25,6 +25,8 @@ private:
 
     bool DestroySwapchain();
 
+    static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugMessenger(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void*);
+
     // GLFW
     GLFWwindow* m_glfw_window = nullptr;
 
