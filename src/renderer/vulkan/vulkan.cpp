@@ -19,8 +19,11 @@ RendererVulkan::RendererVulkan(Unicamotor* engine) : RendererSubsystem(engine)
 
 bool RendererVulkan::Init()
 {
+    toml::parse_result engine_config = toml::parse_file(DirectoriesHelper::EngineDefaultConfigDirectory().c_str());
+
     if (CreateWindow()
-        && CreateVulkanInstance())
+        && CreateVulkanInstance()
+        && CreateVulkanSwapchain(engine_config["GRAPHICS"]["RESOLUTION_WIDTH"].value_or(1280), engine_config["GRAPHICS"]["RESOLUTION_HEIGHT"].value_or(720)))
     {
         return true;
     }
@@ -107,8 +110,50 @@ bool RendererVulkan::CreateVulkanInstance()
     return true;
 }
 
+bool RendererVulkan::CreateVulkanSwapchain(const uint16_t extent_width, const uint16_t extent_height)
+{
+    vkb::SwapchainBuilder swapchain_builder{ m_physical_device, m_vulkan_device, m_glfw_window_surface };
+    m_swapchain_image_format = VK_FORMAT_B8G8R8A8_UNORM;
+
+    toml::parse_result engine_config = toml::parse_file(DirectoriesHelper::EngineDefaultConfigDirectory().c_str());
+    const bool vsync_enabled = engine_config["GRAPHICS"]["VSYNC"].value_or(true);
+    if (!vsync_enabled)
+    {
+        SPDLOG_WARN("Enabling VSync even though it's turned off in the settings (TODO)");
+    }
+
+    vkb::Swapchain vkbootstrap_swapchain = swapchain_builder
+        .set_desired_format(VkSurfaceFormatKHR{ .format = m_swapchain_image_format, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR })
+        // VSYNC FORCED
+        .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+        .set_desired_extent(extent_width, extent_height)
+        .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+        .build()
+        .value();
+
+    m_swapchain_extent = vkbootstrap_swapchain.extent;
+    m_swapchain = vkbootstrap_swapchain.swapchain;
+    m_swapchain_images = vkbootstrap_swapchain.get_images().value();
+    m_swapchain_image_views = vkbootstrap_swapchain.get_image_views().value();
+
+    return true;
+}
+
+bool RendererVulkan::DestroySwapchain()
+{
+    vkDestroySwapchainKHR(m_vulkan_device, m_swapchain, nullptr);
+    for (VkImageView swapchain_image_view : m_swapchain_image_views)
+    {
+        vkDestroyImageView(m_vulkan_device, swapchain_image_view, nullptr);
+    }
+
+    return true;
+}
+
 RendererVulkan::~RendererVulkan()
 {
+    DestroySwapchain();
+
     vkDestroySurfaceKHR(m_vulkan_instance, m_glfw_window_surface, nullptr);
     vkDestroyDevice(m_vulkan_device, nullptr);
 
