@@ -25,6 +25,7 @@ private:
     bool CreateVulkanInstance();
     bool CreateVulkanSwapchain(const uint16_t extent_width, const uint16_t extent_height);
     bool CreateCommandPools();
+    bool CreateSyncStructures();
 
     bool DestroySwapchain();
     bool DestroyCommandPools();

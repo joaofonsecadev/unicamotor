@@ -2,9 +2,14 @@
 
 struct VkCommandPool_T;
 struct VkCommandBuffer_T;
+struct VkSemaphore_T;
+struct VkFence_T;
 
 struct VulkanFrameData
 {
-    VkCommandPool_T* command_pool;
-    VkCommandBuffer_T* main_command_buffer;
+    VkCommandPool_T* command_pool = nullptr;
+    VkCommandBuffer_T* main_command_buffer = nullptr;
+    VkSemaphore_T* swapchain_semaphore = nullptr;
+    VkSemaphore_T* render_semaphore = nullptr;
+    VkFence_T* render_fence = nullptr;
 };

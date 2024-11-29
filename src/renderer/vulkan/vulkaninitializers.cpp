@@ -21,3 +21,21 @@ VkCommandBufferAllocateInfo VulkanInitializers::CommandBufferAllocateInfo(VkComm
     command_buffer_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY; // @TODO secondary command buffers
     return command_buffer_allocate_info;
 }
+
+VkFenceCreateInfo VulkanInitializers::FenceCreateInfo(VkFenceCreateFlags flags)
+{
+    VkFenceCreateInfo fence_create_info = { };
+    fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fence_create_info.pNext = nullptr;
+    fence_create_info.flags = flags;
+    return fence_create_info;
+}
+
+VkSemaphoreCreateInfo VulkanInitializers::SemaphoreCreateInfo(VkSemaphoreCreateFlags flags)
+{
+    VkSemaphoreCreateInfo semaphore_create_info = { };
+    semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semaphore_create_info.pNext = nullptr;
+    semaphore_create_info.flags = flags;
+    return semaphore_create_info;
+}

@@ -24,7 +24,8 @@ bool RendererVulkan::Init()
     if (CreateWindow()
         && CreateVulkanInstance()
         && CreateVulkanSwapchain(engine_config["GRAPHICS"]["RESOLUTION_WIDTH"].value_or(1280), engine_config["GRAPHICS"]["RESOLUTION_HEIGHT"].value_or(720))
-        && CreateCommandPools())
+        && CreateCommandPools()
+        && CreateSyncStructures())
     {
         return true;
     }
@@ -160,14 +161,44 @@ bool RendererVulkan::CreateCommandPools()
         VulkanFrameData& frame_data = m_frame_data.at(i);
         if (vkCreateCommandPool(m_vulkan_device, &command_pool_info, nullptr, &frame_data.command_pool) != VK_SUCCESS)
         {
-            SPDLOG_CRITICAL("Failed to create command pool for swapchain image {}", i);
+            SPDLOG_CRITICAL("Failed to create command pool for image {}", i);
             return false;
         }
 
         VkCommandBufferAllocateInfo command_buffer_allocate_info = VulkanInitializers::CommandBufferAllocateInfo(frame_data.command_pool);
         if (vkAllocateCommandBuffers(m_vulkan_device, &command_buffer_allocate_info, &frame_data.main_command_buffer) != VK_SUCCESS)
         {
-            SPDLOG_CRITICAL("Failed to allocate command buffers for swapchain image {}", i);
+            SPDLOG_CRITICAL("Failed to allocate command buffers for image {}", i);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool RendererVulkan::CreateSyncStructures()
+{
+    VkFenceCreateInfo fence_info = VulkanInitializers::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+    VkSemaphoreCreateInfo semaphore_info = VulkanInitializers::SemaphoreCreateInfo();
+
+    for (uint8_t i = 0; i < m_swapchain_image_count; i++)
+    {
+        VulkanFrameData& frame_data = m_frame_data.at(i);
+        if (vkCreateFence(m_vulkan_device, &fence_info, nullptr, &frame_data.render_fence) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failed render fence creation for image {}", i);
+            return false;
+        }
+
+        if (vkCreateSemaphore(m_vulkan_device, &semaphore_info, nullptr, &frame_data.swapchain_semaphore) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failed to create swapchain semaphore for image {}", i);
+            return false;
+        }
+
+        if (vkCreateSemaphore(m_vulkan_device, &semaphore_info, nullptr, &frame_data.render_semaphore) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failed to create render semaphore for image {}", i);
             return false;
         }
     }
