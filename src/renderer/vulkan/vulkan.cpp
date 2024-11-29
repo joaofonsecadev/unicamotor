@@ -1,8 +1,10 @@
-#define VMA_IMPLEMENTATION
 #include "vulkan.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include "GLFW/glfw3.h"
+
+#define VMA_IMPLEMENTATION
+#include "vk_mem_alloc.h"
 
 #include "toml++/toml.hpp"
 #include "spdlog/spdlog.h"
@@ -256,6 +258,18 @@ bool RendererVulkan::CreateVulkanInstance()
 
     m_graphics_queue = vkbootstrap_device.get_queue(vkb::QueueType::graphics).value();
     m_graphics_queue_family_index = vkbootstrap_device.get_queue_index(vkb::QueueType::graphics).value();
+
+    VmaAllocatorCreateInfo allocator_create_info = { };
+    allocator_create_info.physicalDevice = m_physical_device;
+    allocator_create_info.device = m_vulkan_device;
+    allocator_create_info.instance = m_vulkan_instance;
+    allocator_create_info.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+    vmaCreateAllocator(&allocator_create_info, &m_memory_allocator);
+
+    m_global_deletion_queue.PushDeletionFunction([&]
+    {
+        vmaDestroyAllocator(m_memory_allocator);
+    });
 
     return true;
 }

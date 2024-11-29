@@ -8,6 +8,7 @@
 #include "renderer/renderer.h"
 
 struct GLFWwindow;
+struct VmaAllocator_T;
 
 enum VkFormat : int32_t;
 
@@ -64,4 +65,7 @@ private:
     std::vector<VulkanFrameData> m_frame_data;
     VkQueue m_graphics_queue = nullptr; // @TODO using a single queue, ideally multiple for different work (vkb::QueueType)
     uint32_t m_graphics_queue_family_index = -1;
+
+    // Vulkan Memory Allocation
+    VmaAllocator_T* m_memory_allocator = nullptr;
 };
