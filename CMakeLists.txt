@@ -41,6 +41,9 @@ set(SourceFiles
         src/game/gameinstance.h
         src/demo/demogame.cpp
         src/demo/demogame.h
+        src/renderer/vulkan/vulkanframedata.h
+        src/renderer/vulkan/vulkaninitializers.cpp
+        src/renderer/vulkan/vulkaninitializers.h
 )
 
 find_package(Vulkan REQUIRED)

@@ -41,9 +41,9 @@ void Unicamotor::InitializeSubsystems()
     m_subsystems_vector.push_back(std::make_unique<TimerSubsystem>(this));
     m_timer_subsystem = static_cast<TimerSubsystem*>(m_subsystems_vector.at(0).get());
 
-    m_subsystems_vector.push_back(std::make_unique<GameSubsystem>(this));
-
     ResolveGraphicsApi();
+
+    m_subsystems_vector.push_back(std::make_unique<GameSubsystem>(this));
 
     for (std::unique_ptr<Subsystem>& subsystem : m_subsystems_vector)
     {

@@ -7,6 +7,7 @@
 #include "toml++/toml.hpp"
 #include "spdlog/spdlog.h"
 #include "VkBootstrap.h"
+#include "vulkaninitializers.h"
 
 #include "core/unicamotor.h"
 #include "core/directories.h"
@@ -22,7 +23,8 @@ bool RendererVulkan::Init()
 
     if (CreateWindow()
         && CreateVulkanInstance()
-        && CreateVulkanSwapchain(engine_config["GRAPHICS"]["RESOLUTION_WIDTH"].value_or(1280), engine_config["GRAPHICS"]["RESOLUTION_HEIGHT"].value_or(720)))
+        && CreateVulkanSwapchain(engine_config["GRAPHICS"]["RESOLUTION_WIDTH"].value_or(1280), engine_config["GRAPHICS"]["RESOLUTION_HEIGHT"].value_or(720))
+        && CreateCommandPools())
     {
         return true;
     }
@@ -106,6 +108,9 @@ bool RendererVulkan::CreateVulkanInstance()
     m_vulkan_device = vkbootstrap_device.device;
     m_physical_device = vkbootstrap_physical_device.physical_device;
 
+    m_graphics_queue = vkbootstrap_device.get_queue(vkb::QueueType::graphics).value();
+    m_graphics_queue_family_index = vkbootstrap_device.get_queue_index(vkb::QueueType::graphics).value();
+
     return true;
 }
 
@@ -121,19 +126,51 @@ bool RendererVulkan::CreateVulkanSwapchain(const uint16_t extent_width, const ui
         SPDLOG_WARN("Enabling VSync even though it's turned off in the settings (TODO)");
     }
 
-    vkb::Swapchain vkbootstrap_swapchain = swapchain_builder
+    vkb::Result<vkb::Swapchain> swapchain_builder_result = swapchain_builder
         .set_desired_format(VkSurfaceFormatKHR{ .format = m_swapchain_image_format, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR })
-        // VSYNC FORCED
-        .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+        // @TODO Settings for vsync on or off, currently FORCED VSYNC
+        .set_desired_present_mode(VK_PRESENT_MODE_FIFO_RELAXED_KHR)
         .set_desired_extent(extent_width, extent_height)
         .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
-        .build()
-        .value();
+        .build();
 
+    if (!swapchain_builder_result.has_value())
+    {
+        SPDLOG_CRITICAL("Swapchain creation failed, {}", static_cast<uint64_t>(swapchain_builder_result.vk_result()));
+        return false;
+    }
+
+    vkb::Swapchain vkbootstrap_swapchain = swapchain_builder_result.value();
     m_swapchain_extent = vkbootstrap_swapchain.extent;
     m_swapchain = vkbootstrap_swapchain.swapchain;
     m_swapchain_images = vkbootstrap_swapchain.get_images().value();
     m_swapchain_image_views = vkbootstrap_swapchain.get_image_views().value();
+
+    m_swapchain_image_count = m_swapchain_images.size();
+    m_frame_data.resize(m_swapchain_image_count);
+    return true;
+}
+
+bool RendererVulkan::CreateCommandPools()
+{
+    VkCommandPoolCreateInfo command_pool_info = VulkanInitializers::CommandPoolCreateInfo(m_graphics_queue_family_index, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+
+    for (uint8_t i = 0; i < m_swapchain_image_count; i++)
+    {
+        VulkanFrameData& frame_data = m_frame_data.at(i);
+        if (vkCreateCommandPool(m_vulkan_device, &command_pool_info, nullptr, &frame_data.command_pool) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failed to create command pool for swapchain image {}", i);
+            return false;
+        }
+
+        VkCommandBufferAllocateInfo command_buffer_allocate_info = VulkanInitializers::CommandBufferAllocateInfo(frame_data.command_pool);
+        if (vkAllocateCommandBuffers(m_vulkan_device, &command_buffer_allocate_info, &frame_data.main_command_buffer) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failed to allocate command buffers for swapchain image {}", i);
+            return false;
+        }
+    }
 
     return true;
 }
@@ -149,8 +186,20 @@ bool RendererVulkan::DestroySwapchain()
     return true;
 }
 
+bool RendererVulkan::DestroyCommandPools()
+{
+    vkDeviceWaitIdle(m_vulkan_device);
+    for (const VulkanFrameData& frame_data : m_frame_data)
+    {
+        vkDestroyCommandPool(m_vulkan_device, frame_data.command_pool, nullptr);
+    }
+
+    return true;
+}
+
 RendererVulkan::~RendererVulkan()
 {
+    DestroyCommandPools();
     DestroySwapchain();
 
     vkDestroySurfaceKHR(m_vulkan_instance, m_glfw_window_surface, nullptr);
