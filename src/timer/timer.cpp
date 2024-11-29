@@ -1,6 +1,10 @@
 #include <tracy/Tracy.hpp>
 #include "timer.h"
+
+#include <toml++/toml.hpp>
+
 #include "core/arguments.h"
+#include "core/directories.h"
 #include "spdlog/spdlog.h"
 
 TimerSubsystem::TimerSubsystem(Unicamotor *engine) : Subsystem(engine)
@@ -8,7 +12,8 @@ TimerSubsystem::TimerSubsystem(Unicamotor *engine) : Subsystem(engine)
     std::string* frame_time_string = CommandLineParser::Get().GetArgumentValue("--target-frame-time-ms");
     if (frame_time_string == nullptr || frame_time_string->empty())
     {
-        m_target_frame_time = std::chrono::nanoseconds(16'666'666);
+        toml::parse_result engine_config = toml::parse_file(DirectoriesHelper::EngineDefaultConfigDirectory().c_str());
+        m_target_frame_time = std::chrono::nanoseconds(engine_config["CORE"]["TARGET_FRAME_TIME_NS"].value_or(0));
         return;
     }
 
