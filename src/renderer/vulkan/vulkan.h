@@ -19,6 +19,7 @@ public:
 
     bool Init() override;
     void Tick() override;
+    void DrawFrame();
 
 private:
     bool CreateWindow();
@@ -28,7 +29,11 @@ private:
     bool CreateSyncStructures();
 
     bool DestroySwapchain();
-    bool DestroyCommandPools();
+    bool DestroyCommandPoolFenceAndSemaphores();
+
+    VulkanFrameData& GetCurrentFrameData() { return m_frame_data.at(GetCurrentFrameIndex()); }
+    VulkanFrameData& GetFrameData(const uint8_t frame_index) { return m_frame_data[frame_index]; }
+    [[nodiscard]] uint8_t GetCurrentFrameIndex() const { return m_frame_count % m_frame_buffer_amount; }
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugMessenger(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void*);
 
@@ -36,6 +41,7 @@ private:
     GLFWwindow* m_glfw_window = nullptr;
 
     // Vulkan Instance
+    uint64_t m_frame_count = 0;
     VkInstance m_vulkan_instance = nullptr;
     VkSurfaceKHR m_glfw_window_surface = nullptr;
     VkDebugUtilsMessengerEXT m_vulkan_messenger = nullptr;
@@ -50,7 +56,7 @@ private:
     std::vector<VkImage> m_swapchain_images;
     std::vector<VkImageView> m_swapchain_image_views;
     VkExtent2D m_swapchain_extent = { 0, 0 };
-    uint8_t m_swapchain_image_count = 0;
+    uint8_t m_frame_buffer_amount = -1;
 
     // Vulkan Queues and Commands
     std::vector<VulkanFrameData> m_frame_data;

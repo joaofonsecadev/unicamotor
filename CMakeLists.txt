@@ -44,6 +44,8 @@ set(SourceFiles
         src/renderer/vulkan/vulkanframedata.h
         src/renderer/vulkan/vulkaninitializers.cpp
         src/renderer/vulkan/vulkaninitializers.h
+        src/renderer/vulkan/vulkanutilities.cpp
+        src/renderer/vulkan/vulkanutilities.h
 )
 
 find_package(Vulkan REQUIRED)
