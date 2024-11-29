@@ -46,6 +46,8 @@ set(SourceFiles
         src/renderer/vulkan/vulkaninitializers.h
         src/renderer/vulkan/vulkanutilities.cpp
         src/renderer/vulkan/vulkanutilities.h
+        src/renderer/vulkan/vulkandeletionqueue.cpp
+        src/renderer/vulkan/vulkandeletionqueue.h
 )
 
 find_package(Vulkan REQUIRED)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vulkandeletionqueue.h"
+
 struct VkCommandPool_T;
 struct VkCommandBuffer_T;
 struct VkSemaphore_T;
@@ -12,4 +14,6 @@ struct VulkanFrameData
     VkSemaphore_T* swapchain_semaphore = nullptr;
     VkSemaphore_T* render_semaphore = nullptr;
     VkFence_T* render_fence = nullptr;
+
+    VulkanDeletionQueue deletion_queue;
 };

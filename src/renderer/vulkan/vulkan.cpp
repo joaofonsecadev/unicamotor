@@ -76,6 +76,8 @@ void RendererVulkan::DrawFrame()
         }
     }
 
+    current_frame_data.deletion_queue.FlushDeletionQueue();
+
     {
         ZoneScopedN("vulkan::vkResetFences");
         if (vkResetFences(m_vulkan_device, 1, &current_frame_data.render_fence) != VK_SUCCESS)
@@ -157,7 +159,7 @@ void RendererVulkan::DrawFrame()
 
         if (vkQueueSubmit2(m_graphics_queue, 1, &submit_info, current_frame_data.render_fence) != VK_SUCCESS)
         {
-            SPDLOG_CRITICAL("Failure on frame index {} while submitting to the GPU queue", current_frame_index);
+            SPDLOG_CRITICAL("Failure on frame index {} while submitting to the queue", current_frame_index);
             Unicamotor::RequestExit();
             return;
         }
@@ -176,6 +178,8 @@ void RendererVulkan::DrawFrame()
 
         if (vkQueuePresentKHR(m_graphics_queue, &present_info) != VK_SUCCESS)
         {
+            SPDLOG_CRITICAL("Failure on frame index {} when presenting the frame", current_frame_index);
+            Unicamotor::RequestExit();
             return;
         }
     }
@@ -361,12 +365,14 @@ bool RendererVulkan::DestroySwapchain()
 bool RendererVulkan::DestroyCommandPoolFenceAndSemaphores()
 {
     vkDeviceWaitIdle(m_vulkan_device);
-    for (const VulkanFrameData& frame_data : m_frame_data)
+    for (VulkanFrameData& frame_data : m_frame_data)
     {
         vkDestroyCommandPool(m_vulkan_device, frame_data.command_pool, nullptr);
         vkDestroyFence(m_vulkan_device, frame_data.render_fence, nullptr);
         vkDestroySemaphore(m_vulkan_device, frame_data.render_semaphore, nullptr);
         vkDestroySemaphore(m_vulkan_device, frame_data.swapchain_semaphore, nullptr);
+
+        frame_data.deletion_queue.FlushDeletionQueue();
     }
 
     return true;
@@ -375,6 +381,8 @@ bool RendererVulkan::DestroyCommandPoolFenceAndSemaphores()
 RendererVulkan::~RendererVulkan()
 {
     DestroyCommandPoolFenceAndSemaphores();
+    m_global_deletion_queue.FlushDeletionQueue();
+
     DestroySwapchain();
 
     vkDestroySurfaceKHR(m_vulkan_instance, m_glfw_window_surface, nullptr);

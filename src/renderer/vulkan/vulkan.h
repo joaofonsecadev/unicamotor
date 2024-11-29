@@ -60,6 +60,7 @@ private:
     uint8_t m_frame_buffer_amount = -1;
 
     // Vulkan Queues and Commands
+    VulkanDeletionQueue m_global_deletion_queue;
     std::vector<VulkanFrameData> m_frame_data;
     VkQueue m_graphics_queue = nullptr; // @TODO using a single queue, ideally multiple for different work (vkb::QueueType)
     uint32_t m_graphics_queue_family_index = -1;
