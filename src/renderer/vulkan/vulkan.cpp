@@ -4,8 +4,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include "GLFW/glfw3.h"
 
-#include <tracy/Tracy.hpp>
-
 #include "toml++/toml.hpp"
 #include "spdlog/spdlog.h"
 #include "VkBootstrap.h"
@@ -40,8 +38,20 @@ bool RendererVulkan::Init()
 
 void RendererVulkan::Tick()
 {
-    glfwPollEvents();
-    if (glfwWindowShouldClose(m_glfw_window))
+    ZoneScoped;
+
+    {
+        ZoneScopedN("glfw::glfwPollEvents");
+        glfwPollEvents();
+    }
+
+    bool should_window_close = false;
+    {
+        ZoneScopedN("glfw::glfwWindowShouldClose");
+        should_window_close = glfwWindowShouldClose(m_glfw_window);
+    }
+
+    if (should_window_close)
     {
         Unicamotor::RequestExit();
     }
@@ -56,89 +66,118 @@ void RendererVulkan::DrawFrame()
     uint8_t current_frame_index = GetCurrentFrameIndex();
     VulkanFrameData& current_frame_data = GetFrameData(current_frame_index);
 
-    if (vkWaitForFences(m_vulkan_device, 1, &current_frame_data.render_fence, true, gpu_sync_timeout) != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("Failure on frame index {} while trying to wait for frame render fence on", current_frame_index);
-        Unicamotor::RequestExit();
-        return;
+        ZoneScopedN("vulkan::vkWaitForFences");
+        if (vkWaitForFences(m_vulkan_device, 1, &current_frame_data.render_fence, true, gpu_sync_timeout) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failure on frame index {} while trying to wait for frame render fence on", current_frame_index);
+            Unicamotor::RequestExit();
+            return;
+        }
     }
 
-    if (vkResetFences(m_vulkan_device, 1, &current_frame_data.render_fence) != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("Failure on frame index {} resetting frame render fence", current_frame_index);
-        Unicamotor::RequestExit();
-        return;
+        ZoneScopedN("vulkan::vkResetFences");
+        if (vkResetFences(m_vulkan_device, 1, &current_frame_data.render_fence) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failure on frame index {} resetting frame render fence", current_frame_index);
+            Unicamotor::RequestExit();
+            return;
+        }
     }
 
     uint32_t swapchain_image_index;
-    if (vkAcquireNextImageKHR(m_vulkan_device, m_swapchain, gpu_sync_timeout, current_frame_data.swapchain_semaphore, nullptr, &swapchain_image_index) != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("Failure on frame index {} acquirying next swapchain image", current_frame_index);
-        Unicamotor::RequestExit();
-        return;
+        ZoneScopedN("vulkan::vkAcquireNextImageKHR");
+        if (vkAcquireNextImageKHR(m_vulkan_device, m_swapchain, gpu_sync_timeout, current_frame_data.swapchain_semaphore, nullptr, &swapchain_image_index) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failure on frame index {} acquirying next swapchain image", current_frame_index);
+            Unicamotor::RequestExit();
+            return;
+        }
     }
 
     VkCommandBuffer command_buffer = current_frame_data.main_command_buffer;
-    if (vkResetCommandBuffer(command_buffer, 0) != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("Failure on frame index {} resetting command buffer", current_frame_index);
-        Unicamotor::RequestExit();
-        return;
+        ZoneScopedN("vulkan::vkResetCommandBuffer");
+        if (vkResetCommandBuffer(command_buffer, 0) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failure on frame index {} resetting command buffer", current_frame_index);
+            Unicamotor::RequestExit();
+            return;
+        }
     }
 
     VkCommandBufferBeginInfo command_buffer_begin_info  = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    if (vkBeginCommandBuffer(command_buffer, &command_buffer_begin_info) != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("Failure on frame index {} beginning the command buffer", current_frame_index);
-        Unicamotor::RequestExit();
-        return;
+        ZoneScopedN("vulkan::vkBeginCommandBuffer");
+        if (vkBeginCommandBuffer(command_buffer, &command_buffer_begin_info) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failure on frame index {} beginning the command buffer", current_frame_index);
+            Unicamotor::RequestExit();
+            return;
+        }
     }
 
-    VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
-
-    VkClearColorValue clear_color_value;
-    const float flash = std::abs(std::sin(static_cast<float>(m_frame_count) / 120.f));
-    clear_color_value = { { 0.0f, 0.0f, flash, 1.0f } };
-
-    VkImageSubresourceRange clear_image_range = VulkanInitializers::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
-
-    vkCmdClearColorImage(command_buffer, m_swapchain_images[current_frame_index], VK_IMAGE_LAYOUT_GENERAL, &clear_color_value, 1, &clear_image_range);
-
-    VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index],VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-
-    if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("Failure on frame index {} ending the command buffer", current_frame_index);
-        Unicamotor::RequestExit();
-        return;
+        ZoneScopedN("RendererVulkan::DrawFrame::CommandBufferFill");
+        VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+
+        VkClearColorValue clear_color_value;
+        const float flash = std::abs(std::sin(static_cast<float>(m_frame_count) / 120.f));
+        clear_color_value = { { 0.0f, 0.0f, flash, 1.0f } };
+
+        VkImageSubresourceRange clear_image_range = VulkanInitializers::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
+
+        vkCmdClearColorImage(command_buffer, m_swapchain_images[current_frame_index], VK_IMAGE_LAYOUT_GENERAL, &clear_color_value, 1, &clear_image_range);
+
+        VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index],VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
     }
 
-    VkCommandBufferSubmitInfo command_buffer_submit_info = VulkanInitializers::CommandBufferSubmitInfo(command_buffer);
 
-    VkSemaphoreSubmitInfo wait_semaphore_submit_info = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, current_frame_data.swapchain_semaphore);
-    VkSemaphoreSubmitInfo signal_semaphore_submit_info = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, current_frame_data.render_semaphore);
-
-    VkSubmitInfo2 submit_info = VulkanInitializers::SubmitInfo(&command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info);
-
-    if (vkQueueSubmit2(m_graphics_queue, 1, &submit_info, current_frame_data.render_fence) != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("Failure on frame index {} while submitting to the GPU queue", current_frame_index);
-        Unicamotor::RequestExit();
-        return;
+        ZoneScopedN("vulkan::vkEndCommandBuffer");
+        if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failure on frame index {} ending the command buffer", current_frame_index);
+            Unicamotor::RequestExit();
+            return;
+        }
     }
 
-    VkPresentInfoKHR present_info = {};
-    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    present_info.pNext = nullptr;
-    present_info.pSwapchains = &m_swapchain;
-    present_info.swapchainCount = 1;
-    present_info.pWaitSemaphores = &current_frame_data.render_semaphore;
-    present_info.waitSemaphoreCount = 1;
-    present_info.pImageIndices = &swapchain_image_index;
 
-    if (vkQueuePresentKHR(m_graphics_queue, &present_info) != VK_SUCCESS)
     {
-        return;
+        ZoneScopedN("vulkan::vkQueueSubmit2");
+        VkCommandBufferSubmitInfo command_buffer_submit_info = VulkanInitializers::CommandBufferSubmitInfo(command_buffer);
+
+        VkSemaphoreSubmitInfo wait_semaphore_submit_info = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, current_frame_data.swapchain_semaphore);
+        VkSemaphoreSubmitInfo signal_semaphore_submit_info = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, current_frame_data.render_semaphore);
+
+        VkSubmitInfo2 submit_info = VulkanInitializers::SubmitInfo(&command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info);
+
+        if (vkQueueSubmit2(m_graphics_queue, 1, &submit_info, current_frame_data.render_fence) != VK_SUCCESS)
+        {
+            SPDLOG_CRITICAL("Failure on frame index {} while submitting to the GPU queue", current_frame_index);
+            Unicamotor::RequestExit();
+            return;
+        }
+    }
+
+    {
+        ZoneScopedN("vulkan::vkQueuePresentKHR");
+        VkPresentInfoKHR present_info = {};
+        present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.pNext = nullptr;
+        present_info.pSwapchains = &m_swapchain;
+        present_info.swapchainCount = 1;
+        present_info.pWaitSemaphores = &current_frame_data.render_semaphore;
+        present_info.waitSemaphoreCount = 1;
+        present_info.pImageIndices = &swapchain_image_index;
+
+        if (vkQueuePresentKHR(m_graphics_queue, &present_info) != VK_SUCCESS)
+        {
+            return;
+        }
     }
 
     ++m_frame_count;

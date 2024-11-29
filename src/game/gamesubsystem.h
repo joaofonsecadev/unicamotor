@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <tracy/Tracy.hpp>
+
 #include "subsystem/subsystem.h"
 
 class GameInstance;
@@ -15,7 +17,7 @@ public:
     std::string GetSubsystemName() override { return "GameSubsystem"; }
 
     bool Init() override { return true; }
-    void Tick() override { }
+    void Tick() override { ZoneScoped; }
 
 private:
     GameInstance* m_game_instance = nullptr;

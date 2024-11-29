@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <tracy/Tracy.hpp>
 
 #include "vulkanframedata.h"
 #include "vulkan/vulkan_core.h"
@@ -32,8 +33,8 @@ private:
     bool DestroyCommandPoolFenceAndSemaphores();
 
     VulkanFrameData& GetCurrentFrameData() { return m_frame_data.at(GetCurrentFrameIndex()); }
-    VulkanFrameData& GetFrameData(const uint8_t frame_index) { return m_frame_data[frame_index]; }
-    [[nodiscard]] uint8_t GetCurrentFrameIndex() const { return m_frame_count % m_frame_buffer_amount; }
+    VulkanFrameData& GetFrameData(const uint8_t frame_index) { ZoneScoped; return m_frame_data[frame_index]; }
+    [[nodiscard]] uint8_t GetCurrentFrameIndex() const { ZoneScoped; return m_frame_count % m_frame_buffer_amount; }
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugMessenger(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void*);
 
