@@ -14,4 +14,6 @@ namespace VulkanInitializers
     VkSemaphoreSubmitInfo SemaphoreSubmitInfo(VkPipelineStageFlags2 pipeline_stage_flags, VkSemaphore semaphore);
     VkCommandBufferSubmitInfo CommandBufferSubmitInfo(VkCommandBuffer command_buffer);
     VkSubmitInfo2 SubmitInfo(const VkCommandBufferSubmitInfo* command_buffer_submit_info, const VkSemaphoreSubmitInfo* signal_semaphore_submit_info, const VkSemaphoreSubmitInfo* wait_semaphore_submit_info);
+    VkImageCreateInfo ImageCreateInfo(VkFormat format, VkImageUsageFlags usage_flags, VkExtent3D extent);
+    VkImageViewCreateInfo ImageViewCreateInfo(VkFormat format, VkImage image, VkImageAspectFlags aspect_flags);
 }

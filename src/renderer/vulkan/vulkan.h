@@ -3,6 +3,7 @@
 #include <vector>
 #include <tracy/Tracy.hpp>
 
+#include "vulkanallocatedimage.h"
 #include "vulkanframedata.h"
 #include "vulkan/vulkan_core.h"
 #include "renderer/renderer.h"
@@ -21,9 +22,12 @@ public:
 
     bool Init() override;
     void Tick() override;
-    void DrawFrame();
 
 private:
+    void DrawFrame();
+    void DrawBackground(VkCommandBuffer command_buffer);
+
+
     bool CreateWindow();
     bool CreateVulkanInstance();
     bool CreateVulkanSwapchain(const uint16_t extent_width, const uint16_t extent_height);
@@ -59,6 +63,9 @@ private:
     std::vector<VkImageView> m_swapchain_image_views;
     VkExtent2D m_swapchain_extent = { 0, 0 };
     uint8_t m_frame_buffer_amount = -1;
+
+    VulkanAllocatedImage m_draw_image;
+    VkExtent2D m_draw_extent = { 0, 0 };
 
     // Vulkan Queues and Commands
     VulkanDeletionQueue m_global_deletion_queue;

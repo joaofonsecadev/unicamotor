@@ -16,6 +16,7 @@
 #include "core/directories.h"
 
 constexpr uint64_t gpu_sync_timeout = 3'000'000'000;
+constexpr VkClearColorValue clear_color_value = { { .14f, .16f, .16f, 1.f } };
 
 RendererVulkan::RendererVulkan(Unicamotor* engine) : RendererSubsystem(engine)
 {
@@ -112,6 +113,9 @@ void RendererVulkan::DrawFrame()
         }
     }
 
+    m_draw_extent.width = m_draw_image.extent.width;
+    m_draw_extent.height = m_draw_image.extent.height;
+
     VkCommandBufferBeginInfo command_buffer_begin_info  = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
     {
         ZoneScopedN("vulkan::vkBeginCommandBuffer");
@@ -125,17 +129,15 @@ void RendererVulkan::DrawFrame()
 
     {
         ZoneScopedN("RendererVulkan::DrawFrame::CommandBufferFill");
-        VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+        VulkanUtilities::TransitionImage(command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 
-        VkClearColorValue clear_color_value;
-        const float flash = std::abs(std::sin(static_cast<float>(m_frame_count) / 120.f));
-        clear_color_value = { { 0.0f, 0.0f, flash, 1.0f } };
+        DrawBackground(command_buffer);
 
-        VkImageSubresourceRange clear_image_range = VulkanInitializers::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
+        VulkanUtilities::TransitionImage(command_buffer, m_draw_image.image,VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index],VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-        vkCmdClearColorImage(command_buffer, m_swapchain_images[current_frame_index], VK_IMAGE_LAYOUT_GENERAL, &clear_color_value, 1, &clear_image_range);
-
-        VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index],VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+        VulkanUtilities::CopyImageToImage(command_buffer, m_draw_image.image, m_swapchain_images[current_frame_index], m_draw_extent, m_swapchain_extent);
+        VulkanUtilities::TransitionImage(command_buffer, m_swapchain_images[current_frame_index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
     }
 
 
@@ -187,6 +189,17 @@ void RendererVulkan::DrawFrame()
     }
 
     ++m_frame_count;
+}
+
+void RendererVulkan::DrawBackground(VkCommandBuffer command_buffer)
+{
+    ZoneScoped;
+
+    VkImageSubresourceRange clear_image_range = VulkanInitializers::ImageSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT);
+    {
+        ZoneScopedN("vulkan::vkCmdClearColorImage");
+        vkCmdClearColorImage(command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_color_value, 1, &clear_image_range);
+    }
 }
 
 bool RendererVulkan::CreateWindow()
@@ -308,6 +321,39 @@ bool RendererVulkan::CreateVulkanSwapchain(const uint16_t extent_width, const ui
 
     m_frame_buffer_amount = m_swapchain_images.size();
     m_frame_data.resize(m_frame_buffer_amount);
+
+    VkExtent3D draw_image_extent = { m_swapchain_extent.width, m_swapchain_extent.height, 1 };
+
+    // Draw format as 64bit signed float RGBA
+    m_draw_image.format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    m_draw_image.extent = draw_image_extent;
+
+    VkImageUsageFlags draw_image_usage_flags { };
+    draw_image_usage_flags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    draw_image_usage_flags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    draw_image_usage_flags |= VK_IMAGE_USAGE_STORAGE_BIT;
+    draw_image_usage_flags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    VkImageCreateInfo draw_image_create_info = VulkanInitializers::ImageCreateInfo(m_draw_image.format, draw_image_usage_flags, draw_image_extent);
+
+    VmaAllocationCreateInfo draw_image_allocation_crate_info = {};
+    draw_image_allocation_crate_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    draw_image_allocation_crate_info.requiredFlags = static_cast<VkMemoryPropertyFlags>(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    vmaCreateImage(m_memory_allocator, &draw_image_create_info, &draw_image_allocation_crate_info, &m_draw_image.image, &m_draw_image.allocation, nullptr);
+
+    VkImageViewCreateInfo draw_image_view_create_info = VulkanInitializers::ImageViewCreateInfo(m_draw_image.format, m_draw_image.image, VK_IMAGE_ASPECT_COLOR_BIT);
+    if (vkCreateImageView(m_vulkan_device, &draw_image_view_create_info, nullptr, &m_draw_image.view) != VK_SUCCESS)
+    {
+        SPDLOG_CRITICAL("Failed to create an image view for the draw image");
+        return false;
+    }
+
+    m_global_deletion_queue.PushDeletionFunction([=]
+    {
+        vkDestroyImageView(m_vulkan_device, m_draw_image.view, nullptr);
+        vmaDestroyImage(m_memory_allocator, m_draw_image.image, m_draw_image.allocation);
+    });
+
     return true;
 }
 
