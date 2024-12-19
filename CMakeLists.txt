@@ -18,6 +18,8 @@ endif()
 # Project source files
 set(SourceFiles
         src/main.cpp
+	src/motor/unicaconfig.h
+	src/motor/unicamotor.h
 )
 
 find_package(Vulkan REQUIRED)

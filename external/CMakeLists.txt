@@ -11,9 +11,13 @@ option(TRACY_CALLSTACK "" ON)
 option(TRACY_ONLY_LOCALHOST "" ON)
 add_subdirectory(tracy)
 target_compile_options(TracyClient PUBLIC "-w")
-set_target_properties(TracyClient PROPERTIES FOLDER external)
 
 add_subdirectory(glfw)
 
 add_library(glad STATIC glad/src/glad.c)
 target_include_directories(glad PUBLIC glad/include)
+
+set_target_properties(TracyClient PROPERTIES FOLDER external)
+set_target_properties(glfw PROPERTIES FOLDER external)
+set_target_properties(glad PROPERTIES FOLDER external)
+set_target_properties(vk-bootstrap PROPERTIES FOLDER external)
