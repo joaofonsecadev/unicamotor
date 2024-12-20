@@ -1,4 +1,4 @@
-#include "tracy/Tracy.hpp"
+#include "core/profiling.h"
 
 #include "motor/unicamotor.h"
 
@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
     Unicamotor engine;
     while (!engine.HasExitBeenRequested())
     {
-        FrameMarkNamed("EngineLoop");
+        UnicaProf_FrameMarkNamed("EngineLoop");
     }
 
     return 0;

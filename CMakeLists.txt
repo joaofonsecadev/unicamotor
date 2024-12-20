@@ -5,7 +5,7 @@ if (PROJECT_IS_TOP_LEVEL)
     set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
     option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
-    set(CMAKE_CXX_STANDARD          20)
+    set(CMAKE_CXX_STANDARD          17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS        OFF)
 
@@ -18,8 +18,12 @@ endif()
 # Project source files
 set(SourceFiles
         src/main.cpp
-	src/motor/unicaconfig.h
-	src/motor/unicamotor.h
+        src/core/string.h
+        src/core/profiling.h
+        src/motor/unicaconfig.h
+        src/motor/unicamotor.h
+        src/core/memory.h
+        src/motor/unicamotor.cpp
 )
 
 find_package(Vulkan REQUIRED)
