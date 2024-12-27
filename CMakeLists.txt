@@ -24,6 +24,7 @@ set(SourceFiles
         src/motor/unicamotor.h
         src/core/memory.h
         src/motor/unicamotor.cpp
+        src/core/vector.h
 )
 
 find_package(Vulkan REQUIRED)

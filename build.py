@@ -10,7 +10,7 @@ def get_command(command: str):
 
     return cmd
 
-def should_cmake_run() -> bool:
+def is_cmakelists_file_updated() -> bool:
     current_md5 = hashlib.md5()
     with open("CMakeLists.txt", 'rb') as base_cmake_file:
         data = base_cmake_file.read()
@@ -21,7 +21,6 @@ def should_cmake_run() -> bool:
         old_md5 = saved_file.read()
 
     if current_md5.hexdigest() == old_md5:
-        print("No CMakeLists.txt changes detected, skipping CMake generation")
         return False
 
     with open("build/buildtool.txt", "w") as saved_file:
@@ -30,16 +29,18 @@ def should_cmake_run() -> bool:
     return True
 
 def cmake_run():
-
-    if not should_cmake_run():
+    if not is_cmakelists_file_updated():
+        print("No CMakeLists.txt updates, skipping build files generation")
         return
-    
     cmake_path = get_command("cmake")
     command_fmt = f"{cmake_path} -S . -B build/ -G Ninja"
     print(f"Generating CMake files: {command_fmt}")
     cmake_process = subprocess.run(command_fmt)
 
 def generate_compile_commands():
+    if not is_cmakelists_file_updated():
+        print("No CMakeLists.txt updates, skipping compile_commands.json generation")
+        return
     ninja_path = get_command("ninja")
     command_fmt = f"{ninja_path} -C build/ -t compdb"
     print(f"Generating compile_commands.json: {command_fmt}")

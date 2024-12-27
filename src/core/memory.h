@@ -62,9 +62,9 @@ public:
     void Swap(unique_ptr& other) noexcept
     {
         UnicaProf_ZoneScoped;
-        T* temp = static_cast<T*&&>(other.m_pointer);
-        other.m_pointer = static_cast<T*&&>(m_pointer);
-        m_pointer = static_cast<T*&&>(temp);
+        T* temp = other.m_pointer;
+        other.m_pointer = m_pointer;
+        m_pointer = temp;
     }
 
     T& operator*() const { return *m_pointer; }

@@ -4,10 +4,11 @@
 
 int main(int argc, char* argv[])
 {
-    Unicamotor engine;
+    Unicamotor engine(false);
     while (!engine.HasExitBeenRequested())
     {
-        UnicaProf_FrameMarkNamed("EngineLoop");
+        UnicaProf_FrameMarkStart("EngineLoop");
+        UnicaProf_FrameMarkEnd("EngineLoop");
     }
 
     return 0;
