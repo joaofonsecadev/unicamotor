@@ -2,6 +2,7 @@ import shutil
 import argparse
 import subprocess
 import hashlib
+import pathlib
 
 def get_command(command: str):
     cmd = shutil.which(command)
@@ -16,14 +17,20 @@ def is_cmakelists_file_updated() -> bool:
         data = base_cmake_file.read()
         current_md5.update(data)
 
+    saved_file_path = pathlib.Path("build/buildtool.txt")
+    if not saved_file_path.exists():
+        with open(saved_file_path, "w") as saved_file:
+            saved_file.write(current_md5.hexdigest())
+            return True
+        
     old_md5 = ""
-    with open("build/buildtool.txt", "r") as saved_file:
+    with open(saved_file_path, "r") as saved_file:
         old_md5 = saved_file.read()
 
     if current_md5.hexdigest() == old_md5:
         return False
 
-    with open("build/buildtool.txt", "w") as saved_file:
+    with open(saved_file_path, "w") as saved_file:
         saved_file.write(current_md5.hexdigest())
 
     return True
