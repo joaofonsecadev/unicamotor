@@ -45,6 +45,19 @@ public:
         return &m_data_pointer[m_size++];
     }
 
+    void CopyFrom(const void* src, const size_t size)
+    {
+        UnicaProf_ZoneScoped;
+        if (src == nullptr || src == m_data_pointer || size == 0)
+        {
+            return;
+        }
+
+        memcpy(m_data_pointer, src, size);
+        m_size = size / sizeof(T);
+    }
+
+    T* GetData() { return m_data_pointer; }
     [[nodiscard]] size_t GetSize() const { return m_size; }
 
     T& operator[](size_t index) { return m_data_pointer[index]; }
