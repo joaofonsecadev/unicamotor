@@ -19,6 +19,9 @@ public:
 
         TracyFree(m_data_pointer);
         free(m_data_pointer);
+        m_data_pointer = nullptr;
+        m_capacity = 0;
+        m_size = 0;
     }
 
     explicit vector(size_t initial_size)
@@ -53,6 +56,11 @@ public:
             return;
         }
 
+        if (m_capacity < size / sizeof(T))
+        {
+            Resize(size / sizeof(T));
+        }
+
         memcpy(m_data_pointer, src, size);
         m_size = size / sizeof(T);
     }
@@ -62,6 +70,38 @@ public:
 
     T& operator[](size_t index) { return m_data_pointer[index]; }
     const T& operator[](size_t index) const { return m_data_pointer[index]; }
+
+    vector<T>& operator=(const vector<T>& other)
+    {
+        UnicaProf_ZoneScoped;
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        if (m_data_pointer)
+        {
+            TracyFree(m_data_pointer);
+            free(m_data_pointer);
+
+            m_data_pointer = nullptr;
+            m_capacity = 0;
+            m_size = 0;
+        }
+
+        m_data_pointer = static_cast<T*>(malloc(other.m_capacity * sizeof(T)));
+        if (!m_data_pointer)
+        {
+            return *this;
+        }
+
+        TracyAlloc(m_data_pointer, m_capacity * sizeof(T));
+        memcpy(m_data_pointer, other.m_data_pointer, other.m_size * sizeof(T));
+        m_size = other.m_size;
+        m_capacity = other.m_capacity;
+
+        return *this;
+    }
 
 private:
     bool Resize(size_t new_capacity)

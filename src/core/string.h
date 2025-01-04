@@ -15,7 +15,18 @@ public:
         m_data[0] = '\0';
     }
 
-    string(const char* ptr)
+    explicit string(const char* ptr) { ImportFromCharPtr(ptr); }
+    [[nodiscard]] bool IsEmpty() const { return m_data.GetSize() <= 1; }
+
+    string& operator=(const string& other) = default;
+    string& operator=(const char* char_ptr)
+    {
+        ImportFromCharPtr(char_ptr);
+        return *this;
+    }
+
+private:
+    void ImportFromCharPtr(const char* ptr)
     {
         UnicaProf_ZoneScoped;
         if (!ptr)
@@ -26,20 +37,24 @@ public:
         }
 
         size_t string_size = 0;
-        for (uint32_t i = 0; ptr[i] != '\0'; i++)
+        const char* ptr_c = ptr;
+        while (*ptr_c)
         {
-            string_size++;
+            ++string_size;
+            ++ptr_c;
+        }
+
+        if (string_size == 0)
+        {
+            m_data = unc::vector<char>(1);
+            m_data[0] = '\0';
+            return;
         }
 
         m_data = unc::vector<char>(++string_size);
-        for (size_t i = 0; i < string_size - 1; i++)
-        {
-            m_data.PushBack(ptr[i]);
-        }
-        m_data.PushBack('\0');
+        m_data.CopyFrom(ptr, string_size * sizeof(char));
     }
 
-private:
     unc::vector<char> m_data;
 };
 }
