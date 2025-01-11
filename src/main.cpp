@@ -4,6 +4,11 @@
 
 int main(int argc, char* argv[])
 {
+#ifndef WIN32
+    printf("This architecture is not supported, RIP");
+    return -1;
+#endif
+
     Unicamotor engine(true);
     while (!engine.HasExitBeenRequested())
     {
