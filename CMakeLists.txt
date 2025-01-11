@@ -18,6 +18,7 @@ endif()
 # Project source files
 set(SourceFiles
         src/main.cpp
+        src/core/string.cpp
         src/core/string.h
         src/core/profiling.h
         src/motor/unicaconfig.h
