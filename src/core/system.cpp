@@ -16,7 +16,6 @@ bool unc::SystemUtilities::SetCurrentThreadAffinity()
     uint64_t system_affinity_mask;
     if (GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &system_affinity_mask) == 0)
     {
-        auto ccc = GetLastError();
         return false;
     }
 

@@ -32,6 +32,8 @@ set(SourceFiles
         src/logging/logging.h
         src/core/system.h
         src/core/system.cpp
+        src/timer/timer.cpp
+        src/timer/timer.h
 )
 
 find_package(Vulkan REQUIRED)

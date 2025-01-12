@@ -1,4 +1,3 @@
-#include "../external/glfw/src/internal.h"
 #include "core/profiling.h"
 #include "core/system.h"
 
@@ -6,17 +5,19 @@
 
 int main(int argc, char* argv[])
 {
-    unc::SystemUtilities::SetCurrentThreadAffinity();
 #ifndef WIN32
     printf("This architecture is not supported, RIP");
     return -1;
 #endif
 
-    Unicamotor engine(true);
+    // Setting main thread affinity to the current core
+    unc::SystemUtilities::SetCurrentThreadAffinity();
+
+    Unicamotor engine;
     while (!engine.HasExitBeenRequested())
     {
-        UnicaProf_FrameMarkStart("EngineLoop");
-        UnicaProf_FrameMarkEnd("EngineLoop");
+        engine.Tick();
+        UnicaProf_FrameMarkNamed("EngineLoop");
     }
 
     return 0;
