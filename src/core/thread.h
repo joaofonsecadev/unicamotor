@@ -22,7 +22,7 @@ protected:
 
 private:
 #ifdef WIN32
-    static DWORD WINAPI ThreadProc(LPVOID lpParameter);
+    static DWORD WINAPI ThreadProc(LPVOID lp_parameter);
 #endif
 
     void* m_thread = nullptr;

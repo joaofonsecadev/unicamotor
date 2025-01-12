@@ -28,6 +28,10 @@ set(SourceFiles
         src/core/thread.h
         src/core/vector.h
         src/core/thread.cpp
+        src/logging/logging.cpp
+        src/logging/logging.h
+        src/core/system.h
+        src/core/system.cpp
 )
 
 find_package(Vulkan REQUIRED)

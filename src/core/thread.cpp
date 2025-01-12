@@ -1,7 +1,10 @@
 #include "thread.h"
 
+#include "profiling.h"
+
 unc::thread::thread()
 {
+    UnicaProf_ZoneScoped;
 #ifdef WIN32
     m_thread = CreateThread(nullptr, 0, ThreadProc, this, 0, nullptr);
     if (m_thread == nullptr)
@@ -15,6 +18,7 @@ unc::thread::thread()
 #ifdef WIN32
 DWORD unc::thread::ThreadProc(LPVOID lp_parameter)
 {
+    UnicaProf_ZoneScoped;
     thread* thread = static_cast<unc::thread*>(lp_parameter);
     thread->Main();
     thread->m_is_running = false;
@@ -24,6 +28,7 @@ DWORD unc::thread::ThreadProc(LPVOID lp_parameter)
 
 unc::thread::~thread()
 {
+    UnicaProf_ZoneScoped;
     if (m_thread == nullptr)
     {
         return;
@@ -36,6 +41,7 @@ unc::thread::~thread()
 
 bool unc::thread::Join(const uint64_t timeout_ms) const
 {
+    UnicaProf_ZoneScoped;
     if (m_thread == nullptr || m_is_running == false)
     {
         return true;

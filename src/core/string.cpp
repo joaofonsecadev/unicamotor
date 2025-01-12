@@ -40,6 +40,7 @@ void unc::string::ImportFromCharPtr(const char* ptr)
 
 unc::string& unc::string::operator=(const char* char_ptr)
 {
+    UnicaProf_ZoneScoped;
     ImportFromCharPtr(char_ptr);
     return *this;
 }
