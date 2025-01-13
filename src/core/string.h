@@ -8,13 +8,14 @@ class String
 {
 public:
     String();
+    ~String() = default;
 
     explicit String(const char* ptr) { ImportFromCharPtr(ptr); }
     [[nodiscard]] bool IsEmpty() const { return m_data.GetSize() <= 1; }
 
     char* GetData() { return m_data.GetData(); }
 
-    String& operator=(const String& other) = default;
+    String& operator=(const String& other);
     String& operator=(const char* char_ptr);
 
 private:

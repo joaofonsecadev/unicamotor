@@ -24,19 +24,35 @@ public:
         m_size = 0;
     }
 
-    explicit Vector(size_t initial_size)
+    explicit Vector(size_t initial_size, size_t max_size = 0)
     {
         UnicaProf_ZoneScoped;
-        m_data_pointer = static_cast<T*>(malloc(initial_size * sizeof(T)));
-        m_capacity = initial_size;
+        if (initial_size == 0)
+        {
+            return;
+        }
+
+        m_data_pointer = static_cast<T*>(calloc(initial_size, sizeof(T)));
+        if (!m_data_pointer)
+        {
+            return;
+        }
         TracyAlloc(m_data_pointer, initial_size * sizeof(T));
+
+        m_max_size = max_size;
+        m_capacity = initial_size;
     }
 
-    T* PushBack(T new_element)
+    T* PushBack(T& new_element)
     {
         UnicaProf_ZoneScoped;
         if (m_size == m_capacity)
         {
+            if (m_max_size > 0 && m_size == m_max_size)
+            {
+                return nullptr;
+            }
+
             const size_t new_capacity = m_capacity == 0 ? 1 : m_capacity * 2;
             if (!Resize(new_capacity))
             {
@@ -107,6 +123,12 @@ private:
     bool Resize(size_t new_capacity)
     {
         UnicaProf_ZoneScoped;
+
+        if (m_max_size > 0 && new_capacity > m_max_size)
+        {
+            new_capacity = m_max_size;
+        }
+
         if (new_capacity <= m_capacity)
         {
             return false;
@@ -118,7 +140,11 @@ private:
             return false;
         }
 
-        TracyFree(m_data_pointer);
+        if (m_data_pointer != nullptr)
+        {
+            TracyFree(m_data_pointer);
+        }
+
         TracyAlloc(new_data_pointer, new_capacity * sizeof(T));
         m_data_pointer = new_data_pointer;
         m_capacity = new_capacity;
@@ -128,5 +154,6 @@ private:
     T* m_data_pointer = nullptr;
     size_t m_size = 0;
     size_t m_capacity = 0;
+    size_t m_max_size = 0;
 };
 }

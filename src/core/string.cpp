@@ -38,6 +38,13 @@ void Unica::String::ImportFromCharPtr(const char* ptr)
     m_data.CopyFrom(ptr, string_size * sizeof(char));
 }
 
+Unica::String& Unica::String::operator=(const String& other)
+{
+    UnicaProf_ZoneScoped;
+    m_data = other.m_data;
+    return *this;
+}
+
 Unica::String& Unica::String::operator=(const char* char_ptr)
 {
     UnicaProf_ZoneScoped;
