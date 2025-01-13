@@ -1,6 +1,6 @@
 #pragma once
 
-namespace unc::SystemUtilities
+namespace Unica::SystemUtilities
 {
     bool SetCurrentThreadAffinity();
 }

@@ -18,22 +18,24 @@ endif()
 # Project source files
 set(SourceFiles
         src/main.cpp
-        src/core/string.cpp
-        src/core/string.h
+        src/core/String.cpp
+        src/core/String.h
         src/core/profiling.h
         src/motor/unicaconfig.h
         src/motor/unicamotor.h
         src/core/memory.h
         src/motor/unicamotor.cpp
-        src/core/thread.h
-        src/core/vector.h
-        src/core/thread.cpp
+        src/core/Thread.h
+        src/core/Vector.h
+        src/core/Thread.cpp
         src/logging/logging.cpp
         src/logging/logging.h
         src/core/system.h
         src/core/system.cpp
         src/timer/timer.cpp
         src/timer/timer.h
+        src/core/queue.cpp
+        src/core/queue.h
 )
 
 find_package(Vulkan REQUIRED)

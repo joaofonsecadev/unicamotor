@@ -1,5 +1,7 @@
 #pragma once
+
 #include "unicaconfig.h"
+#include "logging/logging.h"
 #include "timer/timer.h"
 
 class Unicamotor 
@@ -15,5 +17,6 @@ private:
     bool m_requested_exit = false;
 
     UnicaConfig m_unica_config;
+    Logging m_logging;
     Timer m_timer;
 };

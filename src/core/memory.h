@@ -22,20 +22,20 @@ inline void operator delete(void* pointer)
     free(pointer);
 }
 
-namespace unc
+namespace Unica
 {
 template <class T>
-class unique_ptr
+class UniquePtr
 {
 public:
-    unique_ptr() : m_pointer(nullptr) { }
-    explicit unique_ptr(T* pointer = nullptr) : m_pointer(pointer) { }
-    unique_ptr(unique_ptr&& other) noexcept : m_pointer(other.m_pointer) { other.m_pointer = nullptr; }
+    UniquePtr() : m_pointer(nullptr) { }
+    explicit UniquePtr(T* pointer = nullptr) : m_pointer(pointer) { }
+    UniquePtr(UniquePtr&& other) noexcept : m_pointer(other.m_pointer) { other.m_pointer = nullptr; }
 
-    unique_ptr(const unique_ptr&) = delete;
-    unique_ptr& operator=(const unique_ptr&) = delete;
+    UniquePtr(const UniquePtr&) = delete;
+    UniquePtr& operator=(const UniquePtr&) = delete;
 
-    ~unique_ptr() { Reset(nullptr); }
+    ~UniquePtr() { Reset(nullptr); }
 
     T* Get() const { return m_pointer; }
 
@@ -59,7 +59,7 @@ public:
         delete old_pointer;
     }
 
-    void Swap(unique_ptr& other) noexcept
+    void Swap(UniquePtr& other) noexcept
     {
         UnicaProf_ZoneScoped;
         T* temp = other.m_pointer;
@@ -70,7 +70,7 @@ public:
     T& operator*() const { return *m_pointer; }
     T* operator->() const noexcept { return m_pointer; }
     explicit operator bool() const noexcept { return m_pointer != nullptr; }
-    unique_ptr& operator=(unique_ptr&& other) noexcept
+    UniquePtr& operator=(UniquePtr&& other) noexcept
     {
         UnicaProf_ZoneScoped;
         if (this == &other)
@@ -87,5 +87,5 @@ private:
 };
 
 template <class T, class... Args>
-unique_ptr<T> unique_ptr_make(Args&&... args) { return unique_ptr<T>(new T(static_cast<Args&&>(args)...)); }
+UniquePtr<T> UniquePtrMake(Args&&... args) { return UniquePtr<T>(new T(static_cast<Args&&>(args)...)); }
 }

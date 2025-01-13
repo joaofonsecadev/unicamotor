@@ -2,14 +2,14 @@
 
 #include "profiling.h"
 
-namespace unc
+namespace Unica
 {
 template <typename T>
-class vector
+class Vector
 {
 public:
-    vector() = default;
-    ~vector()
+    Vector() = default;
+    ~Vector()
     {
         UnicaProf_ZoneScoped;
         if (!m_data_pointer)
@@ -24,7 +24,7 @@ public:
         m_size = 0;
     }
 
-    explicit vector(size_t initial_size)
+    explicit Vector(size_t initial_size)
     {
         UnicaProf_ZoneScoped;
         m_data_pointer = static_cast<T*>(malloc(initial_size * sizeof(T)));
@@ -71,7 +71,7 @@ public:
     T& operator[](size_t index) { return m_data_pointer[index]; }
     const T& operator[](size_t index) const { return m_data_pointer[index]; }
 
-    vector<T>& operator=(const vector<T>& other)
+    Vector<T>& operator=(const Vector<T>& other)
     {
         UnicaProf_ZoneScoped;
         if (this == &other)

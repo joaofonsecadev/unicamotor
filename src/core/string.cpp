@@ -2,19 +2,19 @@
 
 #include "core/profiling.h"
 
-unc::string::string()
+Unica::String::String()
 {
     UnicaProf_ZoneScoped;
-    m_data = unc::vector<char>(1);
+    m_data = Unica::Vector<char>(1);
     m_data[0] = '\0';
 }
 
-void unc::string::ImportFromCharPtr(const char* ptr)
+void Unica::String::ImportFromCharPtr(const char* ptr)
 {
     UnicaProf_ZoneScoped;
     if (!ptr)
     {
-        m_data = unc::vector<char>(1);
+        m_data = Unica::Vector<char>(1);
         m_data[0] = '\0';
         return;
     }
@@ -29,16 +29,16 @@ void unc::string::ImportFromCharPtr(const char* ptr)
 
     if (string_size == 0)
     {
-        m_data = unc::vector<char>(1);
+        m_data = Unica::Vector<char>(1);
         m_data[0] = '\0';
         return;
     }
 
-    m_data = unc::vector<char>(++string_size);
+    m_data = Unica::Vector<char>(++string_size);
     m_data.CopyFrom(ptr, string_size * sizeof(char));
 }
 
-unc::string& unc::string::operator=(const char* char_ptr)
+Unica::String& Unica::String::operator=(const char* char_ptr)
 {
     UnicaProf_ZoneScoped;
     ImportFromCharPtr(char_ptr);

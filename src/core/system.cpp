@@ -7,7 +7,7 @@
 
 #include "profiling.h"
 
-bool unc::SystemUtilities::SetCurrentThreadAffinity()
+bool Unica::SystemUtilities::SetCurrentThreadAffinity()
 {
     UnicaProf_ZoneScoped;
 #ifdef WIN32

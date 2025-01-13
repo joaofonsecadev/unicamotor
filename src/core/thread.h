@@ -7,13 +7,13 @@
 #include <windows.h>
 #endif
 
-namespace unc
+namespace Unica
 {
-class thread
+class Thread
 {
 public:
-    thread();
-    virtual ~thread();
+    Thread();
+    virtual ~Thread();
 
     bool Join(uint64_t timeout_ms = UINT64_MAX) const;
 
@@ -26,6 +26,7 @@ private:
 #endif
 
     void* m_thread = nullptr;
-    bool m_is_running = false;
+    bool m_started = false;
+    bool m_finished = false;
 };
 }

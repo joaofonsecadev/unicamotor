@@ -2,31 +2,30 @@
 
 #include "profiling.h"
 
-unc::thread::thread()
+Unica::Thread::Thread()
 {
     UnicaProf_ZoneScoped;
 #ifdef WIN32
     m_thread = CreateThread(nullptr, 0, ThreadProc, this, 0, nullptr);
-    if (m_thread == nullptr)
+    if (m_thread != nullptr)
     {
-        m_is_running = false;
+        m_started = true;
     }
-    m_is_running = true;
 #endif
 }
 
 #ifdef WIN32
-DWORD unc::thread::ThreadProc(LPVOID lp_parameter)
+DWORD Unica::Thread::ThreadProc(LPVOID lp_parameter)
 {
     UnicaProf_ZoneScoped;
-    thread* thread = static_cast<unc::thread*>(lp_parameter);
+    Thread* thread = static_cast<Unica::Thread*>(lp_parameter);
     thread->Main();
-    thread->m_is_running = false;
+    thread->m_finished = true;
     return 0;
 }
 #endif
 
-unc::thread::~thread()
+Unica::Thread::~Thread()
 {
     UnicaProf_ZoneScoped;
     if (m_thread == nullptr)
@@ -39,17 +38,22 @@ unc::thread::~thread()
 #endif
 }
 
-bool unc::thread::Join(const uint64_t timeout_ms) const
+bool Unica::Thread::Join(const uint64_t timeout_ms) const
 {
     UnicaProf_ZoneScoped;
-    if (m_thread == nullptr || m_is_running == false)
+    if (m_thread == nullptr || m_started == false)
     {
         return true;
     }
 
+    if (!m_finished)
+    {
+        return false;
+    }
+
 #ifdef WIN32
     uint64_t wait_result = WaitForSingleObject(m_thread, timeout_ms);
-    return wait_result == WAIT_TIMEOUT;
+    return wait_result != WAIT_TIMEOUT;
 #else
     return true;
 #endif
