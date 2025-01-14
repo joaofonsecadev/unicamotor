@@ -8,7 +8,7 @@ inline void* operator new(size_t size)
     void* pointer = malloc(size);
     if (!pointer)
     {
-        throw std::bad_alloc();
+        return nullptr;
     }
 
     TracyAlloc(pointer, size);
@@ -22,14 +22,26 @@ inline void operator delete(void* pointer)
     free(pointer);
 }
 
+inline void* operator new[](size_t size)
+{
+    return operator new(size);
+}
+
+inline void operator delete[](void* pointer)
+{
+    UnicaProf_ZoneScoped;
+    TracyFree(pointer);
+    free(pointer);
+}
+
 namespace Unica
 {
 template <class T>
 class UniquePtr
 {
 public:
-    UniquePtr() : m_pointer(nullptr) { }
-    explicit UniquePtr(T* pointer = nullptr) : m_pointer(pointer) { }
+    UniquePtr() = default;
+    explicit UniquePtr(T* pointer) : m_pointer(pointer) { }
     UniquePtr(UniquePtr&& other) noexcept : m_pointer(other.m_pointer) { other.m_pointer = nullptr; }
 
     UniquePtr(const UniquePtr&) = delete;
@@ -47,13 +59,18 @@ public:
         return pointer;
     }
 
-    void Reset(T* new_pointer = nullptr)
+    void Reset(T* new_pointer = nullptr, bool is_vec_ptr = false)
     {
         UnicaProf_ZoneScoped;
         T* old_pointer = m_pointer;
         m_pointer = new_pointer;
         if (!old_pointer)
         {
+            return;
+        }
+        if (is_vec_ptr)
+        {
+            delete[] old_pointer;
             return;
         }
         delete old_pointer;
@@ -83,7 +100,7 @@ public:
     }
 
 private:
-    T* m_pointer;
+    T* m_pointer = nullptr;
 };
 
 template <class T, class... Args>

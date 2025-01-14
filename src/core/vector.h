@@ -1,5 +1,6 @@
 #pragma once
 
+#include "memory.h"
 #include "profiling.h"
 
 namespace Unica
@@ -11,35 +12,34 @@ public:
     Vector() = default;
     ~Vector()
     {
-        UnicaProf_ZoneScoped;
-        if (!m_data_pointer)
-        {
-            return;
-        }
-
-        TracyFree(m_data_pointer);
-        free(m_data_pointer);
-        m_data_pointer = nullptr;
+        m_data_pointer.Reset(nullptr, true);
         m_capacity = 0;
+        m_max_size = 0;
         m_size = 0;
     }
 
     explicit Vector(size_t initial_size, size_t max_size = 0)
     {
         UnicaProf_ZoneScoped;
+
+        m_max_size = max_size;
         if (initial_size == 0)
         {
             return;
         }
 
-        m_data_pointer = static_cast<T*>(calloc(initial_size, sizeof(T)));
-        if (!m_data_pointer)
+        if (max_size && initial_size > max_size)
+        {
+            initial_size = max_size;
+        }
+
+        T* new_data_ptr = new T[initial_size];
+        if (!new_data_ptr)
         {
             return;
         }
-        TracyAlloc(m_data_pointer, initial_size * sizeof(T));
 
-        m_max_size = max_size;
+        m_data_pointer.Reset(new_data_ptr, true);
         m_capacity = initial_size;
     }
 
@@ -60,14 +60,14 @@ public:
             }
         }
 
-        m_data_pointer[m_size] = new_element;
-        return &m_data_pointer[m_size++];
+        m_data_pointer.Get()[m_size] = new_element;
+        return &m_data_pointer.Get()[m_size++];
     }
 
     void CopyFrom(const void* src, const size_t size)
     {
         UnicaProf_ZoneScoped;
-        if (src == nullptr || src == m_data_pointer || size == 0)
+        if (src == nullptr || src == m_data_pointer.Get() || size == 0)
         {
             return;
         }
@@ -77,15 +77,15 @@ public:
             Resize(size / sizeof(T));
         }
 
-        memcpy(m_data_pointer, src, size);
+        memcpy(m_data_pointer.Get(), src, size);
         m_size = size / sizeof(T);
     }
 
-    T* GetData() { return m_data_pointer; }
+    T* GetData() { return m_data_pointer.Get(); }
     [[nodiscard]] size_t GetSize() const { return m_size; }
 
-    T& operator[](size_t index) { return m_data_pointer[index]; }
-    const T& operator[](size_t index) const { return m_data_pointer[index]; }
+    T& operator[](size_t index) { return m_data_pointer.Get()[index]; }
+    const T& operator[](size_t index) const { return m_data_pointer.Get()[index]; }
 
     Vector<T>& operator=(const Vector<T>& other)
     {
@@ -95,27 +95,15 @@ public:
             return *this;
         }
 
-        if (m_data_pointer)
-        {
-            TracyFree(m_data_pointer);
-            free(m_data_pointer);
-
-            m_data_pointer = nullptr;
-            m_capacity = 0;
-            m_size = 0;
-        }
-
-        m_data_pointer = static_cast<T*>(malloc(other.m_capacity * sizeof(T)));
-        if (!m_data_pointer)
+        T* m_new_data_pointer = new T[other.m_capacity];
+        if (!m_new_data_pointer)
         {
             return *this;
         }
-
-        TracyAlloc(m_data_pointer, m_capacity * sizeof(T));
-        memcpy(m_data_pointer, other.m_data_pointer, other.m_size * sizeof(T));
+        m_data_pointer.Reset(m_new_data_pointer, true);
+        memcpy(m_new_data_pointer, other.m_data_pointer.Get(), other.m_size * sizeof(T));
         m_size = other.m_size;
         m_capacity = other.m_capacity;
-
         return *this;
     }
 
@@ -134,24 +122,24 @@ private:
             return false;
         }
 
-        T* new_data_pointer = static_cast<T*>(realloc(m_data_pointer, new_capacity * sizeof(T)));
+        T* new_data_pointer = new T[new_capacity];
         if (!new_data_pointer)
         {
             return false;
         }
 
-        if (m_data_pointer != nullptr)
+        T* current_ptr = m_data_pointer.Get();
+        for (uint32_t i = 0; i < m_size; i++)
         {
-            TracyFree(m_data_pointer);
+            new_data_pointer[i] = current_ptr[i];
         }
 
-        TracyAlloc(new_data_pointer, new_capacity * sizeof(T));
-        m_data_pointer = new_data_pointer;
+        m_data_pointer.Reset(new_data_pointer, true);
         m_capacity = new_capacity;
         return true;
     }
 
-    T* m_data_pointer = nullptr;
+    Unica::UniquePtr<T> m_data_pointer;
     size_t m_size = 0;
     size_t m_capacity = 0;
     size_t m_max_size = 0;

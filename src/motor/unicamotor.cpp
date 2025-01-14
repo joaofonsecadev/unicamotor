@@ -10,9 +10,10 @@ Unicamotor::Unicamotor()
 void Unicamotor::Tick()
 {
     UnicaProf_ZoneScoped;
-
     m_timer.MarkStartWork();
-
+    {
+        UnicaProf_ZoneScopedNamed("Unicamotor::Tick::Work");
+    }
     m_timer.MarkEndWork();
     m_timer.PossibleSleep();
 }

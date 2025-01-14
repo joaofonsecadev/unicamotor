@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     // Setting main thread affinity to the current core
     Unica::SystemUtilities::SetCurrentThreadAffinity();
 
-    Unicamotor engine(true);
+    Unicamotor engine(false);
     while (!engine.HasExitBeenRequested())
     {
         engine.Tick();
