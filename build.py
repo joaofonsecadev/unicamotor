@@ -46,15 +46,18 @@ def is_cmakelists_file_updated(build_type: str) -> bool:
     return True
 
 def cmake_run(args: argparse.Namespace):
-    
-
     if not is_cmakelists_file_updated(args.build_type):
         #print("No CMakeLists.txt updates, skipping build files generation\n")
         return False
     cmake_path = get_command("cmake")
     command_fmt = f"{cmake_path} -S . -B build/ -G Ninja -DCMAKE_BUILD_TYPE={args.build_type}"
     print(f"Generating CMake files: {command_fmt}\033[90m")
-    _ = subprocess.run(command_fmt)
+    try:
+        _ = subprocess.run(command_fmt, check=True)
+    except subprocess.CalledProcessError:
+        os.remove(pathlib.Path("build/buildtool.txt"))
+        print("\033[31mCMake failure! Aborting\033[0m")
+        exit(-1)
     print("\033[0m")
     return True
 
@@ -65,16 +68,58 @@ def generate_compile_commands(args: argparse.Namespace, force_run: bool):
     ninja_path = get_command("ninja")
     command_fmt = f"{ninja_path} -C build/ -t compdb"
     print(f"Generating compile_commands.json: {command_fmt}\033[90m")
+    delete_command_file = False
     with open("compile_commands.json", "w") as compile_commands_file:
-        _ = subprocess.run(command_fmt, stdout=compile_commands_file)
+        try:
+            _ = subprocess.run(command_fmt, stdout=compile_commands_file, check=True)
+        except subprocess.CalledProcessError:
+            delete_command_file = True
+
+    if delete_command_file:
+        os.remove("compile_commands.json")
+        print("\033[31mFailed generation of compile_commands.json! Aborting\033[0m")
+        exit(-1)
+
     print("\033[0m")
 
 def build_project():
     ninja_path = get_command("ninja")
     command_fmt = f"{ninja_path} -C build/"
     print(f"Building: {command_fmt}\033[90m")
-    _ = subprocess.run(command_fmt)
+    try:
+        _ = subprocess.run(command_fmt, check=True)
+    except subprocess.CalledProcessError:
+        print("\033[31mBuild failure! Aborting\033[0m")
+        exit(-1)
     print("\033[0m")
+
+def run_tests() -> bool:
+    binary_path = ""
+    if os.name == "nt":
+        binary_path = "bin/unicamotor_tests.exe"
+    else:
+        raise Exception("Missing implementation for this OS")
+
+    command = f"{binary_path}"
+    print(f"Starting test run: {command}\033[90m")
+    try:
+        _ = subprocess.run(command, check=True)
+    except subprocess.CalledProcessError:
+        print("\033[31mTests failure! Aborting\033[0m")
+        exit(-1)
+    print("\033[0m")
+
+    return True
+
+def start_project():
+    binary_path = ""
+    if os.name == "nt":
+        binary_path = pathlib.Path("bin/unicamotor.exe")
+    else:
+        raise Exception("Missing implementation for this OS")
+
+    os.startfile(binary_path)
+    return
 
 def main():
     argument_parser = argparse.ArgumentParser(
@@ -82,20 +127,28 @@ def main():
         description="Build system for the amazing Unicamotor, the best game engine which will never be")
     _ = argument_parser.add_argument("-c", "--cmake-run", required=False, action="store_true", help="Generates build files using ninja by default")
     _ = argument_parser.add_argument('--build-only', help='Builds the project using ninja by default', required=False, action='store_true')
-    _ = argument_parser.add_argument("-b", "--build-type", help="Specify the build type. Defaults to Debug", choices=["Debug", "Release", "RelWithDebInfo", "MinSizeRel"], default="Debug")
+    _ = argument_parser.add_argument("-t", "--build-type", help="Specify the build type. Defaults to Debug", choices=["Debug", "Release", "RelWithDebInfo", "MinSizeRel"], default="Debug")
+    _ = argument_parser.add_argument("--skip-tests", help="Skips running the catch2 test suite", required=False, action='store_true')
+    _ = argument_parser.add_argument("--no-run", help="Does not execute the project at the end", required=False, action='store_true')
     parsed_arguments: argparse.Namespace = argument_parser.parse_args()
 
     if parsed_arguments.cmake_run:
         did_cmake_run = cmake_run(parsed_arguments)
         generate_compile_commands(parsed_arguments, did_cmake_run)
+        return
     elif parsed_arguments.build_only:
         build_project()
+        return
     else:
         did_cmake_run = cmake_run(parsed_arguments)
         generate_compile_commands(parsed_arguments, did_cmake_run)
         build_project()
 
-    return
+    if not parsed_arguments.skip_tests:
+        run_tests()
+
+    if not parsed_arguments.no_run:
+        start_project()
 
 if __name__ == "__main__":
     main()
