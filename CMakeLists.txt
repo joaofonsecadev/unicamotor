@@ -17,27 +17,27 @@ endif()
 
 # Project source files
 set(SourceFiles
+        ${CMAKE_SOURCE_DIR}/src/core/queue.cpp
         ${CMAKE_SOURCE_DIR}/src/core/string.cpp
-        ${CMAKE_SOURCE_DIR}/src/motor/unicamotor.cpp
+        ${CMAKE_SOURCE_DIR}/src/core/system.cpp
         ${CMAKE_SOURCE_DIR}/src/core/thread.cpp
         ${CMAKE_SOURCE_DIR}/src/logging/logging.cpp
-        ${CMAKE_SOURCE_DIR}/src/core/system.cpp
+        ${CMAKE_SOURCE_DIR}/src/motor/unicamotor.cpp
         ${CMAKE_SOURCE_DIR}/src/timer/timer.cpp
-        ${CMAKE_SOURCE_DIR}/src/core/queue.cpp
 )
 
 set(HeaderFiles
-        ${CMAKE_SOURCE_DIR}/src/core/string.h
-        ${CMAKE_SOURCE_DIR}/src/core/profiling.h
-        ${CMAKE_SOURCE_DIR}/src/motor/unicaconfig.h
-        ${CMAKE_SOURCE_DIR}/src/motor/unicamotor.h
         ${CMAKE_SOURCE_DIR}/src/core/memory.h
+        ${CMAKE_SOURCE_DIR}/src/core/profiling.h
+        ${CMAKE_SOURCE_DIR}/src/core/queue.h
+        ${CMAKE_SOURCE_DIR}/src/core/string.h
+        ${CMAKE_SOURCE_DIR}/src/core/system.h
         ${CMAKE_SOURCE_DIR}/src/core/thread.h
         ${CMAKE_SOURCE_DIR}/src/core/vector.h
         ${CMAKE_SOURCE_DIR}/src/logging/logging.h
-        ${CMAKE_SOURCE_DIR}/src/core/system.h
+        ${CMAKE_SOURCE_DIR}/src/motor/unicaconfig.h
+        ${CMAKE_SOURCE_DIR}/src/motor/unicamotor.h
         ${CMAKE_SOURCE_DIR}/src/timer/timer.h
-        ${CMAKE_SOURCE_DIR}/src/core/queue.h
 )
 
 set(IncludeDirs
@@ -46,36 +46,35 @@ set(IncludeDirs
 )
 
 set(LibsToLink
-        Tracy::TracyClient
-        glfw
         glad
-        ${Vulkan_LIBRARIES}
-        VulkanMemoryAllocator
+        glfw
+        Tracy::TracyClient
         vk-bootstrap
+        VulkanMemoryAllocator
+        ${Vulkan_LIBRARIES}
 )
 
 set(AllFiles
-        ${SourceFiles}
         ${HeaderFiles}
+        ${SourceFiles}
         ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
 
 find_package(Vulkan REQUIRED)
 add_subdirectory(external EXCLUDE_FROM_ALL)
 
+add_library(unicamotor_lib ${SourceFiles})
+target_link_libraries(unicamotor_lib PUBLIC ${LibsToLink})
+target_include_directories(unicamotor_lib PUBLIC ${IncludeDirs})
+set_target_properties(unicamotor_lib PROPERTIES FOLDER tools)
+
 add_executable(unicamotor ${AllFiles})
-target_include_directories(unicamotor PUBLIC ${IncludeDirs})
-target_link_libraries(unicamotor PUBLIC ${LibsToLink})
+target_link_libraries(unicamotor PRIVATE unicamotor_lib)
 
 if (PROJECT_IS_TOP_LEVEL)
     add_subdirectory(external/catch2)
     set_target_properties(Catch2WithMain PROPERTIES FOLDER external)
     set_target_properties(Catch2 PROPERTIES FOLDER external)
-
-    add_library(unicamotor_lib ${SourceFiles})
-    target_link_libraries(unicamotor_lib PUBLIC ${LibsToLink})
-    target_include_directories(unicamotor_lib PUBLIC ${IncludeDirs})
-    set_target_properties(unicamotor_lib PROPERTIES FOLDER tools)
 
     set(TestFiles
             ${CMAKE_SOURCE_DIR}/tests/unique_ptr.cpp
@@ -84,6 +83,8 @@ if (PROJECT_IS_TOP_LEVEL)
     add_executable(unicamotor_tests ${TestFiles})
     target_link_libraries(unicamotor_tests PRIVATE Catch2::Catch2WithMain unicamotor_lib)
     set_target_properties(unicamotor_tests PROPERTIES FOLDER tools)
+
+    set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 
     include(CTest)
     include(Catch)
