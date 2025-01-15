@@ -104,5 +104,5 @@ private:
 };
 
 template <class T, class... Args>
-UniquePtr<T> UniquePtrMake(Args&&... args) { return UniquePtr<T>(new T(static_cast<Args&&>(args)...)); }
+UniquePtr<T> CreateUniquePtr(Args&&... args) { return UniquePtr<T>(new T(static_cast<Args&&>(args)...)); }
 }
