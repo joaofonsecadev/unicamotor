@@ -2,11 +2,11 @@
 
 #include "core/profiling.h"
 
-Unica::String::String()
+void Unica::String::DefaultDataVectorInitialization()
 {
     UnicaProf_ZoneScoped;
     m_data = Unica::Vector<char>(1);
-    m_data[0] = '\0';
+    m_data.PushBack('\0');
 }
 
 void Unica::String::ImportFromCharPtr(const char* ptr)
@@ -14,8 +14,7 @@ void Unica::String::ImportFromCharPtr(const char* ptr)
     UnicaProf_ZoneScoped;
     if (!ptr)
     {
-        m_data = Unica::Vector<char>(1);
-        m_data[0] = '\0';
+        DefaultDataVectorInitialization();
         return;
     }
 
@@ -29,13 +28,12 @@ void Unica::String::ImportFromCharPtr(const char* ptr)
 
     if (string_size == 0)
     {
-        m_data = Unica::Vector<char>(1);
-        m_data[0] = '\0';
+        DefaultDataVectorInitialization();
         return;
     }
 
     m_data = Unica::Vector<char>(++string_size);
-    m_data.CopyFrom(ptr, string_size * sizeof(char));
+    m_data.CopyFromRawString(ptr, string_size * sizeof(char));
 }
 
 Unica::String& Unica::String::operator=(const String& other)

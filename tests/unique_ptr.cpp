@@ -1,8 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
+
 #include "core/memory.h"
 #include "core/string.h"
 
-TEST_CASE("UniquePtr > lifetime and pointer handling", "[UniquePtr]")
+TEST_CASE("UniquePtr lifetime handling and basic operations", "[uniqueptr]")
 {
 	char* raw = new char('A');
 	{

@@ -78,6 +78,7 @@ if (PROJECT_IS_TOP_LEVEL)
 
     set(TestFiles
             ${CMAKE_SOURCE_DIR}/tests/unique_ptr.cpp
+            ${CMAKE_SOURCE_DIR}/tests/vector.cpp
     )
 
     add_executable(unicamotor_tests ${TestFiles})

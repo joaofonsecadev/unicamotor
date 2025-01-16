@@ -7,7 +7,7 @@ namespace Unica
 class String
 {
 public:
-    String();
+    String() { DefaultDataVectorInitialization(); }
     ~String() = default;
 
     explicit String(const char* ptr) { ImportFromCharPtr(ptr); }
@@ -19,6 +19,7 @@ public:
     String& operator=(const char* char_ptr);
 
 private:
+    void DefaultDataVectorInitialization();
     void ImportFromCharPtr(const char* ptr);
 
     Unica::Vector<char> m_data;
