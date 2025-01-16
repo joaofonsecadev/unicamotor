@@ -6,8 +6,8 @@ A game engine with the main purpose of being a learning tool.</br>There's only o
 - Windows _(Unix based systems WIP)_
 - Compiler compatible with the platform
 - [CMake v3.21](https://github.com/Kitware/CMake) _(earlier versions untested)_
-- [Optional] [Ninja v1.12.1](https://github.com/ninja-build/ninja) _(earlier versions untested)_
-- [Optional] [Python v3.13.1](https://github.com/python/cpython)  _(earlier versions untested)_
+- [Optional for `build.py`] [Ninja v1.12.1](https://github.com/ninja-build/ninja) _(earlier versions untested)_
+- [Optional for `build.py`] [Python v3.13.1](https://github.com/python/cpython)  _(earlier versions untested)_
 
 ## How to run
 - Run the `build.py` file in the project root
