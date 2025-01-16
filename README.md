@@ -1,7 +1,7 @@
 # UNICAMOTOR ("unique engine")
 A game engine with the main purpose of being a learning tool.</br>There's only one rule: <ins>no standard library</ins>.
 
-## Requirements (running through `build.py`)
+## Requirements
 - [Vulkan SDK](https://vulkan.lunarg.com/)
 - Windows _(Unix based systems WIP)_
 - Compiler compatible with the platform
