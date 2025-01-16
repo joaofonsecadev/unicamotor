@@ -15,6 +15,9 @@ if (PROJECT_IS_TOP_LEVEL)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 endif()
 
+find_package(Vulkan REQUIRED)
+add_subdirectory(external EXCLUDE_FROM_ALL)
+
 # Project source files
 set(SourceFiles
         ${CMAKE_SOURCE_DIR}/src/core/queue.cpp
@@ -59,9 +62,6 @@ set(AllFiles
         ${SourceFiles}
         ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
-
-find_package(Vulkan REQUIRED)
-add_subdirectory(external EXCLUDE_FROM_ALL)
 
 add_library(unicamotor_lib ${SourceFiles})
 target_link_libraries(unicamotor_lib PUBLIC ${LibsToLink})
